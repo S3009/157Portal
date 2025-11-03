@@ -1,43 +1,270 @@
-import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
+// This is done by vaibhavi kawarkhe Date: 10-12-2024
+// Task: Applicant Form
+import React, { useRef, useState, useEffect } from "react";
 import "./JobApplicationForm.css";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faWindowClose } from "@fortawesome/free-regular-svg-icons";
 
-const JobApplicationForm = () => {
-  const { id } = useParams();
-  const navigate = useNavigate();
+import { faXmark } from "@fortawesome/free-solid-svg-icons";
+// import bannerImage from '../assets/newImage-removebg-preview.png';
+import { faFilePdf } from "@fortawesome/free-solid-svg-icons";
+// import newLogoHead from '../assets/ApplicantFormLogo.png';
+import { faUserGear } from "@fortawesome/free-solid-svg-icons"; // 👈 New icon import
+import {
+  faUser,
+  faPhone,
+  faMailBulk,
+  faSackDollar,
+  faCheckCircle,
+  faHourglassHalf,
+  faUserTie,
+  faBirthdayCake,
+  faMoneyCheck,
+  faFile,
+  faIndustry,
+  faWallet,
+  faLocation,
+  faLocationPin,
+  faCalendar,
+  faBriefcase,
+  faKeyboard,
+  faCertificate,
+  faUpload,
+  faPhotoFilm,
+  faClock,
+} from "@fortawesome/free-solid-svg-icons";
+import { FormControlLabel, Radio } from "@mui/material";
+import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+// import { toast } from "react-toastify";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
+//  import { API_BASE_URL } from "../api/api";
+// import CryptoJS from "crypto-js";
+// import { getSocket } from "../EmployeeDashboard/socket";
+// import Loader from "../EmployeeSection/loader";
+import { Button, message, Modal } from "antd";
+import { Select, Space } from 'antd';
+import { Radio as AntdRadio } from 'antd';
+// import CvTemplate from "../ResumeData/cv";
+// import ResumeCopy from "../ResumeData/resumecopy";
 
-  const [jobDetails, setJobDetails] = useState(null);
-  const [questions, setQuestions] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [answers, setAnswers] = useState({});
-  const [formData, setFormData] = useState({
-    fullName: "",
-    email: "",
-    phone: "",
-    resume: null,
-    coverLetter: "",
+
+function JobApplicationForm({ loginEmployeeName }) {
+  {/*const [messageApi, contextHolder] = message.useMessage()*/ }
+  // const API_BASE_URL = "http://localhost:8080";
+
+ const { id } = useParams();
+ const [jobDetails, setJobDetails] = useState({});
+const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+
+  const { encodedParams } = useParams()
+  const extractedParam = encodedParams?.split("+")[1]
+  const [socket, setSocket] = useState(null)
+  const [salaryInWords, setSalaryInWords] = useState("")
+  // const { employeeId, userType } = getEmployeeDetails();
+  const [employeeId, setEmployeeId] = useState()
+  const [userType, setUserType] = useState()
+  const [showTestPrompt, setShowTestPrompt] = useState(false);
+ const [mcqQuestions, setMcqQuestions] = useState([]);
+  const [showMCQModal, setShowMCQModal] = useState(false);
+  const [mcqAnswers, setMcqAnswers] = useState({});
+  const [mcqScore, setMcqScore] = useState(null); 
+  const [savedApplicationId, setSavedApplicationId] = useState(null);
+
+    const [answers, setAnswers] = useState({});
+
+  const getEmployeeDetails = async () => {
+    const response = await axios.post(`${API_BASE_URL}/get-shorten-details`, {
+      shortenUrl: `${extractedParam}`,
+    })
+    setEmployeeId(response.data.employeeId)
+    setUserType(response.data.userType)
+  }
+
+  const handleMCQAnswerChange = (index, value) => {
+  setMcqAnswers({ ...mcqAnswers, [index]: value });
+};
+
+
+  useEffect(() => {
+    {/*messageApi.success("Mobile View Recommended !")*/ }
+    getEmployeeDetails()
+  }, [])
+const [questions, setQuestions] = useState([]); // fetched from backend by JD
+  const [loading, setLoading] = useState(false)
+  const [resumeSelected, setResumeSelected] = useState(false)
+  const [fileSelected, setSelected] = useState("")
+  const [photoSelected, setPhotoSelected] = useState(false)
+  const dateInputRef = useRef(null)
+  const [isSubmitted, setIsSubmitted] = useState(false)
+  const [whatsappSelected, setWhatsappSelected] = useState(false)
+  const [doneAnyCertification, SetDoneAnyCertification] = useState(false)
+  const [showCreateResumeModule, setShowCreateResumeModule] = useState(false)
+  const [showCreatecvModule, setShowCreatecvModule] = useState(false)
+  const [modalHistory, setModalHistory] = useState([])
+
+  const [cvFromApplicantsForm, setCvFromApplicantsForm] = useState(true)
+  const [cv2FromApplicantsForm, setCv2FromApplicantsForm] = useState(true)
+const [currentMcqIndex, setCurrentMcqIndex] = useState(0);
+const candidateId = localStorage.getItem("candidateId"); // set after login
+
+  const [showResumeCVOptions, setShowResumeCVOptions] = useState(false)
+  const [showResumeModal, setShowResumeModal] = useState(false)
+  const [showCVModal, setShowCVModal] = useState(false)
+// ✅ Define form data state at top
+const [formData, setFormData] = useState({
+  fullName: "",
+  email: "",
+  contactNumber: "",
+  noticePeriod: "",
+  gender: "",
+  educationalQualification: "",
+  highestQualification: "",
+  jobDesignation: "",
+   yearOfPassout: "",   
+  totalExperience: "",
+      experienceYear: "",
+  currentSalary: "",
+  expectedSalary: "",
+  skills: "",
+  currentLocation: "",
+  preferredLocation: "",
+  resume: null,
+  profilePhoto: null,
+  uanNumber: "",
+  reference: "",
+    requirementId: jobDetails.requirementId,
+});
+
+
+
+  // ===== Handle Input Changes =====
+const handleFormChange = (e) => {
+  const { name, value, files, type } = e.target;
+  const newValue = type === "file" ? (files?.[0] || null) : value.trimStart();
+
+  // Update first
+  setFormData((prevData) => ({
+    ...prevData,
+    [name]: newValue,
+  }));
+
+  // Validate after state update
+  validateField(name, newValue);
+};
+
+
+
+useEffect(() => {
+  if (!formData.requirementId) return;
+
+  const fetchQuestions = async () => {
+    try {
+      const response = await axios.get(
+        `${API_BASE_URL}/api/questions/requirement/${formData.requirementId}`
+      );
+      setQuestions(response.data || []);
+    } catch (error) {
+      console.error("❌ Error fetching job-specific questions:", error);
+    }
+  };
+
+  fetchQuestions();
+}, [formData.requirementId]);
+
+const handleAnswerChange = (questionId, value) => {
+  setAnswers((prev) => ({
+    ...prev,
+    [questionId]: value,
+  }));
+};
+
+  // Rajlaxmi JAadale Added that code line 138/202
+  const handleOpen = () => {
+    setShowCreateResumeModule(true)
+    setSelectedOption(null) // reset when opening
+    setModalHistory([]) // Clear history when opening the main modal
+  }
+
+  const handleSelect = (option) => {
+    setModalHistory((prev) => [...prev, selectedOption]) // Store current option in history
+    setSelectedOption(option)
+  }
+const handleMCQSubmit = () => {
+  let score = 0;
+  mcqQuestions.forEach((q, idx) => {
+    const userAnswer = mcqAnswers[idx];
+    if (userAnswer && q.answer) {
+      if (userAnswer.trim().toLowerCase() === q.answer.trim().toLowerCase()) {
+        score++;
+      }
+    }
   });
 
-  // ===== Fetch Job Details + Questions =====
+  setMcqScore(score);
+  setShowMCQModal(false);
+
+  toast.success(`Test submitted! Your score: ${score}/${mcqQuestions.length}`, { autoClose: 4000 });
+
+  // ✅ Get application ID from memory or localStorage
+  const appId = savedApplicationId || localStorage.getItem("jobApplicationId");
+
+  if (!appId) {
+    console.warn("⚠️ No Application ID — score not saved");
+    return;
+  }
+
+  // ✅ Save score to backend
+  axios.post("http://localhost:8080/api/applications/update-score", {
+    applicationId: appId,
+    score: score,
+  })
+  .then(() => console.log("✅ Score saved in backend:", score))
+  .catch((err) => console.error("❌ Error saving score:", err));
+};
+
+
+  const handleBack = () => {
+    if (modalHistory.length > 0) {
+      // Get the last option from history
+      const previousOption = modalHistory[modalHistory.length - 1]
+      // Remove the last option from history
+      setModalHistory((prev) => prev.slice(0, -1))
+      // Set the previous option as current
+      setSelectedOption(previousOption)
+    } else {
+      // If no history, go back to option selection
+      setSelectedOption(null)
+    }
+  }
+  const handleClose = () => {
+    setShowCreateResumeModule(false)
+    setSelectedOption(null)
+  }
+
+  const JobApplicationForm = () => {
+    const [skillsArray, setSkillsArray] = useState([]);
+
+    // When selecting from dropdown
+    const handleSelect = (value) => {
+      if (value && !skillsArray.includes(value)) {
+        setSkillsArray([...skillsArray, value]);
+      }
+    };
+ // ===== Fetch Job Details + Questions =====
   useEffect(() => {
     const fetchJobData = async () => {
-      console.log("🔎 Requirement ID being fetched:", id);
-
       try {
         const [jobRes, questionRes] = await Promise.all([
           axios.get(`http://localhost:8080/api/requirements/${id}`),
           axios.get(`http://localhost:8080/api/questions/requirement/${id}`),
         ]);
 
-        console.log("✅ Job Data:", jobRes.data);
-        console.log("📦 Full Question Response:", questionRes);
-        console.log("✅ Question Data:", questionRes.data);
-
         setJobDetails(jobRes.data);
         setQuestions(questionRes.data || []);
       } catch (error) {
-        console.error("❌ Error fetching job/questions:", error);
+        console.error("Error fetching job/questions:", error);
       } finally {
         setLoading(false);
       }
@@ -45,172 +272,2366 @@ const JobApplicationForm = () => {
 
     fetchJobData();
   }, [id]);
+    const removeSkill = (skillToRemove) => {
+      setSkillsArray(skillsArray.filter((skill) => skill !== skillToRemove));
+    };
 
-  // ===== Handle Input Changes =====
-  const handleFormChange = (e) => {
-    const { name, value, files } = e.target;
-    setFormData({
-      ...formData,
-      [name]: files ? files[0] : value,
-    });
+    return (
+      <div className="form-group-December" style={{ width: "400px" }}>
+        <label>
+          Skills <span className="setRequiredAstricColorRed">*</span>
+        </label>
+
+        <div
+          className="input-with-icon-December"
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            padding: "5px",
+            border: "1px solid #ccc",
+            borderRadius: "6px",
+            minHeight: "45px",
+            boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
+            gap: "5px",
+          }}
+        >
+          {/* Icon */}
+          <FontAwesomeIcon
+            icon={faUserGear}
+            className="input-icon-December"
+            style={{ marginRight: "5px" }}
+          />
+
+          {/* Skill Tags */}
+          {skillsArray.map((skill, index) => (
+            <div
+              key={index}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                backgroundColor: "#f1f1f1",
+                padding: "4px 8px",
+                borderRadius: "4px",
+                boxShadow: "0px 1px 3px rgba(0,0,0,0.2)",
+                fontSize: "13px",
+              }}
+            >
+              {skill}
+              <span
+                style={{
+                  marginLeft: "6px",
+                  cursor: "pointer",
+                  fontWeight: "bold",
+                  color: "#555",
+                }}
+                onClick={() => removeSkill(skill)}
+              >
+                ×
+              </span>
+            </div>
+          ))}
+
+          {/* Ant Design Select */}
+          <Select
+            defaultValue="lucy"
+            style={{ width: 120 }}
+            allowClear
+            placeholder="select it"
+            options={[
+              { value: "lucy", label: "Lucy" },
+              { value: "javascript", label: "JavaScript" },
+              { value: "python", label: "Python" },
+              { value: "react", label: "React" },
+            ]}
+            onSelect={handleSelect}
+          />
+        </div>
+      </div>
+    );
   };
+  const handleCVDownload = async (cvData) => {
+    try {
+      // Create a blob from the CV data
+      const response = await fetch(cvData)
+      const blob = await response.blob()
 
-  const handleAnswerChange = (qid, value) => {
-    setAnswers({ ...answers, [qid]: value });
-  };
+      // Create a File object from the blob with a proper name
+      const filename = `generated`
+      const file = new File([blob], filename, { type: "application/pdf" })
 
-  // ===== Submit Application =====
-  const handleSubmit = async (e) => {
-  e.preventDefault();
+      // Update the form data with the file
+     setFormData((prevData) => ({
+  ...prevData,
+  photo: file,
+}));
 
-  // ===== FRONTEND VALIDATION: check duplicate by jobId + email + phone =====
-  const { email, phone } = formData;
-  const appliedList = JSON.parse(localStorage.getItem("submittedApplications")) || [];
 
-  const alreadyApplied = appliedList.some(
-    (app) => app.jobId === id && app.email === email && app.phone === phone
-  );
+      // Set resume selected state to true
+      setResumeSelected(true)
 
-  if (alreadyApplied) {
-    alert("❗You have already applied for this job using this email and phone number.");
-    return; // stop submission
+      // Close the modal
+      setShowCreateResumeModule(false)
+
+      // Show success message
+      messageApi.success("CV successfully generated and added to your application!")
+    } catch (error) {
+      console.error("Error handling CV download:", error)
+      messageApi.error("Failed to process the CV. Please try again.")
+    }
+  }
+  // const [formData, setFormData] = useState(initialFormData)
+  const inputRefs = useRef([])
+  const [type, settype] = useState("")
+  const navigator = useNavigate();
+
+  // establishing socket for emmiting event
+  //   useEffect(() => {
+  //     const newSocket = getSocket();
+  //     setSocket(newSocket);
+  //   }, []);
+
+  useEffect(() => {
+    if (loginEmployeeName) {
+      setFormData((prevData) => ({
+        ...prevData,
+        recruiterName: loginEmployeeName,
+      }))
+    }
+  }, [loginEmployeeName])
+
+  const handleKeyDown = (e) => {
+    if (e.target.name === "candidateEmail") {
+      if (e.key === " ") {
+        e.preventDefault() // Prevents spaces from being entered
+      }
+    }
+    if (
+      e.target.name === "experienceYear" ||
+      e.target.name === "experienceMonth" ||
+      e.target.name === "currentCTCLakh" ||
+      e.target.name === "currentCTCThousand" ||
+      e.target.name === "expectedCTCLakh" ||
+      e.target.name === "expectedCTCThousand"
+    ) {
+      if (e.key === "." || e.key === "-" || e.key === "e") {
+        e.preventDefault() // Prevent decimal points, negative numbers, and exponent notation
+      }
+    }
+    if (e.key === "Enter") {
+      e.preventDefault()
+
+      const currentField = e.target
+      const currentClassName = currentField.className
+
+      if (currentClassName.includes("contact-number")) {
+        return
+      }
+
+      const inputs = Array.from(document.querySelectorAll("input, select, textarea"))
+
+      const currentIndex = inputs.indexOf(currentField)
+
+      if (currentIndex > -1 && currentIndex < inputs.length - 1) {
+        inputs[currentIndex + 1].focus()
+      }
+    }
   }
 
-  // ===== Prepare data for backend submission =====
-  const formDataToSend = new FormData();
-  formDataToSend.append(
-    "application",
-    new Blob(
-      [
-        JSON.stringify({
-          fullName: formData.fullName,
-          email: formData.email,
-          phone: formData.phone,
-          coverLetter: formData.coverLetter,
-          requirementId: id,
-          answers: answers,
-        }),
-      ],
-      { type: "application/json" }
-    )
-  );
+  // const handleChange = (e) => {
+  //   const { name, type, files, value } = e.target;
 
-  if (formData.resume) {
-    formDataToSend.append("resume", formData.resume);
+  //   const inputValue =
+  //     type === "file" ? (files && files.length > 0 ? files[0] : null) : value;
+
+  //   if (name === "lineUp.offersalary") {
+  //     if (!/^\d{0,2}$/.test(value)) {
+  //       return; // Prevent updating if the value is not numeric or exceeds 2 digits
+  //     }
+  //   }
+  //   if (name === "candidateEmail") {
+  //     if (!/^\S*$/.test(value)) {
+  //       return; // Prevent updating if there is a space
+  //     }
+  //   }
+
+  //   // Update the formData for nested objects like certificates
+  //   setFormData((prevData) => {
+  //     let updatedData = { ...prevData };
+
+  //     if (name === "lineUp.holdingAnyOffer") {
+  //       const isHoldingOffer = value === "true" || value === true;
+
+  //       updatedData.lineUp = {
+  //         ...prevData.lineUp,
+  //         holdingAnyOffer: isHoldingOffer,
+  //         ...(isHoldingOffer
+  //           ? {} // Keep existing values if "Yes" is selected
+  //           : {
+  //               companyName: "",
+  //               offersalary: "",
+  //               negotiation: "",
+  //               offerdetails: "",
+  //             }), // Clear values if "No" is selected
+  //       };
+  //     } else if (name.startsWith("lineUp.")) {
+  //       const nameParts = name.split(".");
+  //       if (name.startsWith("lineUp.certificates")) {
+  //         const nameParts = name.split(".");
+  //         const index = parseInt(nameParts[1].match(/\d+/)[0], 10);
+  //         const field = nameParts[2];
+  //         const updatedCertificates = [...prevData.lineUp.certificates];
+  //         updatedCertificates[index][field] = inputValue;
+
+  //         updatedData.lineUp = {
+  //           ...prevData.lineUp,
+  //           certificates: updatedCertificates,
+  //         };
+  //       } else {
+  //         const nestedField = nameParts[1];
+  //         updatedData.lineUp = {
+  //           ...prevData.lineUp,
+  //           [nestedField]: inputValue,
+  //         };
+  //       }
+  //     } else {
+  //       updatedData[name] = inputValue;
+  //     }
+  //     return updatedData;
+  //   });
+
+  //   // Reset the error for the field that was changed
+  //   setErrors((prevErrors) => ({
+  //     ...prevErrors,
+  //     [name]: undefined,
+  //   }));
+
+  //   // Optionally validate the input
+  //   const error = validateField(name, inputValue);
+  //   setErrors((prevErrors) => ({
+  //     ...prevErrors,
+  //     [name]: error,
+  //   }));
+
+  //   if (name === "lineUp.resume" && files.length > 0) {
+  //     const maxFileSize = 5 * 1024 * 1024;
+
+  //     if (files[0].size > maxFileSize) {
+  //       setErrors((prevErrors) => ({
+  //         ...prevErrors,
+  //         [name]: "File size should not exceed 5MB",
+  //       }));
+  //       return;
+  //     }
+
+  //     setResumeSelected(true);
+  //   }
+
+  //   if (name === "lineUp.photo" && files.length > 0) {
+  //     setPhotoSelected(true);
+  //   }
+
+  //   if (files && files.length > 0) {
+  //     const reader = new FileReader();
+  //     reader.onloadend = () => {
+  //       const arrayBuffer = reader.result;
+  //       const byteArray = new Uint8Array(arrayBuffer);
+  //       const chunkSize = 0x8000;
+  //       let base64String = "";
+
+  //       for (let i = 0; i < byteArray.length; i += chunkSize) {
+  //         base64String += String.fromCharCode.apply(
+  //           null,
+  //           byteArray.subarray(i, i + chunkSize)
+  //         );
+  //       }
+  //       base64String = btoa(base64String);
+  //     };
+  //     reader.readAsArrayBuffer(files[0]);
+  //   }
+  // };
+
+  // const handleCertificateChange = (e, index, field) => {
+  //   const value =
+  //     field === "certificateFile" ? e.target.files[0] : e.target.value;
+
+  //   setFormData((prev) => {
+  //     const certificates = [...prev.lineUp.certificates];
+  //     certificates[index][field] = value;
+  //     return { ...prev, lineUp: { ...prev.lineUp, certificates } };
+  //   });
+  // };
+
+  // Attach the event listener for keydown event
+
+  // Function to get the next input element
+  // Add some CSS for the new buttons
+  const styles = `
+.button-container {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.modal-back-button-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.modal-back-button {
+  background-color: #f0f0f0;
+  border: 1px solid #d9d9d9;
+  padding: 5px 15px;
+}
+
+.back-button {
+  background-color: #f0f0f0;
+  color: #333;
+  border: 1px solid #d9d9d9;
+}
+`
+
+  // Add this style tag to the component
+  useEffect(() => {
+    const styleElement = document.createElement("style")
+    styleElement.innerHTML = styles
+    document.head.appendChild(styleElement)
+
+    return () => {
+      document.head.removeChild(styleElement)
+    }
+  }, [])
+
+const handleChange = (e) => {
+  const { name, value } = e.target;
+  const trimmedValue = value.trimStart();
+
+  // 1️⃣ First, update form data
+  setFormData((prevData) => ({
+    ...prevData,
+    [name]: trimmedValue,
+  }));
+
+  // 2️⃣ Then validate
+  validateField(name, trimmedValue);
+};
+
+
+
+  const getNextInput = (currentElement) => {
+    let nextElement = currentElement
+    while (nextElement) {
+      nextElement = nextElement.nextElementSibling
+      if (
+        (nextElement && nextElement.tagName === "INPUT") ||
+        nextElement.tagName === "TEXTAREA" ||
+        nextElement.tagName === "SELECT"
+      ) {
+        return nextElement
+      }
+    }
+    return null
+  }
+
+  // const handleAddCertificate = () => {
+  //   setFormData((prev) => ({
+  //     ...prev,
+  //     lineUp: {
+  //       ...prev.lineUp,
+  //       certificates: [
+  //         ...prev.lineUp.certificates,
+  //         { certificateName: "", certificateFile: null },
+  //       ],
+  //     },
+  //   }));
+  // };
+
+  // const handleRemoveCertificate = (index) => {
+  //   setFormData((prev) => {
+  //     const certificates = [...prev.lineUp.certificates];
+  //     certificates.splice(index, 1);
+  //     return { ...prev, lineUp: { ...prev.lineUp, certificates } };
+  //   });
+  // };
+
+  // const handleCloseCertificate = (index) => {
+  //   const updatedCertificates = formData.lineUp.certificates.filter(
+  //     (_, i) => i !== index
+  //   );
+  //   setFormData((prevData) => ({
+  //     ...prevData,
+  //     lineUp: {
+  //       ...prevData.lineUp,
+  //       certificates: updatedCertificates,
+  //     },
+  //   }));
+  // };
+
+  //rajalxmi JAgadale 10-01-2025
+  const convertToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.readAsDataURL(file)
+      reader.onload = () => {
+        const base64String = reader.result.split(",")[1] // Extract base64 content only
+        resolve(base64String)
+      }
+      reader.onerror = (error) => reject(error)
+    })
+  }
+
+  const getNestedValue = (obj, path) => {
+    return path.split(".").reduce((acc, key) => {
+      return acc && acc[key] !== undefined ? acc[key] : undefined
+    }, obj)
+  }
+
+  const handleInputInterview = (e) => {
+    const inputValue = e.target.value
+
+    if (inputValue.length > 2) {
+      e.target.value = inputValue.slice(0, 5)
+    }
+  }
+
+  const numberToWords = (num) => {
+    const ones = [
+      "",
+      "One",
+      "Two",
+      "Three",
+      "Four",
+      "Five",
+      "Six",
+      "Seven",
+      "Eight",
+      "Nine",
+      "Ten",
+      "Eleven",
+      "Twelve",
+      "Thirteen",
+      "Fourteen",
+      "Fifteen",
+      "Sixteen",
+      "Seventeen",
+      "Eighteen",
+      "Nineteen",
+    ]
+    const tens = ["", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"]
+
+    if (num < 20) return ones[num]
+    if (num < 100) return tens[Math.floor(num / 10)] + (num % 10 !== 0 ? " " + ones[num % 10] : "")
+
+    return ones[Math.floor(num / 100)] + " Hundred" + (num % 100 !== 0 ? " " + numberToWords(num % 100) : "")
+  }
+
+  const convertNumberToWords = (currentCTCLakh, currentCTCThousand) => {
+    const lakhPart = Number.parseInt(currentCTCLakh, 10)
+    const thousandPart = Number.parseInt(currentCTCThousand, 10)
+    let words = ""
+
+    if (lakhPart > 0) {
+      words += numberToWords(lakhPart) + (lakhPart === 1 ? " Lakh" : " Lakhs")
+    }
+
+    if (thousandPart > 0) {
+      if (words) words += " "
+      words += numberToWords(thousandPart) + (thousandPart === 1 ? " Thousand" : " Thousand")
+    }
+
+    return words || "Zero"
+  }
+
+  const convertNumberToWordsYesr = (experienceYear, experienceMonth) => {
+    const year = Number.parseInt(experienceYear, 10)
+    const month = Number.parseInt(experienceMonth, 10)
+    let words = ""
+
+    if (year > 0) {
+      words += numberToWords(year) + (year === 1 ? " Year" : " Years")
+    }
+
+    if (month > 0) {
+      if (words) words += " "
+      words += numberToWords(month) + (month === 1 ? " Month" : " Months")
+    }
+    return words || "Zero"
+  }
+
+  const currentDate = new Date()
+  const minDate = new Date()
+  minDate.setFullYear(currentDate.getFullYear() - 18)
+  const minDateString = minDate.toISOString().split("T")[0]
+
+  const startYear = 1947
+  const calendarStartDate = new Date(startYear, 0, 1)
+  const calendarStartDateString = calendarStartDate.toISOString().split("T")[0]
+
+  // const handleFileChange = async (e, index) => {
+  //   const file = e.target.files[0];
+
+  //   if (file) {
+  //     const reader = new FileReader();
+  //     reader.onloadend = () => {
+  //       const updatedFormData = { ...formData };
+  //       updatedFormData.lineUp.certificates[index].certificateFile =
+  //         reader.result.split(",")[1];
+
+  //       setFormData(updatedFormData);
+  //     };
+  //     reader.readAsDataURL(file);
+  //   }
+  // };
+
+
+
+  const [selectedOption, setSelectedOption] = useState(null)
+
+  const [lastScrollPos, setLastScrollPos] = useState(0)
+  const [isScrolled, setIsScrolled] = useState(false)
+  const [scrollingUp, setScrollingUp] = useState(false)
+  const [errors, setErrors] = useState({})
+
+  useEffect(() => {
+    let lastScrollY = window.scrollY
+
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY
+
+      if (currentScrollY > 50) {
+        setIsScrolled(true)
+        setScrollingUp(lastScrollY > currentScrollY)
+      } else {
+        setIsScrolled(false)
+        setScrollingUp(false)
+      }
+
+      lastScrollY = currentScrollY
+    }
+
+    window.addEventListener("scroll", handleScroll)
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll)
+    }
+  }, [])
+  // Rajlaxmi jaadale added that code line 841/872
+  const handleSetCV = async (cvData) => {
+    try {
+      // Create a blob from the CV data
+      const response = await fetch(cvData)
+      const blob = await response.blob()
+
+      // Create a File object from the blob with a proper name
+      const filename = `generated`
+      const file = new File([blob], filename, { type: "application/pdf" })
+
+      // Update the form data with the file
+   setFormData((prevData) => ({
+  ...prevData,
+  resume: file,
+}));
+
+
+      // Set resume selected state to true
+      setResumeSelected(true)
+
+      // Close the modal
+      setShowCreateResumeModule(false)
+
+      // Show success message
+      messageApi.success("CV successfully added to your application!")
+    } catch (error) {
+      console.error("Error setting CV:", error)
+      messageApi.error("Failed to add the CV to your application. Please try again.")
+    }
+  }
+  //Validation Rajlaxmi Jagadale 10-01-2025/13-01-2025
+  const validateField = (name, value) => {
+    let error = ""
+    const stringValue = value ? String(value).trim() : ""
+
+    switch (name) {
+      case "candidateName":
+        if (!stringValue) {
+          error = "Enter your name."
+        } else if (/[^a-zA-Z\s]/.test(value)) {
+          error = "Only alphabets and spaces are allowed."
+        } else if (stringValue.length > 100) {
+          error = "Name cannot exceed 100 characters."
+        }
+        break
+      case "currentLocation":
+        if (!stringValue) {
+          error = "Enter your current location."
+        } else if (stringValue.length > 100) {
+          error = "Name cannot exceed 100 characters."
+        }
+        break
+
+      case "contactNumber":
+        if (!stringValue) {
+          error = "Enter your contact number"
+        } else if (!/^\d{6,16}$/.test(value)) {
+          error = "Contact Number must be between 6 and 16 digits."
+        }
+        break
+
+      case "lineUp.dateOfBirth":
+        if (!stringValue) {
+          error = "Enter your date of birth"
+        } else {
+          const dob = new Date(value)
+          const today = new Date()
+          let age = today.getFullYear() - dob.getFullYear()
+          const month = today.getMonth() - dob.getMonth()
+
+          if (month < 0 || (month === 0 && today.getDate() < dob.getDate())) {
+            age--
+          }
+
+          if (age < 18) {
+            error = "You must be at least 18 years old to apply."
+          } else if (isNaN(dob.getTime())) {
+            error = "Enter a valid Birth Date"
+          }
+        }
+        break
+
+case "candidateEmail":
+  if (!value || !value.trim()) {
+    error = "Please fill the email address";
+  } else if (
+    !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(value.trim())
+  ) {
+    error = "Enter a valid email address";
+  } else if (value.trim().length > 100) {
+    error = "Email cannot exceed 100 characters.";
+  }
+  break;
+
+
+
+      case "jobDesignation":
+        if (!stringValue) {
+          error = "Enter your job designation"
+        }
+        // else if (!/^[a-zA-Z\s]+$/.test(value)) {
+        //   error = "Job designation must contain only letters and spaces.";
+        // }
+        // else if (value.length >= 100) {
+        //   error = "Job designation cannot exceed 100 characters.";
+        // }
+
+        break
+
+      case "yearOfPassout":
+        if (!stringValue) {
+          error = "Enter your Year Of Passing"
+        }
+        break
+
+      case "experienceYear":
+        if (!stringValue) {
+          error = "Experience year is required."
+        }
+        // else if (value < 0 || value > 12) {
+        //   error = "Experience must be between 0 and 12 years.";
+        // }
+        break
+
+      case "photo":
+        if (!value || value.length === 0) {
+          error = "Upload the photo"
+        }
+        break
+
+      case "resume":
+        if (!value || value.length === 0) {
+          error = "Please upload your resume"
+        } else if (!(value instanceof File)) {
+          error = "Invalid file format"
+        } else if (value.size > 5 * 1024 * 1024) {
+          error = "File size must not exceed 5 MB"
+        }
+        break
+
+      case "currentCTCLakh":
+        if (!/^\d+(\.\d{1,2})?$/.test(value)) {
+          error = "Please enter a valid salary amount."
+        }
+        break
+
+      case "expectedCTCLakh":
+        if (value === "" || isNaN(value) || value < 0) {
+          error = "Please enter a valid expected salary"
+        }
+        break
+
+      case "preferredLocation":
+        if (!stringValue) {
+          error = "Enter your preferred location"
+        } else if (!/^[a-zA-Z0-9\s,.'-]*$/.test(value)) {
+          error = "Only Alphabets and Spaces are allowed"
+        }
+        break
+
+      case "noticePeriod":
+        if (!stringValue) {
+          error = "Enter Your Notice Period"
+        } else if (!/^[a-zA-Z0-9\s,.'-]*$/.test(value)) {
+          error = "Invalid Notice Period"
+        }
+        break
+
+      case "availabilityForInterview":
+        const today = new Date().toISOString().split("T")[0]
+        if (!stringValue) {
+          error = "Enter your available date for Interview "
+        } else if (new Date(value) < new Date(today)) {
+          error = "Please select today's date or a future date."
+        }
+        break
+
+      default:
+        break
+    }
+    return error
+  }
+useEffect(() => {
+  if (formData.requirementId || id) {
+    axios
+      .get(`${API_BASE_URL}/api/requirements/${formData.requirementId || id}/questions`)
+      .then((res) => {
+        setQuestions(res.data || []);
+      })
+      .catch((err) => console.error("Error fetching questions:", err));
+  }
+}, [formData.requirementId, id]);
+
+const API_BASE_URL = "http://localhost:8080"; // ✅ update if your backend runs elsewhere
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  const requiredFields = [
+    "fullName",
+    "candidateEmail",
+    "contactNumber",
+    "gender",
+    "highestQualification",
+    "yearOfPassout",
+    "experienceYear",
+    "currentCTCLakh",
+    "currentCTCThousand",
+    "expectedCTCLakh",
+    "expectedCTCThousand",
+    "skills",
+    "currentLocation",
+    "preferredLocation",
+  ];
+
+  for (let field of requiredFields) {
+    if (!formData[field]) {
+      toast.error(`Please fill the ${field.replace(/([A-Z])/g, " $1")}`);
+      return;
+    }
   }
 
   try {
-    const res = await axios.post(
-      "http://localhost:8080/api/applications/submit",
-      formDataToSend,
-      { headers: { "Content-Type": "multipart/form-data" } }
+    const applicationData = {
+      fullName: formData.fullName,
+      email: formData.candidateEmail,
+      contactNumber: formData.contactNumber,
+      gender: formData.gender,
+      jobDesignation: formData.jobDesignation || "",
+      totalExperience: `${formData.experienceYear || 0} years ${
+        formData.experienceMonth || 0
+      } months`,
+      currentSalary: `${formData.currentCTCLakh || 0}.${formData.currentCTCThousand || 0}`,
+      expectedSalary: `${formData.expectedCTCLakh || 0}.${formData.expectedCTCThousand || 0}`,
+      skills: formData.skills || "",
+      educationalQualification: formData.highestQualification || "",
+      yearOfPassout: formData.yearOfPassout || "",
+      noticePeriod: formData.noticePeriod || "",
+      currentLocation: formData.currentLocation || "",
+      preferredLocation: formData.preferredLocation || "",
+      uanNumber: formData.candidateUanNumber || "",
+      reference: formData.candidateReference || "",
+      requirementId: formData.requirementId || id || 0,
+      testCompleted: 0,
+      testScore: 0,
+      answers,
+    };
+
+    // ✅ Save optional MCQ answers
+    const formattedAnswers = Object.keys(answers).map((questionId) => ({
+      questionId: parseInt(questionId),
+      answer: answers[questionId],
+    }));
+
+    if (formattedAnswers.length > 0) {
+      await axios.post(`${API_BASE_URL}/api/questions/submit-answers`, formattedAnswers);
+    }
+
+    // ✅ Submit application to backend
+    const response = await axios.post(
+      `${API_BASE_URL}/api/applications/submit`,
+      applicationData
     );
 
-    console.log("✅ Submitted successfully:", res.data);
-    alert("Application submitted successfully!");
+    const appId = response.data?.id;
+    if (appId) {
+      setSavedApplicationId(appId);
+      localStorage.setItem("jobApplicationId", appId);
+    }
+window.dispatchEvent(new Event("jobApplied"));
 
-    // ===== FRONTEND counter update =====
-    const appliedJobs = JSON.parse(localStorage.getItem("appliedJobs")) || {};
-    appliedJobs[id] = (appliedJobs[id] || 0) + 1;
-    localStorage.setItem("appliedJobs", JSON.stringify(appliedJobs));
+    toast.success("✅ Application submitted successfully!", { autoClose: 1500 });
+// ✅ Refresh job list from backend so RecruiterNavbar updates count
+axios.get(`${API_BASE_URL}/api/requirements/all`)
+  .then(res => {
+    localStorage.setItem("jobsList", JSON.stringify(res.data));
+    window.dispatchEvent(new Event("jobsUpdated")); // notify navbar to refresh
+  })
+  .catch(err => console.error("Error updating job counts:", err));
 
-    // ===== Save this submission so duplicate can't happen =====
-    const newEntry = { jobId: id, email, phone };
-    localStorage.setItem(
-      "submittedApplications",
-      JSON.stringify([...appliedList, newEntry])
+    const requirementId = formData.requirementId || id;
+    const candidateEmail = formData.candidateEmail
+    
+    // ✅ Store in applied list
+    const jobId = requirementId;
+    const appliedList = JSON.parse(localStorage.getItem("appliedJobsList")) || [];
+
+    const appliedJob = {
+      jobId,
+      companyName: jobDetails?.companyName || "Unknown Company",
+      designation: jobDetails?.designation || formData.jobDesignation || "N/A",
+      location: jobDetails?.location || formData.currentLocation || "N/A",
+      appliedOn: new Date().toLocaleDateString("en-GB", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      }),
+      email: formData.candidateEmail,
+    };
+
+    const alreadyApplied = appliedList.some(
+      (j) => j.jobId === jobId && j.email === formData.candidateEmail
     );
 
-    navigate("/");
+    if (!alreadyApplied) {
+      appliedList.push(appliedJob);
+      localStorage.setItem("appliedJobsList", JSON.stringify(appliedList));
+    }
+
+    // ✅ Show test popup
+    setShowTestPrompt(true);
+
   } catch (error) {
     console.error("❌ Error submitting application:", error);
-    alert("Failed to submit application. Please try again.");
+
+    // ✅ Candidate already applied
+    if (error.response && error.response.status === 409) {
+      toast.error("⚠️ You have already applied for this job!", { autoClose: 2500 });
+      return;
+    }
+
+    toast.error("Submission failed! Please try again.");
   }
 };
 
-  // ===== Render =====
-  if (loading) return <p>Loading form...</p>;
 
-  return (
-    <div className="application-form-container">
-      <h2>Apply for {jobDetails?.designation}</h2>
-      <p>
-        <strong>Company:</strong> {jobDetails?.companyName}
-      </p>
-      <p>
-        <strong>Location:</strong> {jobDetails?.location}
-      </p>
 
-      <form onSubmit={handleSubmit} className="application-form">
-        {/* ===== Basic Info ===== */}
-        <label>Full Name</label>
-        <input
-          type="text"
-          name="fullName"
-          value={formData.fullName}
-          onChange={handleFormChange}
-          required
-        />
 
-        <label>Email</label>
-        <input
-          type="email"
-          name="email"
-          value={formData.email}
-          onChange={handleFormChange}
-          required
-        />
 
-        <label>Phone</label>
-        <input
-          type="tel"
-          name="phone"
-          value={formData.phone}
-          onChange={handleFormChange}
-          required
-        />
 
-        <label>Upload Resume (PDF/DOC)</label>
-        <input
-          type="file"
-          name="resume"
-          accept=".pdf,.doc,.docx"
-          onChange={handleFormChange}
-          required
-        />
 
-        <label>Cover Letter</label>
-        <textarea
-          name="coverLetter"
-          rows="4"
-          value={formData.coverLetter}
-          onChange={handleFormChange}
-        ></textarea>
+// ---------- Replace existing handleStartTest with this ----------
+const handleStartTest = async () => {
+  try {
+    // Prefer the designation from the form (candidate selected) else from job details
+    const roleName =
+      (formData && formData.jobDesignation && formData.jobDesignation.trim()) ||
+      (jobDetails && jobDetails.designation && jobDetails.designation.trim());
 
-        {/* ===== Dynamic Questions ===== */}
-        <h3>Job-Specific Questions</h3>
-        {questions.length > 0 ? (
-          questions.map((q) => (
-            <div key={q.questionId} className="question-block">
-              <label>{q.question}</label>
-              <textarea
-                rows="3"
-                value={answers[q.questionId] || ""}
-                onChange={(e) => handleAnswerChange(q.questionId, e.target.value)}
-                required
-              ></textarea>
-            </div>
-          ))
-        ) : (
-          <p>No specific questions for this job.</p>
-        )}
+    if (!roleName) {
+      alert("Please select a role/designation first.");
+      return;
+    }
 
-        <button type="submit" className="submit-btn">
-          Submit Application
-        </button>
-      </form>
-    </div>
-  );
+    // Use backend API first
+    const encodedRole = encodeURIComponent(roleName);
+    const resp = await axios.get(`${API_BASE_URL}/api/mcq/role/${encodedRole}`);
+
+    // Defensive: try several common places the questions array may live
+    const payload = resp?.data || {};
+    const candidates =
+      payload.questions ||
+      payload.mcqs ||
+      payload.items ||
+      payload.data ||
+      (Array.isArray(payload) ? payload : null);
+
+    if (Array.isArray(candidates) && candidates.length > 0) {
+      // normalize each item to have question/options/answer if needed
+      const normalized = candidates.map((q) => {
+        // if q already has question and options, keep; else try alternate shapes
+        return {
+          question: q.question ?? q.questionText ?? q.title ?? "",
+          options: q.options ?? q.choices ?? q.answers ?? (q.optionList || []),
+          answer: q.answer ?? q.correctAnswer ?? q.key ?? "",
+          // keep whole original object for any other fields
+          __raw: q,
+        };
+      });
+
+      setMcqQuestions(normalized.slice(0, 20));
+      setMcqAnswers({});
+      setMcqScore(null);
+      setShowMCQModal(true);
+      setShowTestPrompt(false);
+      return;
+    }
+
+    // --- Fallback: previously used local JSON mapping (keeps old behaviour) ---
+    // (Keep your existing roleFileMap and file fetch code as fallback)
+    const roleFileMap = {
+      "Software Engineer": "softwareDeveloperMCQs.json",
+      "Full-Stack Developer": "fullStackDeveloperMCQs.json",
+      "Java Developer": "javaDeveloperMCQs.json",
+      "React Developer": "reactDeveloperMCQs.json",
+      "Software Developer": "softwareDeveloperMCQs.json",
+      // ...keep the rest of your mappings as in file...
+    };
+
+    const matchedKey = Object.keys(roleFileMap).find(
+      (key) => key.toLowerCase() === roleName.toLowerCase()
+    );
+
+    if (!matchedKey) {
+      alert(`No test available for this role: ${roleName}`);
+      return;
+    }
+
+    const fileName = roleFileMap[matchedKey];
+    const res = await fetch(`/data/${fileName}`);
+    if (!res.ok) throw new Error("Local test file not found");
+
+    const data = await res.json();
+    setMcqQuestions((data && Array.isArray(data) ? data : []).slice(0, 20));
+    setMcqAnswers({});
+    setMcqScore(null);
+    setShowMCQModal(true);
+    setShowTestPrompt(false);
+  } catch (err) {
+    console.error("Error loading test:", err);
+    alert("Failed to load test questions. Please try again later.");
+  }
 };
+
+
+
+
+  //Error msg Rajlaxmi jagadale 13-01-2025
+  return (
+    <div>
+      {/*{contextHolder}*/}
+      <div className="form-container-December">
+        <div className="maindivheadapplicant">
+          <div className="form-heading-December-main-div">
+            {/* <h1 id="applicant-form-heading">Applicant Form</h1> */}
+            {/*<img className="classnameforsetwidthforlogpimage" src={newLogoHead || "/placeholder.svg"} alt="" />*/}
+            <div>
+              
+              <p>Applicant Form</p>
+              <br />
+            </div>
+            {/* <div className="headingDivForApplicantNewHeading">
+          <h3 className="newclassnamefor157header">157 Careers</h3>
+          <h3 className="newclassheadapplicantfor">Applicant Form</h3>
+          </div> */}
+          </div>
+        </div>
+
+        {/* <div className="maincontforimagediv">
+          <div className="banner-container-December">
+            <img src={bannerImage || "/placeholder.svg"} alt="Banner Image" />
+
+            <div className="banner-description">
+              <h1>157 Industries Private Limited</h1>
+              <h2>Recruitments</h2>
+              <h3>157 Carrers</h3>
+            </div>
+          </div>
+
+        </div> */}
+
+        <form onSubmit={handleSubmit} encType="multipart/form-data">
+
+          <div className="form-grid-December">
+            <div className="form-column-December">
+              <div className="form-group-December">
+                <label>
+                  Full name
+                  <span className="setRequiredAstricColorRed">*</span>
+                </label>
+                <div className="input-with-icon-December">
+                  <FontAwesomeIcon icon={faUser} className="input-icon-December" />
+              <input
+  name="fullName"
+  value={formData.fullName}
+  onChange={handleFormChange}
+  required
+/>
+
+                </div>
+                {errors.candidateName && <span className="error">{errors.candidateName}</span>}
+              </div>
+
+              <div className="form-group-December">
+          <label>
+  Email address <span className="setRequiredAstricColorRed">*</span>
+</label>
+<div className="input-with-icon-December">
+  <FontAwesomeIcon icon={faMailBulk} className="input-icon-December" />
+  <input
+    type="email"
+    name="candidateEmail"
+    id="candidateEmail"
+    placeholder="Enter email Id"
+    value={formData.candidateEmail}
+    onChange={handleFormChange}
+    maxLength={100}
+    required
+  />
+</div>
+{errors.candidateEmail && (
+  <p className="error-message">{errors.candidateEmail}</p>
+)}
+
+              </div>
+
+              <div className="form-group-December">
+                <label>
+                  Contact number <span className="setRequiredAstricColorRed">*</span>
+                </label>
+                <div className="input-with-icon-December">
+                  <FontAwesomeIcon icon={faPhone} className="input-icon-December" />
+                  <input
+                    type="number"
+                    placeholder="Enter contact number"
+                    name="contactNumber"
+                    id="contactNumber"
+                    value={formData.contactNumber}
+                    onChange={handleChange}
+                    maxLength={16}
+                    onKeyDown={handleKeyDown}
+                  />
+                </div>
+                {errors.contactNumber && <span className="error">{errors.contactNumber}</span>}
+              </div>
+              <div className="form-group-December">
+                <div className="notice-gender-row">
+                  {/* Notice Period */}
+                  <div className="form-group-December notice-box">
+                    <label>
+                      Notice period <span className="setRequiredAstricColorRed">*</span>
+                    </label>
+                    <div className="input-with-icon-December">
+                      <FontAwesomeIcon icon={faHourglassHalf} className="input-icon-December" />
+                     <input
+  name="noticePeriod"
+  value={formData.noticePeriod}
+  onChange={handleFormChange}
+/>
+                    </div>
+                    {errors["lineUp.noticePeriod"] && (
+                      <div className="error">{errors["lineUp.noticePeriod"]}</div>
+                    )}
+                  </div>
+
+                  {/* Gender */}
+                  <div className="form-group-December gender-box">
+                    <label>
+                      Gender <span className="setRequiredAstricColorRed">*</span>
+                    </label>
+                    <div className="gender-radio-group">
+                      <label>
+                        <input
+                          type="radio"
+                          name="gender"
+                          value="Male"
+                          checked={formData.gender === "Male"}
+                          onChange={handleChange}
+                        />
+                        Male
+                      </label>
+                      <label style={{ marginLeft: "20px" }}>
+                        <input
+                          type="radio"
+                          name="gender"
+                          value="Female"
+                          checked={formData.gender === "Female"}
+                          onChange={handleChange}
+                        />
+                        Female
+                      </label>
+                    </div>
+                    {errors.gender && <div className="error">{errors.gender}</div>}
+                  </div>
+                </div>
+              </div>
+
+              <div className="form-group-December">
+                <label>Educational Qualification</label>
+                <div className="input-with-icon-December">
+                  <FontAwesomeIcon icon={faFile} className="input-icon-December" />
+              <input
+  type="text"
+  name="highestQualification"
+  value={formData.highestQualification}
+  onChange={handleFormChange}
+/>
+
+
+
+                </div>
+                {errors["lineUp.qualification"] && <span className="error">{errors["lineUp.qualification"]}</span>}
+              </div>
+            </div>
+            <div className="form-column-December">
+              <div className="makeDisplayFlexForYopApplicantForm setWidth100formakesubdives50">
+                <div className="form-group-December setwidth50onlyforthis2">
+                  <label>
+                    Job designation <span className="setRequiredAstricColorRed">*</span>
+                  </label>
+                  <div className="input-with-icon-December">
+                    <FontAwesomeIcon icon={faUserTie} className="input-icon-December" />
+                    <input
+                      type="text"
+                      placeholder="Enter designation"
+                       name="jobDesignation"
+                      id="jobDesignation"
+                      value={formData.jobDesignation}
+                      onChange={handleChange}
+                      onKeyDown={handleKeyDown}
+                      maxLength={150}
+                    />
+                  </div>
+                  {errors.jobDesignation && <span className="error">{errors.jobDesignation}</span>}
+                </div>
+                <div className="form-group-December newmargintop10pxformobile setwidth50onlyforthis2">
+                  <label>
+                    Year Of Passout <span className="setRequiredAstricColorRed">*</span>
+                  </label>
+                  <div className="input-with-icon-December">
+                    <FontAwesomeIcon icon={faUserTie} className="input-icon-December" />
+                   <input
+  type="text"
+  name="yearOfPassout"
+  id="yearOfPassout"
+  placeholder="Enter Year Of Passout"
+  value={formData.yearOfPassout}
+  onChange={handleFormChange}
+  onKeyDown={handleKeyDown}
+  maxLength={100}
+/>
+
+                  </div>
+                  {errors["yearOfPassout"] && <span className="error">{errors["yearOfPassout"]}</span>}
+                </div>
+              </div>
+
+              <div className="form-group-December">
+                <label>
+                  Total experience <span className="setRequiredAstricColorRed">*</span>
+                </label>
+                <div className="input-with-icon-December">
+                  <FontAwesomeIcon icon={faKeyboard} className="input-icon-December" />
+                <input
+  type="text"
+  name="experienceYear"
+  id="experienceYear"
+  value={formData.experienceYear}
+  onChange={handleChange}
+/>
+
+
+
+                  <span></span>
+                  <input
+                    type="number"
+                    placeholder="Month"
+                    name="experienceMonth"
+                    id="experienceMonth"
+                    value={formData.experienceMonth}
+                    onChange={handleChange}
+                    onKeyDown={handleKeyDown}
+                    onInput={(e) => {
+                      const monthValue = e.target.value
+                      if (monthValue > 11) {
+                        e.target.value = 11
+                      } else if (monthValue < 0) {
+                        e.target.value = 0
+                      }
+                      if (e.target.value.length > 2) {
+                        e.target.value = e.target.value.slice(0, 2)
+                      }
+                    }}
+                  />
+                </div>
+                {errors["experienceYear"] && <span className="error">{errors["experienceYear"]}</span>}
+{(formData.experienceYear || formData.experienceMonth) && (
+  <span className="experience-words">
+    {convertNumberToWordsYesr(formData.experienceYear, formData.experienceMonth)}
+  </span>
+)}
+
+              </div>
+
+              <div className="form-group-December">
+                <label>
+                  Current salary (LPA) <span className="setRequiredAstricColorRed">*</span>
+                </label>
+                <div className="input-with-icon-December">
+                  <FontAwesomeIcon icon={faSackDollar} className="input-icon-December" />
+                  <input
+                    type="number"
+                    placeholder="Lakhs"
+                    name="currentCTCLakh"
+                    id="currentCTCLakh"
+                    value={formData.currentCTCLakh}
+                    onKeyDown={handleKeyDown}
+                    onChange={handleChange}
+                    onInput={(e) => {
+                      if (e.target.value.length > 2) {
+                        e.target.value = e.target.value.slice(0, 2)
+                      }
+                    }}
+                  />
+                  <input
+                    type="number"
+                    name="currentCTCThousand"
+                    id="currentCTCThousand"
+                    placeholder="Thousands"
+                    value={formData.currentCTCThousand}
+                    onChange={handleChange}
+                    onKeyDown={handleKeyDown}
+                    onInput={(e) => {
+                      if (e.target.value.length > 2) {
+                        e.target.value = e.target.value.slice(0, 2)
+                      }
+                    }}
+                  />
+                </div>
+                {(errors["currentCTCLakh"] || errors["currentCTCThousand"]) && (
+                  <span className="error">
+                    {errors["currentCTCLakh"] || errors["currentCTCThousand"]}
+                  </span>
+                )}
+
+                {(formData.currentCTCLakh || formData.currentCTCThousand) && (
+                  <span className="experience-words">
+                    {convertNumberToWords(formData.currentCTCLakh, formData.currentCTCThousand)}
+                  </span>
+                )}
+              </div>
+
+              <div className="form-group-December">
+                <label>
+                  Expected salary (LPA) <span className="setRequiredAstricColorRed">*</span>
+                </label>
+                <div className="input-with-icon-December">
+                  <FontAwesomeIcon icon={faMoneyCheck} className="input-icon-December" />
+                  <input
+                    type="number"
+                    name="expectedCTCLakh"
+                    placeholder="Lakhs"
+                    value={formData.expectedCTCLakh}
+                    onChange={handleChange}
+                    onKeyDown={handleKeyDown}
+                    onInput={(e) => {
+                      if (e.target.value.length > 2) {
+                        e.target.value = e.target.value.slice(0, 2)
+                      }
+                    }}
+                  />
+                  <span></span>
+                  <input
+                    type="number"
+                    name="expectedCTCThousand"
+                    placeholder="Thousands"
+                    value={formData.expectedCTCThousand}
+                    onChange={handleChange}
+                    onKeyDown={handleKeyDown}
+                    onInput={(e) => {
+                      if (e.target.value.length > 2) {
+                        e.target.value = e.target.value.slice(0, 2)
+                      }
+                    }}
+                  />
+                </div>
+                {(errors["expectedCTCLakh"] || errors["expectedCTCThousand"]) && (
+                  <span className="error">
+                    {errors["expectedCTCLakh"] || errors["expectedCTCThousand"]}
+                  </span>
+                )}
+                {(formData.expectedCTCLakh || formData.expectedCTCThousand) && (
+                  <span className="experience-words">
+                    {convertNumberToWords(formData.expectedCTCLakh, formData.expectedCTCThousand)}
+                  </span>
+                )}
+              </div>
+              <div className="form-group-December">
+                <label>
+                  Skills <span className="setRequiredAstricColorRed">*</span>
+                </label>
+                <div className="input-with-icon-December">
+                  {/*<FontAwesomeIcon icon={faUserGear} className="input-icon-December" />*/}
+                  <FontAwesomeIcon
+                    icon={faUserGear}
+                    className="input-with-icon-December"
+                    style={{
+                      position: "absolute",
+                      top: "50%",
+                      left: "8px",
+                      transform: "translateY(-50%)",
+                      color: "rgba(92, 90, 90, 1)",
+                      zIndex: 1
+                    }}
+                  />
+
+                  <Select
+                    mode="tags"
+                    style={{ width: "100%" }}
+                    placeholder="Enter Skills"
+                    value={formData.skills ? formData.skills.split(",") : []}
+                    onChange={(values) => {
+                      handleChange({
+                        target: {
+                          name: "skills",
+                          value: values.join(",")
+                        }
+                      });
+                    }}
+                    maxTagCount="responsive"
+                    // Custom input style so the icon is part of it
+                    className="skills-select"
+                  />
+
+                </div>
+                {errors["skills"] && (
+                  <div className="error">{errors["skills"]}</div>
+                )}
+              </div>
+              {/*<div className="form-group-December">
+                <label>
+                  Notice period <span className="setRequiredAstricColorRed">*</span>
+                </label>
+                <div className="input-with-icon-December">
+                  <FontAwesomeIcon icon={faHourglassHalf} className="input-icon-December" />
+                  <input
+                    type="text"
+                    name="lineUp.noticePeriod"
+                    placeholder="Notice Period In Days"
+                    value={formData.lineUp.noticePeriod}
+                    onChange={handleChange}
+                    onKeyDown={handleKeyDown}
+                    maxLength={100}
+                  />
+                </div>
+                {errors["lineUp.noticePeriod"] && <div className="error">{errors["lineUp.noticePeriod"]}</div>}
+              </div>*/}
+            </div>
+
+            {/* <div className="form-group-December">
+                <label>
+                  Availability for interview{" "}
+                  <span className="setRequiredAstricColorRed">*</span>
+                </label>
+                <div className="input-with-icon-December">
+                  <FontAwesomeIcon
+                    icon={faCalendar}
+                    className="input-icon-December"
+                  />
+                  <input
+                    type="date"
+                    name="lineUp.availabilityForInterview"
+                    placeholder="Availability For Interview"
+                    id="lineUp.availabilityForInterview"
+                    value={formData.lineUp.availabilityForInterview}
+                    onKeyDown={handleKeyDown}
+                    onChange={handleChange}
+                    max="9999-12-31"
+                  />
+                </div>
+                {errors["lineUp.availabilityForInterview"] && (
+                  <div className="error">
+                    {errors["lineUp.availabilityForInterview"]}
+                  </div>
+                )}
+              </div> */}
+            {/* 
+              <div className="form-group-December">
+                <label>Expected joining date</label> */}
+            {/* <div className="input-with-icon-December">
+                  <FontAwesomeIcon
+                    icon={faClock}
+                    className="input-icon-December"
+                  />
+                  <input
+                    type="date"
+                    placeholder="Expected Joining Date"
+                    name="lineUp.expectedJoinDate"
+                    id="lineUp.expectedJoinDate"
+                    value={formData.lineUp.expectedJoinDate}
+                    onChange={handleChange}
+                    onKeyDown={handleKeyDown}
+                    max="9999-12-31"
+                  />
+                </div> */}
+            {/* {errors["lineUp.expectedJoiningDate"] && (
+              <div className="error">
+                {errors["lineUp.expectedJoiningDate"]}
+              </div>
+            )} */}
+            {/* </div> */}
+
+            {/* <div className="form-group-December">
+                <label>
+                  Relevant experience (Years){" "}
+                  <span className="setRequiredAstricColorRed">*</span>
+                </label>
+                <div className="input-with-icon-December">
+                  <FontAwesomeIcon
+                    icon={faBriefcase}
+                    className="input-icon-December"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Relevant experience"
+                    name="lineUp.relevantExperience"
+                    id="lineUp.relevantExperience"
+                    value={formData.lineUp.relevantExperience}
+                    onChange={handleChange}
+                    onKeyDown={handleKeyDown}
+                    maxLength="10"
+                  />
+                </div>
+                {errors["lineUp.relevantExperience"] && (
+                  <span className="error">
+                    {errors["lineUp.relevantExperience"]}
+                  </span>
+                )}
+              </div> */}
+
+            {/* <div className="form-group-December">
+                <div className="disability">
+                  <label>Disability</label>
+                  <div className="radio-group" id="disabilityId">
+                    <FormControlLabel
+                      control={
+                        <Radio
+                          checked={formData.lineUp.disability === "Yes"}
+                          onChange={() =>
+                            handleChange({
+                              target: {
+                                name: "lineUp.disability",
+                                value: "Yes",
+                              },
+                            })
+                          }
+                        />
+                      }
+                      label="Yes"
+                    />
+
+                    <FormControlLabel
+                      control={
+                        <Radio
+                          checked={formData.lineUp.disability === "No"}
+                          onChange={() =>
+                            handleChange({
+                              target: {
+                                name: "lineUp.disability",
+                                value: "No",
+                              },
+                            })
+                          }
+                        />
+                      }
+                      label="No"
+                    />
+                  </div>
+                  {errors["lineUp.disability"] && (
+                    <span className="error">{errors["lineUp.disability"]}</span>
+                  )}
+
+                  {formData.lineUp.disability === "Yes" && (
+                    <div className="disability-dropdown">
+                      <label className="form-group-December">
+                        Please select disability type:
+                      </label>
+                      <select
+                        name="lineUp.disabilityDetails"
+                        value={formData.lineUp.disabilityDetails || ""}
+                        onChange={handleChange}
+                      >
+                        <option value={""} selected disabled>
+                          Select Condition
+                        </option>
+                        <option value="heart">Heart Disease</option>
+                        <option value="vision">Vision Impairment</option>
+                        <option value="mobility">Mobility Impairment</option>
+                        <option value="phobia">Phobia</option>
+                        <option value="mental">Mental Health Issues</option>
+                        <option value="handicapped">Handicapped</option>
+                        <option value="leg">Leg Impairment</option>
+                      </select>
+                      {errors["lineUp.disabilityDetails"] && (
+                        <span className="error">
+                          {errors["lineUp.disabilityDetails"]}
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div> */}
+
+            {/* <div className="form-group-December">
+                <label>
+                  Date of birth{" "}
+                  <span className="setRequiredAstricColorRed">*</span>
+                </label>
+                <div className="input-with-icon-December">
+                  <FontAwesomeIcon
+                    icon={faBirthdayCake}
+                    className="input-icon-December"
+                  />
+                  <input
+                    type="date"
+                    name="lineUp.dateOfBirth"
+                    id="lineUp.dateOfBirth"
+                    placeholder="BirthDate"
+                    value={formData.lineUp.dateOfBirth}
+                    onChange={handleChange}
+                    onKeyDown={handleKeyDown}
+                    // min={calendarStartDateString}
+                    max={minDateString}
+                  />
+                </div>
+                {errors["lineUp.dateOfBirth"] && (
+                  <span className="error">{errors["lineUp.dateOfBirth"]}</span>
+                )}
+              </div> */}
+
+            <div className="form-column-December">
+              <div className="form-group-December">
+                <label>
+                  Current location
+                  <span className="setRequiredAstricColorRed">*</span>
+                </label>
+                <div className="input-with-icon-December">
+                  <FontAwesomeIcon icon={faLocation} className="input-icon-December" />
+                  <input
+                    type="text"
+                    placeholder="Current location"
+                    name="currentLocation"
+                    id="currentLocation"
+                    value={formData.currentLocation}
+                    onChange={handleChange}
+                    onKeyDown={handleKeyDown}
+                    maxLength={100}
+                  />
+                </div>
+                {errors.currentLocation && <span className="error">{errors.currentLocation}</span>}
+              </div>
+
+              <div className="form-group-December">
+                <label>
+                  Preferred location <span className="setRequiredAstricColorRed">*</span>
+                </label>
+                <div className="input-with-icon-December">
+                  <FontAwesomeIcon icon={faLocationPin} className="input-icon-December" />
+                  <input
+                    type="text"
+                    name="preferredLocation"
+                    id="preferredLocation"
+                    placeholder="Preferred location"
+                    value={formData.preferredLocation}
+                    onChange={handleChange}
+                    onKeyDown={handleKeyDown}
+                    maxLength={100}
+                  />
+                </div>
+                {errors["preferredLocation"] && (
+                  <span className="error">{errors["preferredLocation"]}</span>
+                )}
+              </div>
+
+              <div className="form-group-December">
+                <label> Upload resume {/* <span className="setRequiredAstricColorRed">*</span> */}</label>
+<div className="input-with-icon-December resume-upload">
+                  <FontAwesomeIcon icon={faUpload} className="input-icon-December" />
+                  <input
+                    className="paddingtopbottomforinputfilesonly"
+                    style={{
+                      color: "var(--text-color)",
+                      padding: "7px 10px 7px 35px",
+                      border: "1px solid #1d3a5d",
+                      borderRadius: "10px",
+                    }}
+                    type="file"
+                    name="resume"
+                    id="resumeUpload"
+                    onChange={handleChange}
+                    onKeyDown={handleKeyDown}
+                    accept=".pdf,.doc,.docx"
+                  />
+                  <br></br>
+                  {formData.resume instanceof File && (
+                    <div className="file-selected-info">
+                      <FontAwesomeIcon icon={faCheckCircle} className="success-December" />
+                      <span className="file-name">{formData.resume.name}</span>
+                    </div>
+                  )}
+                  {resumeSelected && !formData.resume && (
+                    <FontAwesomeIcon icon={faCheckCircle} className="success-December" />
+                  )}
+                  <button type="button" className="createresumebutton form-group-December newclassnameforremovemarginof newmargin0forbuttongenarate" onClick={handleOpen}>
+                    <FontAwesomeIcon icon={faFilePdf} className="genratepdficon" />
+                    Generate
+                  </button>
+                </div>
+                {errors["resume"] && <span className="error">{errors["resume"]}</span>}
+              </div>
+              <div className="form-group-December">
+                <label>Upload profile photo {/* <span className="setRequiredAstricColorRed">*</span> */}</label>
+                <div className="input-with-icon-December photo-upload">
+                  <FontAwesomeIcon icon={faPhotoFilm} className="input-icon-December" />
+                  <input
+                    style={{
+                      color: "var(--text-color)",
+                      padding: "7px 10px 7px 35px",
+                    }}
+                    type="file"
+                    name="photo"
+                    id="photo"
+                    onChange={handleChange}
+                    onKeyDown={handleKeyDown}
+                    accept="image/*"
+                  />
+                  {formData.photo instanceof File && (
+                    <div className="file-selected-info">
+                      <FontAwesomeIcon icon={faCheckCircle} className="success-December" />
+                      <span className="file-name">{formData.photo.name}</span>
+                    </div>
+                  )}
+                  {photoSelected && <FontAwesomeIcon icon={faCheckCircle} className="success-December" />}
+                  <br></br>
+                </div>
+                {errors["photo"] && <span className="error">{errors["photo"]}</span>}
+              </div>
+
+              <div className="forNewUanandRefFlex">
+                <div className="form-group-December forNewUanandRefFlexwidth50">
+                  <label>UAN Number</label>
+                  <div className="input-with-icon-December uan-upload">
+                    <input
+                      type="text"
+                      name="candidateUanNumber"
+                      id="uanNumber"
+                      placeholder="Enter UAN Number"
+                      value={formData.candidateUanNumber}
+                      onChange={handleChange}
+                      maxLength={12} // Assuming UAN has 12 digits
+                    />
+                  </div>
+                  {errors.candidateUanNumber && <span className="error">{errors.candidateUanNumber}</span>}
+                </div>
+
+                <div className="form-group-December forNewUanandRefFlexwidth50 setMargintop10pxforref">
+                  <label>Reference</label>
+                  <div className="input-with-icon-December reference-upload">
+                    <input
+                      type="text"
+                      name="candidateReference"
+                      id="reference"
+                      placeholder="Enter reference name"
+                      value={formData.candidateReference}
+                      onChange={handleChange}
+                      maxLength={100}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* <div className="form-group-December">
+                <div className="form-December-certificate">
+                  <label>Have you done any courses and certificates ? </label>
+
+                  <div className="radio-group" id="certificationRadio">
+                    <FormControlLabel
+                      control={
+                        <Radio
+                          checked={doneAnyCertification === true}
+                          onChange={() => {
+                            SetDoneAnyCertification(true);
+                          }}
+                        />
+                      }
+                      label="Yes"
+                    />
+
+                    <FormControlLabel
+                      control={
+                        <Radio
+                          checked={doneAnyCertification === false}
+                          onChange={() => {
+                            SetDoneAnyCertification(false);
+                            formData.lineUp.certificates = [
+                              { certificateName: "", certificateFile: null },
+                            ];
+                          }}
+                        />
+                      }
+                      label="No"
+                    />
+                  </div>
+
+                  {doneAnyCertification && (
+                    <>
+                      {formData.lineUp.certificates.map((cert, index) => (
+                        <div key={index} className="certificate-item-December">
+                          <div className="certificate-inputs-December-sub-div">
+                            <div className="input-with-icon-December">
+                              <FontAwesomeIcon
+                                icon={faCertificate}
+                                className="input-icon-December"
+                              />
+                              <input
+                                type="text"
+                                name={`lineUp.certificates[${index}].certificateName`}
+                                placeholder="Certificate name"
+                                value={cert.certificateName}
+                                onChange={handleChange}
+                                ref={(el) =>
+                                  (inputRefs.current[index * 2] = el)
+                                }
+                                maxLength={100}
+                              />
+                            </div>
+                            <div
+                              className="input-with-icon-December"
+                              id="input-with-icon-December-certificates"
+                            >
+                              <FontAwesomeIcon
+                                icon={faUpload}
+                                className="input-icon-December"
+                              />
+                              <input
+                                type="file"
+                                id="certificateFile"
+                                name={`lineUp.certificates[${index}].certificateFile`}
+                                onChange={(e) => handleFileChange(e, index)}
+                                ref={(el) =>
+                                  (inputRefs.current[index * 2 + 1] = el)
+                                }
+                              />
+                            </div>
+                          </div>
+
+                          <div className="certificate-buttons-December-button-div">
+                            <button
+                              type="button"
+                              onClick={() => handleCloseCertificate(index)}
+                              className="remove-btn"
+                            >
+                              <FontAwesomeIcon
+                                icon={faXmark}
+                                className="remove-btn-icon"
+                              />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={handleAddCertificate}
+                              className="remove-btn"
+                            >
+                              <FontAwesomeIcon
+                                icon={faPlus}
+                                className="remove-btn-icon"
+                              />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </>
+                  )}
+                </div>
+              </div>
+
+              <div className="form-group-December">
+                <label>Are you holding any offer ? </label>
+                <div className="radio-group" id="holdinganyoffer">
+                  <FormControlLabel
+                    control={
+                      <Radio
+                        checked={formData.lineUp.holdingAnyOffer}
+                        onChange={(e) =>
+                          handleChange({
+                            target: {
+                              name: "lineUp.holdingAnyOffer",
+                              value: e.target.checked,
+                            },
+                          })
+                        }
+                      />
+                    }
+                    label="Yes"
+                  />
+                  <FormControlLabel
+                    control={
+                      <Radio
+                        checked={!formData.lineUp.holdingAnyOffer}
+                        onChange={(e) =>
+                          handleChange({
+                            target: {
+                              name: "lineUp.holdingAnyOffer",
+                              value: false,
+                            },
+                          })
+                        }
+                      />
+                    }
+                    label="No"
+                  />
+                </div>
+              </div>
+
+              {formData.lineUp.holdingAnyOffer && (
+                <div className="offer-details">
+                  <div className="form-group-December">
+                    <label>Company name</label>
+                    <div className="input-with-icon-December">
+                      <FontAwesomeIcon
+                        icon={faIndustry}
+                        className="input-icon-December"
+                      />
+                      <input
+                        type="text"
+                        name="lineUp.companyName"
+                        id="lineUp.companyName"
+                        placeholder="company Name"
+                        value={formData.lineUp.companyName}
+                        onChange={handleChange}
+                        onKeyDown={handleKeyDown}
+                        maxLength={100}
+                        className="form-textfield"
+                      />
+                    </div>
+                    {errors["lineUp.companyName"] && (
+                      <div className="error">
+                        {errors["lineUp.companyName"]}
+                      </div>
+                    )}
+                  </div>
+                  <br></br>
+
+                  <div className="form-group-December">
+                    <label>Offer salary (LPA)</label>
+                    <div className="input-with-icon-December">
+                      <FontAwesomeIcon
+                        icon={faWallet}
+                        className="input-icon-December"
+                      />
+                      <input
+                        type="text"
+                        name="lineUp.offersalary"
+                        id="lineUp.offersalary"
+                        placeholder="Salary (Lakh)"
+                        value={formData.lineUp.offersalary}
+                        onChange={handleChange}
+                        onKeyDown={handleKeyDown}
+                        className="form-textfield"
+                        maxLength={2}
+                      />
+                    </div>
+                    {errors["lineUp.offersalary"] && (
+                      <div className="error">
+                        {errors["lineUp.offersalary"]}
+                      </div>
+                    )}
+                  </div>
+                  <br></br>
+
+                  <div className="form-group-December">
+                    <label>Offer details</label>
+                    <textarea
+                      name="lineUp.offerdetails"
+                      placeholder="Details about the offer"
+                      value={formData.lineUp.offerdetails}
+                      onChange={handleChange}
+                      maxLength={200}
+                      rows="6"
+                      className="form-textfield"
+                    />
+                    {errors["lineUp.offerdetails"] && (
+                      <div className="error">
+                        {errors["lineUp.offerdetails"]}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )} */}
+
+          {/* <div className="input-with-icon-December">
+                <div className="form-group-December" style={{ width: "400px" }}>
+                  <label>Do you have a WhatsApp number ? </label>
+                  <div className="radio-group" id="whatsappnumberid">
+                    <FormControlLabel
+                      control={
+                        <Radio
+                          checked={whatsappSelected === true}
+                          onChange={() => {
+                            setWhatsappSelected(true);
+                            setFormData({
+                              ...formData,
+                              alternateNumber: "",
+                            });
+                          }}
+                        />
+                      }
+                      label="Yes"
+                    />
+
+                    <FormControlLabel
+                      control={
+                        <Radio
+                          checked={whatsappSelected === false}
+                          onChange={() => {
+                            setWhatsappSelected(false);
+                            setFormData({
+                              ...formData,
+                              alternateNumber: 0, 
+                            });
+                          }}
+                        />
+                      }
+                      label="No"
+                    />
+                  </div>
+
+                  {whatsappSelected && (
+                    <div className="form-group-December">
+                      <label>WhatsApp number:</label>
+                      <div className="input-with-icon-December">
+                        <FontAwesomeIcon
+                          icon={faPhone}
+                          className="input-icon-December"
+                        />
+                        <input
+                          type="number"
+                          name="alternateNumber"
+                          id="alternateNumber"
+                          value={formData.alternateNumber}
+                          placeholder="Enter WhatsApp Number"
+                          onChange={(e) => {
+                            const value = e.target.value.replace(/\D/g, "");
+                            if (value.length <= 13) {
+                              handleChange({
+                                target: {
+                                  name: "alternateNumber",
+                                  value,
+                                },
+                              });
+                            }
+                          }}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div> */}
+
+          {/* <div className="form-group-December">
+                <div className="negotiation">
+                  <label>Are you ready to negotiation ? </label>
+                  <div className="radio-group">
+                    <FormControlLabel
+                      control={
+                        <Radio
+                          checked={formData.lineUp.negotiation === "Yes"}
+                          onChange={() =>
+                            handleChange({
+                              target: {
+                                name: "lineUp.negotiation",
+                                value: "Yes",
+                              },
+                            })
+                          }
+                        />
+                      }
+                      label="Yes"
+                    />
+
+                    <FormControlLabel
+                      control={
+                        <Radio
+                          checked={formData.lineUp.negotiation === "No"}
+                          onChange={() =>
+                            handleChange({
+                              target: {
+                                name: "lineUp.negotiation",
+                                value: "No",
+                              },
+                            })
+                          }
+                        />
+                      }
+                      label="No"
+                    />
+                  </div>
+                  {errors["lineUp.negotiation"] && (
+                    <span className="error">
+                      {errors["lineUp.negotiation"]}
+                    </span>
+                  )}
+                </div>
+              </div> */}
+              {/* ==================== Job-Specific Questions ==================== */}
+<h3 className="form-group-December">Job-Specific Questions</h3>
+
+{questions.length > 0 ? (
+  questions.map((q) => (
+    <div key={q.questionId} className="question-block">
+      <label className="question-label">{q.question}</label>
+      <textarea
+        rows="3"
+        className="question-textarea"
+        value={answers[q.questionId] || ""}
+        onChange={(e) => handleAnswerChange(q.questionId, e.target.value)}
+        required
+      ></textarea>
+    </div>
+  ))
+) : (
+  <p className="no-questions-text">No specific questions for this job.</p>
+)}
+
+
+          <div className="click-December">
+            <button
+              type="submit"
+              onKeyDown={handleKeyDown}
+              disabled={loading}
+              style={{
+                backgroundColor: loading ? "#ffffff" : "#1d3a5d",
+                color: loading ? "#1d3a5d" : "#ffffff",
+              }}
+            >
+              {" "}
+              {loading ? "Submitting..." : "Submit"}
+            </button>
+          </div>
+
+          <div className="reference-links">
+            <p>
+              {/* <b className="newclassforfontsizechnges">Visit: {" "} </b>
+    <a href="https://157careers.in/" target="_blank" rel="noopener noreferrer" className="newclassnameforlinkblue newclassforfontsizechnges">
+      www.157careers.in
+    </a> */}
+
+              {/* <b className="newclassforfontsizechnges">Follow LinkedIn Page: </b>
+              <a
+                href="https://www.linkedin.com/company/157careers/posts/?feedView=all"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="newclassnameforlinkblue newclassforfontsizechnges"
+              >
+                157 Careers Profile
+              </a> */}
+            </p>
+            {/* <p>© 2025 157 Industries PVT. LTD. All rights reserved.</p> */}
+          </div>
+        </form>
+          {/* Optional Test Modal */}
+     {showMCQModal && (
+  <div className="mcq-overlay">
+    <div className="mcq-modal">
+      <h2>Technical Test</h2>
+
+      <div className="mcq-questions-container">
+        {mcqQuestions.map((q, idx) => (
+          <div key={idx} className="mcq-question-block">
+            <label>{q.question}</label>
+            <div className="mcq-options">
+              {q.options.map((opt, i) => (
+                <div key={i}>
+                  <input
+                    type="radio"
+                    name={`q${idx}`}
+                    value={opt}
+                    checked={mcqAnswers[idx] === opt}
+                    onChange={() => handleMCQAnswerChange(idx, opt)}
+                  />
+                  {opt}
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="mcq-buttons">
+        <button className="close-btn" onClick={() => setShowMCQModal(false)}>Close</button>
+        <button className="submit-btn" onClick={handleMCQSubmit}>Submit Test</button>
+      </div>
+
+      {mcqScore !== null && (
+        <div className="mcq-score">Your Score: {mcqScore}/{mcqQuestions.length}</div>
+      )}
+    </div>
+  </div>
+)}
+
+
+      {/* MCQ Modal */}
+{/* MCQ Modal Popup */}
+{showMCQModal && (
+  <div className="mcq-overlay">
+    <div className="mcq-modal">
+      <h2>{jobDetails?.designation} Test</h2>
+
+      {/* Progress Bar */}
+      <div className="mcq-progress-container">
+        <div
+          className="mcq-progress-bar"
+          style={{
+            width: `${(Object.keys(mcqAnswers).length / mcqQuestions.length) * 100}%`
+          }}
+        ></div>
+      </div>
+      <p style={{ textAlign: "center", margin: "10px 0" }}>
+        {Object.keys(mcqAnswers).length} of {mcqQuestions.length} answered
+      </p>
+
+      {/* Questions */}
+      <div className="mcq-questions-container">
+        {mcqQuestions.map((q, idx) => (
+          <div key={idx} className="mcq-question-block">
+            <label>{q.question}</label>
+            <div className="mcq-options">
+              {q.options.map((opt, i) => (
+                <div key={i}>
+                  <input
+                    type="radio"
+                    name={`q${idx}`}
+                    value={opt}
+                    checked={mcqAnswers[idx] === opt}
+                    onChange={() => handleMCQAnswerChange(idx, opt)}
+                  />
+                  {opt}
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Buttons */}
+      <div className="mcq-buttons">
+        <button className="close-btn" onClick={() => setShowMCQModal(false)}>Close</button>
+        <button className="submit-btn" onClick={handleMCQSubmit}>Submit Test</button>
+      </div>
+      
+
+      {/* Score */}
+      {mcqScore !== null && (
+        <div className="mcq-score">
+          Your Score: {mcqScore} / {mcqQuestions.length}
+        </div>
+      )}
+    </div>
+  </div>
+)}
+
+        {loading && <div className="SCE_Loading_Animation">{/* <Loader size={50} color="#ffb281" /> */}</div>}
+        <br />
+      </div>
+    {/* Rajlaxmi Jaadale Added that code line 2090/2142 */}
+<Modal
+  open={showCreateResumeModule}
+  onCancel={handleClose}
+  width="50%"
+  bodyStyle={{
+    padding: "0px",
+    backgroundColor: "#ffffff",
+    borderRadius: "12px",
+  }}
+  centered
+  footer={null}
+>
+  {!selectedOption && (
+    <div className="modal-container">
+      <h2 className="modal-title">Select Your Format</h2>
+      <div className="button-container">
+        <Button type="primary" onClick={() => handleSelect("cv")} className="modal-button">
+          CV
+        </Button>
+        <Button type="primary" onClick={() => handleSelect("resume")} className="modal-button">
+          Resume
+        </Button>
+      </div>
+    </div>
+  )}
+
+  {selectedOption === "cv" && (
+    <div className="cvtemplatemaindivinapplicantfor">
+      <CvTemplate
+        cvFromApplicantForm={cvFromApplicantsForm}
+        onCVDownload={handleCVDownload}
+        onSetCV={handleSetCV}
+        onBack={() => setSelectedOption(null)} // Go back to format selection
+      />
+    </div>
+  )}
+
+  {selectedOption === "resume" && (
+    <div className="cvtemplatemaindivinapplicantfor">
+      <ResumeCopy
+        ResumeFromApplicantForm={cv2FromApplicantsForm}
+        onCVDownload={handleCVDownload}
+        onSetCV={handleSetCV}
+        onBack={() => setSelectedOption(null)} // Go back to format selection
+      />
+    </div>
+  )}
+</Modal>
+
+{/* ✅ Optional Test Modal — moved outside AntD Modal */}
+{showTestPrompt && (
+  <div className="testPrompt-overlay">
+    <div className="testPrompt-modal">
+      <h2>Optional: Take Technical Test for Early Shortlist</h2>
+      <p>Completing this test increases your chances of getting shortlisted early. This is optional.</p>
+     <div className="testPrompt-buttons">
+  <button
+    className="close-btn"
+    onClick={() => {
+      setShowTestPrompt(false);
+      navigate("/recruiter-dashboard");
+    }}
+  >
+    Close
+  </button>
+
+  <button className="start-test-btn" onClick={handleStartTest}>
+    Start Test
+  </button>
+</div>
+
+    </div>
+  </div>
+)}
+ {/* MCQ Modal */}
+{/* MCQ Modal Popup */}
+{showMCQModal && (
+  <div className="mcq-overlay">
+    <div className="mcq-modal">
+      <h2>{jobDetails?.designation} Test</h2>
+
+      {/* Progress Bar */}
+      <div className="mcq-progress-container">
+        <div
+          className="mcq-progress-bar"
+          style={{
+            width: `${((currentMcqIndex + 1) / mcqQuestions.length) * 100}%`,
+          }}
+        ></div>
+      </div>
+      <p style={{ textAlign: "center", margin: "10px 0" }}>
+        Question {currentMcqIndex + 1} of {mcqQuestions.length}
+      </p>
+
+          {/* Show one question at a time */}
+      {mcqQuestions.length > 0 && (
+        <div className="mcq-questions-container">
+          <div className="mcq-question-block">
+            <label>{mcqQuestions[currentMcqIndex].question}</label>
+            <div className="mcq-options">
+              {mcqQuestions[currentMcqIndex].options.map((opt, i) => (
+                <div key={i}>
+                  <input
+                    type="radio"
+                    name={`q${currentMcqIndex}`}
+                    value={opt}
+                    checked={mcqAnswers[currentMcqIndex] === opt}
+                    onChange={() =>
+                      handleMCQAnswerChange(currentMcqIndex, opt)
+                    }
+                  />
+                  {opt}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Navigation Buttons */}
+      <div className="mcq-buttons">
+        <button
+          className="nav-button prev"
+          onClick={() =>
+            setCurrentMcqIndex((prev) => Math.max(prev - 1, 0))
+          }
+          disabled={currentMcqIndex === 0}
+        >
+          ⬅ Previous
+        </button>
+
+        {currentMcqIndex < mcqQuestions.length - 1 ? (
+          <button
+            className="nav-button next"
+            onClick={() =>
+              setCurrentMcqIndex((prev) =>
+                Math.min(prev + 1, mcqQuestions.length - 1)
+              )
+            }
+          >
+            Next ➡
+          </button>
+        ) : (
+          <button className="submit-btn" onClick={handleMCQSubmit}>
+            ✅ Submit Test
+          </button>
+        )}
+      </div>
+
+      {/* Close Button */}
+      <button className="close-btn" onClick={() => setShowMCQModal(false)}>
+        ✖ Close
+      </button>
+
+      {/* Score */}
+      {mcqScore !== null && (
+        <div className="mcq-score">
+          Your Score: {mcqScore} / {mcqQuestions.length}
+        </div>
+      )}
+    </div>
+  </div>
+)}
+
+
+
+<ToastContainer />
+</div>
+)
+}
 
 export default JobApplicationForm;
