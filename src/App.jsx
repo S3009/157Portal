@@ -23,14 +23,17 @@ import SocketTest from "./Components/SocketIO/SocketTest.jsx";
 import ResumeTemplates from "./Components/Candidate_Profile/ResumeTemplate/ResumeTemplate.jsx";
 import SavedJobs from "./Components/Candidate_Profile/SavedJobs.jsx";
 import PaidPostPage from "./Components/Recruiter_Profile/PaidPostPage.jsx";
-import AddTechnicalTest from"./Components/Recruiter_Profile/AddTechnicalTest.jsx";
+import AddTechnicalTest from "./Components/Recruiter_Profile/AddTechnicalTest.jsx";
+import LandingPage from "./Components/LandingPage.jsx";
+import HeaderWrapper from "./Components/HeaderWrapper.jsx"
 
 function App() {
 
   return (
     <BrowserRouter>
+      <HeaderWrapper />  {/* Header only for specific pages */}
       <Routes>
-        <Route path="/" element={<UserTypeSelection />} />
+        <Route path="/user-type-selection" element={<UserTypeSelection />} />
         <Route path="/employee-roles" element={<EmployeeRoles />} />
         <Route path="/login/:userType/:role?" element={<LoginPage />} />
         <Route path="/login" element={<LoginPage />} />
@@ -42,14 +45,16 @@ function App() {
         <Route path="/registerEmp" element={<RegisterEmp />} />
         <Route path="/paid-post" element={<PaidPostPage />} />
         <Route path="/add-technical-test" element={<AddTechnicalTest />} />
+        {/* <Route path="/recruiter-homepage" element={<RecruiterHome/>}/> */}
 
 
 
 
         {/* General */}
-        <Route path="/navbar" element={<Navbar />} />
+        <Route path="/" element={<LandingPage />} />
 
         {/* Candidate routes */}
+        <Route path="/navbar" element={<Navbar />} />
         <Route path="/apply/:id" element={<JobApplicationForm />} />
         <Route path="/interview-faqs" element={<InterviewFAQ />} />
         <Route path="/share-experience" element={<ShareInterviewQuestions />} />

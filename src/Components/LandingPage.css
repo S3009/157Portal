@@ -1,0 +1,765 @@
+.logo {
+  width: 270px;
+  /* controls how big the image appears */
+  height: auto;
+  /* keeps the image’s aspect ratio */
+  border-radius: 10px;
+  /* rounds the corners */
+  display: block;
+  /* removes small gaps below inline images */
+  margin: 10px auto;
+  /* centers it horizontally */
+  object-fit: contain;
+  /* makes sure the whole image fits without cropping */
+}
+
+/* ===== Base container ===== */
+.marquee-container {
+  width: 100%;
+  overflow: hidden;
+  background-color: #f9fafb;
+  padding: 20px 0;
+  text-align: center;
+}
+
+.marquee-title {
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+/* ===== Marquee track ===== */
+.marquee {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+.marquee-track {
+  display: flex;
+  width: calc(200%);
+  animation: scroll 40s linear infinite;
+  /* default slow speed */
+}
+
+/* ===== Each logo ===== */
+.marquee-item {
+  flex: 0 0 auto;
+  padding: 0 40px;
+}
+
+.marquee-item img {
+  width: 120px;
+  height: auto;
+  transition: transform 0.3s ease, filter 0.3s ease;
+  filter: grayscale(40%);
+}
+
+.marquee-item img:hover {
+  transform: scale(1.1);
+  filter: grayscale(0%);
+}
+
+/* ===== Continuous scroll animation ===== */
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+/* Pause on hover */
+.marquee:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+/* ===== Responsive Design ===== */
+
+/* Medium screens (tablets) */
+@media (max-width: 1024px) {
+  .marquee-item {
+    padding: 0 25px;
+  }
+
+  .marquee-item img {
+    width: 100px;
+  }
+
+  .marquee-track {
+    animation: scroll 30s linear infinite;
+    /* slightly faster on tablet */
+  }
+}
+
+/* Small screens (mobiles) */
+@media (max-width: 600px) {
+  .marquee-title {
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+  }
+
+  .marquee-item {
+    padding: 0 15px;
+  }
+
+  .marquee-item img {
+    width: 80px;
+  }
+
+  .marquee-track {
+    animation: scroll 20s linear infinite;
+    /* faster on mobile */
+  }
+}
+
+/* JobVacanciesTabs.css */
+
+.job-tabs-container {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 25px;
+  margin: 30px auto;
+  max-width: 1000px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.job-tabs-container h2 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-bottom: 15px;
+}
+
+.tab-header {
+  display: flex;
+  flex-wrap: wrap;
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 20px;
+  gap: 25px;
+}
+
+.tab-btn {
+  background: none;
+  border: none;
+  font-size: 1rem;
+  color: #333;
+  cursor: pointer;
+  padding: 8px 0;
+  position: relative;
+  font-weight: 500;
+}
+
+.tab-btn.active {
+  color: #6b21a8;
+  /* purple shade */
+}
+
+.tab-btn.active::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: #6b21a8;
+  border-radius: 2px;
+}
+
+.tab-content {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.chip {
+  border: 1px solid #d1d5db;
+  border-radius: 20px;
+  padding: 8px 16px;
+  background: #fff;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.chip:hover {
+  background: #f3e8ff;
+  color: #6b21a8;
+  border-color: #c084fc;
+}
+
+.view-all {
+  margin-top: 10px;
+}
+
+.view-all a {
+  color: #6b21a8;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.view-all a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .tab-header {
+    gap: 15px;
+  }
+
+  .chip {
+    font-size: 0.85rem;
+    padding: 6px 12px;
+  }
+
+  .job-tabs-container {
+    padding: 15px;
+  }
+}
+
+/* EmployerBanner.css */
+
+.employer-banner {
+  background-color: #dae4eb;
+  border-radius: 20px;
+  padding: 2rem;
+  margin: 2rem auto;
+  max-width: 1200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+
+  /* entry animation */
+  opacity: 0;
+  transform: translateY(40px);
+  animation: fadeSlideIn 0.8s ease-out forwards;
+}
+
+/* on hover: slight lift + shadow */
+.employer-banner:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  transition: all 0.4s ease;
+}
+
+.employer-banner-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.employer-banner-image img {
+  width: 300px;
+  max-width: 100%;
+  border-radius: 12px;
+  transition: transform 0.5s ease;
+}
+
+/* zoom effect on image hover */
+.employer-banner:hover .employer-banner-image img {
+  transform: scale(1.05);
+}
+
+.employer-banner-text {
+  flex: 1;
+  text-align: left;
+  min-width: 280px;
+  cursor: pointer;
+  animation: slideFromRight 0.8s ease forwards;
+}
+
+.tag {
+  display: inline-block;
+  background-color: #e9e9ed;
+  color: #526d82;
+  font-weight: 600;
+  border-radius: 6px;
+  padding: 6px 14px;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+.employer-banner-text h2 {
+  font-size: 2rem;
+  color: #005d4f;
+  margin-bottom: 0.5rem;
+}
+
+.employer-banner-text p {
+  color: #002e25;
+  font-size: 1.1rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Button styles */
+.post-job-btn {
+  background-color: #526d82;
+  color: white;
+  font-size: 1rem;
+  padding: 0.8rem 1.6rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+}
+
+/* pulse on hover */
+.post-job-btn:hover {
+  background-color: white;
+  transform: scale(1.05);
+  box-shadow: 0 0 10px rgba(82, 109, 130, 0.4);
+  color: #526d82;
+}
+
+/* ========== Animations ========== */
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ========== Responsive ========== */
+@media (max-width: 768px) {
+  .employer-banner-content {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .employer-banner-text {
+    text-align: center;
+  }
+
+  .post-job-btn {
+    margin: 0 auto;
+  }
+
+  .employer-banner-image img {
+    width: 250px;
+  }
+}
+
+.employer-banner {
+  position: relative; /* Required for ::before overlay */
+  overflow: hidden; /* Hide the shine overflow */
+  background-color: #dae4eb;
+  border-radius: 20px;
+  padding: 2rem;
+  margin: 2rem auto;
+  max-width: 1200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+
+  opacity: 0;
+  transform: translateY(40px);
+  animation: fadeSlideIn 0.8s ease-out forwards;
+}
+
+/* ✨ Add the moving shine overlay */
+.employer-banner::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -150%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.5) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: skewX(-25deg);
+  animation: shine 6s infinite ease-in-out;
+}
+
+/* Animation that makes the shine move across */
+@keyframes shine {
+  0% {
+    left: -150%;
+  }
+  50% {
+    left: 150%;
+  }
+  100% {
+    left: 150%;
+  }
+}
+
+/* Optional: Slow down or speed up the shine by changing 6s to 8s, 10s, etc. */
+
+/* Optional: make it only move when hovered */
+.employer-banner:hover::before {
+  animation-play-state: running;
+}
+
+/* If you want the shine only on hover, comment out the animation line above and add this: */
+/*
+.employer-banner:hover::before {
+  animation: shine 2s forwards ease-in-out;
+}
+*/
+
+.footer {
+  background-color: #7291ac;
+  color: #eaeaea;
+  padding: 2rem 3rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.footer-content {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.footer-left {
+  display: grid;
+  grid-template-columns: repeat(2, 200px);
+  gap: 1rem 2rem;
+}
+
+.footer-column h4 {
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+  position: relative;
+}
+
+.footer-column h4::after {
+  content: "▾";
+  margin-left: 10px;
+  font-size: 0.8rem;
+}
+
+.footer-right {
+  max-width: 400px;
+}
+
+.footer-country select {
+  background-color: transparent;
+  color: white;
+  border: 1px solid #555;
+  padding: 4px 8px;
+  border-radius: 4px;
+  margin-left: 10px;
+}
+
+.footer-right p {
+  margin: 0.6rem 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: white;
+}
+
+.footer-download {
+  margin-top: 1rem;
+}
+
+.app-buttons img {
+  width: 100px;
+  margin: 8px 10px 0 0;
+  cursor: pointer;
+}
+
+.footer-social {
+  margin-top: 1.5rem;
+}
+
+.footer-social .social-icons {
+  display: flex;
+  gap: 15px;
+  margin-top: 0.5rem;
+}
+
+.footer-social svg {
+  font-size: 1.2rem;
+  color: white;
+  transition: color 0.3s;
+  cursor: pointer;
+}
+
+.footer-social svg:hover {
+  color: #2b3c52;
+}
+
+.footer-bottom {
+  text-align: center;
+  font-size: 0.85rem;
+  color: white;
+  line-height: 1.8;
+}
+
+.footer-bottom p:first-child {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 1rem;
+}
+
+@media (max-width: 768px) {
+  .footer-content {
+    flex-direction: column;
+  }
+
+  .footer-left {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .footer-right {
+    margin-top: 2rem;
+  }
+
+  .footer-bottom p {
+    font-size: 0.8rem;
+  }
+}
+
+.hero {
+  position: relative;
+  height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  overflow: hidden;
+
+  /* animated gradient background */
+  background: linear-gradient(
+    120deg,
+    #7291ac,
+    #a9bfd1,
+    #7291ac
+  );
+  background-size: 300% 300%;
+  animation: heroBG 12s ease-in-out infinite;
+}
+
+/* smooth gradient animation */
+@keyframes heroBG {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* glossy animated shine layer */
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+
+  background: radial-gradient(
+    circle at 20% 50%,
+    rgba(255, 255, 255, 0.25),
+    rgba(255, 255, 255, 0) 60%
+  );
+  mix-blend-mode: screen;
+  animation: shineMove 10s ease-in-out infinite;
+  opacity: 0.6;
+}
+
+/* movement animation */
+@keyframes shineMove {
+  0% {
+    transform: translateX(-30%) translateY(0%) scale(1);
+  }
+  50% {
+    transform: translateX(30%) translateY(-10%) scale(1.2);
+  }
+  100% {
+    transform: translateX(-30%) translateY(0%) scale(1);
+  }
+}
+
+/* rotating halo glow */
+.hero::after {
+  content: "";
+  position: absolute;
+  width: 450px;
+  height: 450px;
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.25) 0%,
+    rgba(255, 255, 255, 0.05) 40%,
+    rgba(255, 255, 255, 0) 70%
+  );
+
+  filter: blur(20px);
+  animation: haloRotation 18s linear infinite;
+  opacity: 0.5;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes haloRotation {
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg) scale(1);
+  }
+  50% {
+    transform: translate(-50%, -50%) rotate(180deg) scale(1.1);
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(360deg) scale(1);
+  }
+}
+
+/* make sure hero content stays on top */
+.hero-content {
+  position: relative;
+  z-index: 5;
+}
+
+/* clean shine wave inside text only */
+.wave-text {
+  position: relative;
+  display: inline-block;
+
+  /* your dark navy near-black glass color gradient */
+  background: linear-gradient(
+    120deg,
+    #02060E 0%,
+    #040A14 6%,
+    #02060E 14%,
+    #040A14 20%,
+    #02060E 100%
+  );
+  background-size: 250%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+
+  animation: shineWave 6s linear infinite;
+  opacity: 0.9;
+}
+
+/* ✅ GLASS REFLECTION OVERLAY */
+.wave-text::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 250%;
+  height: 100%;
+
+  background: linear-gradient(
+    120deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.08) 10%,   /* very soft thin reflection */
+    rgba(255, 255, 255, 0.18) 14%,   /* glass streak */
+    rgba(255, 255, 255, 0.08) 18%,
+    transparent 25%
+  );
+
+  pointer-events: none;
+  animation: glassReflection 5s linear infinite;
+}
+
+@keyframes shineWave {
+  0% {
+    background-position: 200% center;
+  }
+  100% {
+    background-position: -50% center;
+  }
+}
+
+/* ✅ GLASS SWIPE MOTION */
+@keyframes glassReflection {
+  0% { left: -180%; }
+  100% { left: 80%; }
+}
+
+
+/* animation */
+@keyframes shineWave {
+  0% {
+    background-position: 200% center;
+  }
+  100% {
+    background-position: -200% center;
+  }
+}
+
+
+#particle-container {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.particle {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.7);
+  filter: blur(2px);
+  animation: floatUp linear infinite;
+  opacity: 0.6;
+}
+
+@keyframes floatUp {
+  from {
+    transform: translateY(0px);
+    opacity: 0.7;
+  }
+  to {
+    transform: translateY(-150px);
+    opacity: 0.1;
+  }
+}
+
+.hero-content {
+  position: relative;
+  z-index: 10;
+  text-align: center;
+}
+
+
+
+
+

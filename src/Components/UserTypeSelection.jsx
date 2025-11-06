@@ -5,29 +5,31 @@ import "./UserTypeSelection.css";
 const UserTypeSelection = () => {
   const navigate = useNavigate();
 
+
   return (
     <div className="landing-container">
-      {/* --- HEADER --- */}
-      <header className="modern-header clean">
-        <div className="header-left">
-          <span className="logo-accent">RG</span> Portal
-        </div>
-        <div className="header-right">
-          <button className="login-btn" onClick={() => navigate("/login")}>
-            Login
-          </button>
-          <button className="signup-btn" onClick={() => navigate("/register")}>
-            Sign Up
-          </button>
-        </div>
-      </header>
+      {/* {showHeader && (
+        <header className="modern-header clean">
+          <div className="header-left">
+            <span className="logo-accent">RG</span> Portal
+          </div>
+          <div className="header-right">
+            <button className="login-btn" onClick={() => navigate("/login")}>
+              Login
+            </button>
+            <button className="signup-btn" onClick={() => navigate("/register")}>
+              Sign Up
+            </button>
+          </div>
+        </header>
+      )} */}
 
       {/* --- HERO SECTION --- */}
       <section className="hero-section">
         <div className="floating-bg">
-  <span className="blob"></span>
-  <span className="blob delay"></span>
-</div>
+          <span className="blob"></span>
+          <span className="blob delay"></span>
+        </div>
 
         <div className="hero-content">
           <h1 className="hero-title">Welcome to RG Portal</h1>

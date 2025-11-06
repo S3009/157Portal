@@ -23,16 +23,16 @@
 }
 
 .plan-card.selected {
-  border-color: #007bff;
+  border-color: #526d82;
   box-shadow: 0 0 10px rgba(0, 123, 255, 0.3);
 }
 
 .plan-card h2 {
-  color: #007bff;
+  color: #526d82;
 }
 
 .proceed-btn {
-  background: #007bff;
+  background: #526d82;
   color: white;
   padding: 12px 24px;
   border: none;
@@ -61,7 +61,7 @@
 
 /* Popup Box */
 .payment-popup {
-  background: white;
+  background: azure;
   padding: 30px;
   border-radius: 12px;
   width: 400px;
@@ -99,7 +99,7 @@
 }
 
 .method-tabs .active {
-  background: #007bff;
+  background: #526d82;
   color: white;
 }
 
@@ -190,12 +190,13 @@
 }
 
 .pay-btn {
-  background: #007bff;
+  background: #526d82;
   color: white;
   border: none;
   padding: 10px 20px;
   border-radius: 8px;
   cursor: pointer;
+  margin-bottom: 10px;
 }
 
 .cancel-btn {
