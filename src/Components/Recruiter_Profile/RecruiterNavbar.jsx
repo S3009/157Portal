@@ -1,17 +1,24 @@
 // Samruddhi Patole 29/10/25
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import {
-  FaEnvelope,
+  FaBell,
   FaUserCircle,
+  FaBars,
+  FaTimes,
+  FaCog,
+  FaQuestionCircle,
+  FaSignOutAlt,
   FaUsers,
+  FaEnvelope,
   FaClipboardList,
   FaUserTie,
   FaSearch,
 } from "react-icons/fa";
 import "./RecruiterNavbar.css";
 import { FaPencilAlt, FaTrashAlt } from "react-icons/fa";
+import { toast } from "react-toastify";
 
 const RecruiterNavbar = () => {
   // const API_BASE_URL = "http://localhost:8080";
@@ -27,6 +34,7 @@ const RecruiterNavbar = () => {
     { sender: "Candidate", text: "Hello, is this position still open?" },
     { sender: "You", text: "Yes, please share your updated resume." },
   ]);
+
   const [newMessage, setNewMessage] = useState("");
   const [allJobs, setAllJobs] = useState([]);
   const [applicants, setApplicants] = useState([]);
@@ -38,7 +46,7 @@ const RecruiterNavbar = () => {
   const [visibleCount, setVisibleCount] = useState(3);
   //  const [companies, setCompanies] = useState([]);
   //   const [showCompanies, setShowCompanies] = useState(false);
-const [filteredJobs, setFilteredJobs] = useState([]);
+  const [filteredJobs, setFilteredJobs] = useState([]);
 
   const [filters, setFilters] = useState({
     keyword: "",
@@ -50,7 +58,7 @@ const [filteredJobs, setFilteredJobs] = useState([]);
     company: "All Companies",
   });
 
-   const params = new URLSearchParams(location.search);
+  const params = new URLSearchParams(location.search);
   const userType = params.get("userType");
 
   // 💬 Chat Popup States
@@ -70,7 +78,6 @@ const [filteredJobs, setFilteredJobs] = useState([]);
 
   const [designationSuggestions, setDesignationSuggestions] = useState([]);
   const [locationSuggestions, setLocationSuggestions] = useState([]);
-
 
 
   // Close profile panel on outside click
@@ -101,28 +108,28 @@ const [filteredJobs, setFilteredJobs] = useState([]);
   //   };
   const API_BASE_URL = "http://localhost:8080";
 
-const handleDelete = async (requirementId) => {
-  if (!window.confirm("Are you sure you want to delete this job description?")) return;
+  const handleDelete = async (requirementId) => {
+    if (!window.confirm("Are you sure you want to delete this job description?")) return;
 
-  try {
-    const response = await fetch(
-      `http://localhost:8080/api/requirements/delete/${requirementId}`,
-      { method: "DELETE" }
-    );
-
-    if (response.ok) {
-      toast.success("Job deleted successfully!");
-      setJobs((prevJobs) =>
-        prevJobs.filter((job) => job.requirementId !== requirementId)
+    try {
+      const response = await fetch(
+        `http://localhost:8080/api/requirements/delete/${requirementId}`,
+        { method: "DELETE" }
       );
-    } else {
-      toast.error("Failed to delete job!");
+
+      if (response.ok) {
+        toast.success("Job deleted successfully!");
+        setJobs((prevJobs) =>
+          prevJobs.filter((job) => job.requirementId !== requirementId)
+        );
+      } else {
+        toast.error("Failed to delete job!");
+      }
+    } catch (error) {
+      console.error("Error deleting job:", error);
+      toast.error("Error connecting to backend!");
     }
-  } catch (error) {
-    console.error("Error deleting job:", error);
-    toast.error("Error connecting to backend!");
-  }
-};
+  };
 
 
   const currentYear = new Date().getFullYear();
@@ -140,9 +147,9 @@ const handleDelete = async (requirementId) => {
   };
 
 
- const handleEdit = (requirementId) => {
-  navigate(`/add-job-description/${requirementId}`);
-};
+  const handleEdit = (requirementId) => {
+    navigate(`/add-job-description/${requirementId}`);
+  };
 
 
   // ✅ Fetch jobs and listen to Apply count updates
@@ -164,9 +171,9 @@ const handleDelete = async (requirementId) => {
           job.applications = res.data.length; // real-time count
         }
 
-       setAllJobs(jobList);
-       setJobs(jobList);
-       setFilteredJobs(jobList); 
+        setAllJobs(jobList);
+        setJobs(jobList);
+        setFilteredJobs(jobList);
 
       } catch (error) {
         console.error("❌ Error fetching jobs:", error);
@@ -177,6 +184,7 @@ const handleDelete = async (requirementId) => {
 
     fetchJobs();
   }, []);
+
 
   // Fetch recruiter’s posted jobs
   useEffect(() => {
@@ -248,9 +256,9 @@ const handleDelete = async (requirementId) => {
 
         <div className="recNav-right">
           <div className="recNav-item" onClick={() => setShowChatPopup(true)}>
-            <FaEnvelope className="recNav-icon-big" />
-            <span className="recNav-label">Messaging</span>
-          </div> 
+            {/* <FaEnvelope className="recNav-icon-big" />
+            <span className="recNav-label">Messaging</span> */}
+          </div>
           <div className="recNav-item">
             <FaUserCircle
               className="recNav-icon-big"
@@ -260,6 +268,51 @@ const handleDelete = async (requirementId) => {
           </div>
         </div>
       </nav>
+
+            {/* ===== Profile Panel ===== */}
+      {openPanel === "profile" && (
+        <div className="recNav-profile-panel recNav-open">
+          <button className="recNav-close-btn" onClick={() => setOpenPanel(null)}>
+            X
+          </button>
+          <div className="recNav-profile-top">
+            <img src="icon.png" alt="Profile" className="recNav-profile-pic" />
+            <div className="recNav-profile-info">
+              <h3>Samruddhi Shekhar Patole</h3>
+              <p>B.Sc Computer Science at Dr D Y Patil Law College, Pune</p>
+              <button className="recNav-btn-update">View & Update Profile</button>
+            </div>
+          </div>
+
+          <div className="recNav-performance-block">
+            <p className="recNav-performance-text">Your Profile Performance</p>
+            <div className="recNav-stats">
+              <div className="recNav-stat-item">
+                <span className="recNav-stat-number">107</span>
+                <span className="recNav-stat-label">Search Appearances</span>
+                <button className="recNav-view-btn">View All</button>
+              </div>
+              <div className="recNav-stat-item">
+                <span className="recNav-stat-number">7</span>
+                <span className="recNav-stat-label">Recruiter Actions</span>
+                <button className="recNav-view-btn">View All</button>
+              </div>
+            </div>
+          </div>
+
+          <div className="recNav-quick-links">
+            <a href="#">
+              <FaCog className="recNav-quick-icon" /> Settings
+            </a>
+            <a href="#">
+              <FaQuestionCircle className="recNav-quick-icon" /> FAQs
+            </a>
+            <a href="#">
+              <FaSignOutAlt className="recNav-quick-icon" /> Logout
+            </a>
+          </div>
+        </div>
+      )}
 
       {/* ===== TEST TYPE POPUP ===== */}
       {showTestPopup && (
@@ -299,16 +352,78 @@ const handleDelete = async (requirementId) => {
             </button>
 
             <h2 className="jd-modal-title">Job Description Details</h2>
-            <div className="jd-modal-scroll">
+<div className="jd-modal-scroll">
               <section className="jd-section">
                 <h3>Overview</h3>
                 <div className="jd-grid">
                   <p><strong>Requirement ID:</strong> {selectedJD.requirementId}</p>
-                  <p><strong>Company:</strong> {selectedJD.companyName}</p>
+                  <p><strong>Company Name:</strong> {selectedJD.companyName}</p>
                   <p><strong>Designation:</strong> {selectedJD.designation}</p>
                   <p><strong>Location:</strong> {selectedJD.location}</p>
+                  <p><strong>Job Type:</strong> {selectedJD.jobType}</p>
                   <p><strong>Salary:</strong> {selectedJD.salary}</p>
+                  <p><strong>Experience:</strong> {selectedJD.experience}</p>
+                  <p><strong>Shift:</strong> {selectedJD.shift}</p>
+                  <p><strong>Week Off:</strong> {selectedJD.weekOff}</p>
+                  <p><strong>Notice Period:</strong> {selectedJD.noticePeriod}</p>
                 </div>
+              </section>
+              <section className="jd-section">
+                <h3>Qualification & Skills</h3>
+                <div className="jd-grid">
+                  <p><strong>Qualification:</strong> {selectedJD.qualification}</p>
+                  <p><strong>Field:</strong> {selectedJD.field}</p>
+                  <p><strong>Stream:</strong> {selectedJD.stream}</p>
+                  <p><strong>Percentage:</strong> {selectedJD.percentage}</p>
+                  <p><strong>Skills:</strong> {selectedJD.skills}</p>
+                </div>
+              </section>
+              <section className="jd-section">
+                <h3>Perks & Other Details</h3>
+                <div className="jd-grid">
+                  <p><strong>Perks:</strong> {selectedJD.perks}</p>
+                  <p><strong>Incentive:</strong> {selectedJD.incentive}</p>
+                  <p><strong>Reporting Hierarchy:</strong> {selectedJD.reportingHierarchy}</p>
+                  <p><strong>Bond:</strong> {selectedJD.bond}</p>
+                  <p><strong>Documentation:</strong> {selectedJD.documentation}</p>
+                  <p><strong>Age Criteria:</strong> {selectedJD.ageCriteria}</p>
+                </div>
+              </section>
+              <section className="jd-section">
+                <h3>Responsibilities</h3>
+                {selectedJD.responsibilities?.length > 0 ? (
+                  <ul>
+                    {selectedJD.responsibilities.map((r, i) => (
+                      <li key={i}>{r.responsibilitiesMsg}</li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p>No responsibilities provided.</p>
+                )}
+              </section>
+              <section className="jd-section">
+                <h3>Job Requirements</h3>
+                {selectedJD.jobRequirements?.length > 0 ? (
+                  <ul>
+                    {selectedJD.jobRequirements.map((r, i) => (
+                      <li key={i}>{r.jobRequirementMsg}</li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p>No requirements provided.</p>
+                )}
+              </section>
+              <section className="jd-section">
+                <h3>Preferred Qualifications</h3>
+                {selectedJD.preferredQualifications?.length > 0 ? (
+                  <ul>
+                    {selectedJD.preferredQualifications.map((r, i) => (
+                      <li key={i}>{r.preferredQualificationMsg}</li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p>No preferred qualifications provided.</p>
+                )}
               </section>
             </div>
           </div>
@@ -458,7 +573,38 @@ const handleDelete = async (requirementId) => {
                       </p>
                     </div>
 
-                    <div style={{ width: "100%", marginTop: "10px", textAlign: "right" }}>
+
+
+                    <div
+                      style={{
+                        width: "100%",
+                        marginTop: "10px",
+                        textAlign: "right",
+                        display: "flex",
+                        justifyContent: "flex-end",
+                        gap: "10px", // spacing between buttons
+                      }}
+                    >
+                      {/* {userType === "PortalEmp" && ( */}
+                      <div style={{ display: "flex", alignItems: "center" }}>
+                        <button
+                          className="recJobCard-edit-btn"
+                          onClick={() => handleEdit(job.requirementId)}
+                          title="Edit Job"
+                        >
+                          <FaPencilAlt />
+                        </button>
+
+                        <button
+                          className="recJobCard-delete-btn"
+                          onClick={() => handleDelete(job.requirementId)}
+                          title="Delete Job"
+                        >
+                          <FaTrashAlt />
+                        </button>
+                      </div>
+
+
                       <button
                         className="recJobCard-view-btn"
                         onClick={() => handleViewJD(job.requirementId)}

@@ -10,8 +10,6 @@ import Navbar from "./Components/Candidate_Profile/Navbar.jsx";
 // Recruiter-related components
 import RecruiterNavbar from "./Components/Recruiter_Profile/RecruiterNavbar.jsx";
 import AddJobDescription from "./Components/Recruiter_Profile/addJobDescription.jsx";
-import PaidPostPage from "./Components/Recruiter_Profile/PaidPostPage.jsx";
-import AddTechnicalTest from "./Components/Recruiter_Profile/AddTechnicalTest.jsx";
 import LoginEmp from "../src/Components/Recruiter_Profile/LoginEmp.jsx";
 
 // Candidate-related components
