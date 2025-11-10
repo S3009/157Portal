@@ -1,0 +1,570 @@
+/* ===== Container ===== */
+.premium-container {
+  padding: 50px 20px;
+  text-align: center;
+  background: #f8f9fa;
+  min-height: 100vh;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* ===== Header ===== */
+.premium-header {
+  margin-bottom: 50px;
+  position: relative;
+}
+
+.premium-icon {
+  font-size: 70px;
+  color: #f0c419;
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-15px); }
+  60% { transform: translateY(-10px); }
+}
+
+.premium-header h1 {
+  font-size: 36px;
+  color: #222;
+  margin-top: 15px;
+  font-weight: 700;
+}
+
+.premium-header p {
+  font-size: 18px;
+  color: #555;
+  margin-top: 10px;
+}
+
+.premium-cta-btn {
+  margin-top: 20px;
+  padding: 12px 30px;
+  font-size: 16px;
+  font-weight: 600;
+  background: #526d82;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.premium-cta-btn:hover {
+  background: #526d82;
+  transform: translateY(-3px);
+}
+
+/* ===== Benefits ===== */
+.premium-benefits {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 25px;
+  margin-bottom: 60px;
+}
+
+.benefit-card {
+  background: white;
+  border-radius: 16px;
+  padding: 25px 20px;
+  width: 260px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.benefit-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 12px 25px rgba(0,0,0,0.15);
+}
+
+.benefit-icon {
+  font-size: 35px;
+  color: #526d82;
+  margin-bottom: 15px;
+}
+
+.benefit-card h3 {
+  font-size: 20px;
+  margin-bottom: 8px;
+  color: #222;
+}
+
+.benefit-card p {
+  font-size: 14px;
+  color: #555;
+}
+
+/* ===== Premium Plans ===== */
+.premium-plans h2 {
+  font-size: 28px;
+  margin-bottom: 35px;
+  color: #222;
+}
+
+.plans-grid {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 25px;
+}
+
+.plan-card {
+  background: white;
+  border-radius: 18px;
+  padding: 30px 20px;
+  width: 280px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  text-align: center;
+  position: relative;
+  transition: transform 0.3s, box-shadow 0.3s, border 0.3s;
+}
+
+.plan-card.highlight {
+  border: 3px solid #526d82;
+  transform: scale(1.08);
+  box-shadow: 0 12px 25px rgba(0,0,0,0.2);
+}
+
+.plan-card.highlight::before {
+  content: "Most Popular";
+  position: absolute;
+  top: -15px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #526d82;
+  color: white;
+  font-size: 12px;
+  padding: 5px 12px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.plan-card h3 {
+  font-size: 22px;
+  margin-bottom: 10px;
+  color: #222;
+}
+
+.plan-card .price {
+  font-size: 22px;
+  color: #526d82;
+  margin: 10px 0 20px;
+  font-weight: 700;
+}
+
+.plan-card ul {
+  list-style: none;
+  padding: 0;
+  text-align: left;
+  margin-bottom: 25px;
+}
+
+.plan-card li {
+  margin: 8px 0;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+}
+
+.plan-card li::before {
+  content: "✔";
+  margin-right: 8px;
+  color: #28a745;
+  font-weight: bold;
+}
+
+.plan-card li:contains("✖")::before {
+  content: "✖";
+  color: #dc3545;
+}
+
+.plan-card button {
+  background: #526d82;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 25px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.plan-card button:hover {
+  background: #526d82;
+  transform: translateY(-3px);
+}
+
+/* ===== Plan Comparison Table ===== */
+.plan-comparison {
+  margin-top: 60px;
+  overflow-x: auto;
+}
+
+.plan-comparison table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 600px;
+}
+
+.plan-comparison th, .plan-comparison td {
+  padding: 15px 12px;
+  border: 1px solid #ddd;
+  text-align: center;
+  font-size: 14px;
+}
+
+.plan-comparison th {
+  background: #526d82;
+  color: white;
+}
+
+.plan-comparison td {
+  background: white;
+}
+
+.plan-comparison td:first-child {
+  text-align: left;
+  font-weight: 600;
+}
+
+/* ===== Bottom CTA ===== */
+.premium-cta-bottom {
+  margin-top: 60px;
+  background: #526d82;
+  color: white;
+  padding: 40px 20px;
+  border-radius: 16px;
+}
+
+.premium-cta-bottom h2 {
+  margin-bottom: 20px;
+  font-size: 26px;
+}
+
+.premium-cta-bottom button {
+  background: white;
+  color: #526d82;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 30px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.premium-cta-bottom button:hover {
+  background: #e6e6e6;
+  transform: translateY(-3px);
+}
+.upgrade-modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right:0; bottom:0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.upgrade-modal {
+  background: #fff;
+  padding: 30px;
+  border-radius: 12px;
+  width: 450px;
+  max-width: 90%;
+  text-align: left;
+}
+.upgrade-modal h2 {
+  margin-bottom: 20px;
+  color: #007bff;
+}
+
+.modal-section {
+  margin-bottom: 20px;
+}
+.modal-section label {
+  font-weight: 600;
+}
+
+.modal-section select {
+  width: 100%;
+  padding: 8px;
+  margin-top: 5px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+
+.modal-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 25px;
+}
+
+.modal-buttons .cancel-btn {
+  background: #ccc;
+  color: #333;
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}
+
+.modal-buttons .confirm-btn {
+  background: #007bff;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}
+/* Upgrade Modal Overlay */
+.upgrade-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.upgrade-modal {
+  background: #fff;
+  padding: 30px 25px;
+  border-radius: 12px;
+  max-width: 500px;
+  width: 95%;
+  text-align: center;
+  box-shadow: 0 6px 25px rgba(0,0,0,0.3);
+}
+
+.upgrade-modal h2 {
+  margin-bottom: 20px;
+  color: #007bff;
+}
+
+.modal-section {
+  margin: 15px 0;
+  text-align: left;
+}
+
+.modal-section label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.modal-section select {
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+}
+
+.modal-plan-comparison {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.modal-plan-comparison h3 {
+  color: #007bff;
+  margin-bottom: 10px;
+}
+
+.modal-plan-comparison table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+.modal-plan-comparison th, .modal-plan-comparison td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: center;
+}
+
+
+.modal-plan-comparison th,
+.modal-plan-comparison td {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+.modal-plan-comparison th {
+  background: #f1f1f1;
+  color: #007bff;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 15px;
+}
+.prorated-cost {
+  font-size: 22px;
+  font-weight: 700;
+  color: #28a745;
+}
+
+.modal-buttons .cancel-btn {
+  background: #ccc;
+  color: #333;
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}
+
+.modal-buttons .confirm-btn {
+  background: #007bff;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}
+.payment-methods {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.payment-btn {
+  flex: 1;
+  padding: 10px 0;
+  border-radius: 8px;
+  border: 1px solid #007bff;
+  background: #fff;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.payment-btn.selected {
+  background: #007bff;
+  color: #fff;
+}
+
+.payment-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.payment-modal {
+  background: #fff;
+  padding: 30px;
+  border-radius: 12px;
+  width: 400px;
+  max-width: 90%;
+}
+
+.payment-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.payment-tabs button {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: #f5f5f5;
+  cursor: pointer;
+}
+
+.payment-tabs button.active {
+  background: #007bff;
+  color: #fff;
+  border-color: #007bff;
+}
+
+.payment-method-content .method-card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.payment-method-content input,
+.payment-method-content select {
+  padding: 8px;
+  width: 100%;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.cancel-btn {
+  background: #f5f5f5;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.confirm-btn {
+  background: #007bff;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 992px) {
+  .plans-grid {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .premium-benefits {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+@media (max-width: 576px) {
+  .premium-header h1 {
+    font-size: 28px;
+  }
+
+  .premium-header p {
+    font-size: 15px;
+  }
+
+  .plan-card {
+    width: 90%;
+  }
+
+  .plan-comparison table {
+    font-size: 12px;
+  }
+
+  .premium-cta-bottom h2 {
+    font-size: 22px;
+  }
+}

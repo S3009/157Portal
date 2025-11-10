@@ -26,6 +26,7 @@ import AddTechnicalTest from "./Components/Recruiter_Profile/AddTechnicalTest.js
 import LandingPage from "./Components/LandingPage.jsx";
 import HeaderWrapper from "./Components/HeaderWrapper.jsx"
 import ProfilePage from "./Components/Candidate_Profile/Profile/ProfilePage.jsx";
+import PremiumPage from "./Components/Candidate_Profile/PremiumPage.jsx";
 
 function App() {
   return (
@@ -66,6 +67,8 @@ function App() {
         <Route path="/resume-templates" element={<ResumeTemplates />} />
         <Route path="/saved-jobs" element={<SavedJobs />} />
         <Route path="/profile-page" element={<ProfilePage/>}/>
+        <Route path="/premium" element={<PremiumPage />} />
+
       </Routes>
     </BrowserRouter>
   );

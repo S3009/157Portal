@@ -32,6 +32,22 @@
 
 .navbar-center
 
+/* Premium link styled like nav links */
+.premium-click-container {
+  display: flex;
+  align-items: center;
+}
+
+.premium-label {
+  color: #fff; /* golden/orange color for premium */
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.premium-label:hover {
+  color: #0078ff;
+}
 
 .search-bar input {
   width: 100%;
