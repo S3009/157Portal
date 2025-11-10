@@ -24,7 +24,7 @@ const HomePage = () => {
       <div className="hero-center">
         <h1>Over 8,00,000 openings delivered perfectly</h1>
 
-        <form className="search-bar" onSubmit={handleSearch}>
+        <form className="search-barr" onSubmit={handleSearch}>
           <div className="input-box">
             <FaSearch className="icon" />
             <input

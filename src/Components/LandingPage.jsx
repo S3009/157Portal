@@ -68,14 +68,14 @@ function LandingPage() {
   return (
     <div>
 
-      <section class="hero">
-        <div class="particles"></div>
+      <section className="hero">
+        <div className="particles"></div>
 
-        <div class="hero-content">
-          <h2 class="static-line wave-text">Connecting Talent with Opportunity.</h2>
+        <div className="hero-content">
+          <h2 className="static-line wave-text">Connecting Talent with Opportunity.</h2>
 
-          <h1 class="typing-line">
-            <span id="typed" class="wave-text"></span>
+          <h1 className="typing-line">
+            <span id="typed" className="wave-text"></span>
           </h1>
         </div>
       </section>

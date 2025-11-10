@@ -28,7 +28,7 @@
 }
 
 /* === SEARCH BAR === */
-.search-bar {
+.search-barr {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -94,7 +94,6 @@
   transition: all 0.3s ease;
 
   position: relative;
-  /* top: 10px;  */
 }
 
 .search-btn:hover {
@@ -273,7 +272,7 @@
 
 /* === RESPONSIVE === */
 @media (max-width: 768px) {
-  .search-bar {
+  .search-barr {
     flex-direction: column;
     border-radius: 16px;
     height: auto;

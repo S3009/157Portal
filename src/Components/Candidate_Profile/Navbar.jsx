@@ -35,9 +35,9 @@ const Navbar = () => {
   const [showInterviewSubmenu, setShowInterviewSubmenu] = useState();
   const [filteredJobs, setFilteredJobs] = useState([]);
   const [showSearchOverlay, setShowSearchOverlay] = useState(false);
-const [searchSkill, setSearchSkill] = useState("");
-const [searchExp, setSearchExp] = useState("");
-const [searchLocation, setSearchLocation] = useState("");
+  const [searchSkill, setSearchSkill] = useState("");
+  const [searchExp, setSearchExp] = useState("");
+  const [searchLocation, setSearchLocation] = useState("");
 
   // ===== Job Dashboard States =====
   const [jobs, setJobs] = useState([]);
@@ -78,7 +78,7 @@ const [searchLocation, setSearchLocation] = useState("");
     JSON.parse(localStorage.getItem("savedJobs")) || []
   );
   const toggleSave = async (jobId) => {
-    const candidateId = 1; 
+    const candidateId = 1;
 
     try {
       let updated;
@@ -134,8 +134,8 @@ const [searchLocation, setSearchLocation] = useState("");
       try {
         const res = await axios.get("http://localhost:8080/api/requirements/all");
         const data = res.data || [];
-         setJobs(data);
-         setFilteredJobs(data); 
+        setJobs(data);
+        setFilteredJobs(data);
         localStorage.setItem("jobsList", JSON.stringify(data)); // ✅ store globally
       } catch (error) {
         console.error("Error fetching jobs:", error);
@@ -199,42 +199,42 @@ const [searchLocation, setSearchLocation] = useState("");
     setFilters({ ...filters, [e.target.name]: e.target.value });
 
   useEffect(() => {
-  let updated = jobs;
+    let updated = jobs;
 
-  if (filters.keyword) {
-    updated = updated.filter(
-      (job) =>
-        job.jobRole?.toLowerCase().includes(filters.keyword.toLowerCase()) ||
-        job.companyName?.toLowerCase().includes(filters.keyword.toLowerCase())
-    );
-  }
+    if (filters.keyword) {
+      updated = updated.filter(
+        (job) =>
+          job.jobRole?.toLowerCase().includes(filters.keyword.toLowerCase()) ||
+          job.companyName?.toLowerCase().includes(filters.keyword.toLowerCase())
+      );
+    }
 
-  if (filters.location && filters.location !== "All Locations") {
-    updated = updated.filter((job) => job.location === filters.location);
-  }
+    if (filters.location && filters.location !== "All Locations") {
+      updated = updated.filter((job) => job.location === filters.location);
+    }
 
-  if (filters.experience && filters.experience !== "All Experience Levels") {
-    updated = updated.filter((job) => job.experience === filters.experience);
-  }
+    if (filters.experience && filters.experience !== "All Experience Levels") {
+      updated = updated.filter((job) => job.experience === filters.experience);
+    }
 
-  if (filters.salary && filters.salary !== "All Salary Ranges") {
-    updated = updated.filter((job) => job.salary === filters.salary);
-  }
+    if (filters.salary && filters.salary !== "All Salary Ranges") {
+      updated = updated.filter((job) => job.salary === filters.salary);
+    }
 
-  if (filters.designation && filters.designation !== "All Job Designations") {
-    updated = updated.filter((job) => job.jobRole === filters.designation);
-  }
+    if (filters.designation && filters.designation !== "All Job Designations") {
+      updated = updated.filter((job) => job.jobRole === filters.designation);
+    }
 
-  if (filters.qualification && filters.qualification !== "All Qualifications") {
-    updated = updated.filter((job) => job.qualification === filters.qualification);
-  }
+    if (filters.qualification && filters.qualification !== "All Qualifications") {
+      updated = updated.filter((job) => job.qualification === filters.qualification);
+    }
 
-  if (filters.company && filters.company !== "All Companies") {
-    updated = updated.filter((job) => job.companyName === filters.company);
-  }
+    if (filters.company && filters.company !== "All Companies") {
+      updated = updated.filter((job) => job.companyName === filters.company);
+    }
 
-  setFilteredJobs(updated);
-}, [filters, jobs]);
+    setFilteredJobs(updated);
+  }, [filters, jobs]);
 
 
   const handleViewJD = async (id) => {
@@ -290,31 +290,31 @@ const [searchLocation, setSearchLocation] = useState("");
   //     ]);
   //   }, 1000);
   // };
-const handleSearchJobs = () => {
-  let filtered = jobs;
+  const handleSearchJobs = () => {
+    let filtered = jobs;
 
-  if (searchSkill.trim() !== "") {
-    filtered = filtered.filter(job =>
-      (job.skills?.toLowerCase().includes(searchSkill.toLowerCase())) ||
-      (job.designation?.toLowerCase().includes(searchSkill.toLowerCase())) ||
-      (job.jobRole?.toLowerCase().includes(searchSkill.toLowerCase()))
-    );
-  }
+    if (searchSkill.trim() !== "") {
+      filtered = filtered.filter(job =>
+        (job.skills?.toLowerCase().includes(searchSkill.toLowerCase())) ||
+        (job.designation?.toLowerCase().includes(searchSkill.toLowerCase())) ||
+        (job.jobRole?.toLowerCase().includes(searchSkill.toLowerCase()))
+      );
+    }
 
-  if (searchExp !== "") {
-    filtered = filtered.filter(job => job.experience?.includes(searchExp));
-  }
+    if (searchExp !== "") {
+      filtered = filtered.filter(job => job.experience?.includes(searchExp));
+    }
 
-  if (searchLocation.trim() !== "") {
-    filtered = filtered.filter(job =>
-      job.location?.toLowerCase().includes(searchLocation.toLowerCase())
-    );
-  }
+    if (searchLocation.trim() !== "") {
+      filtered = filtered.filter(job =>
+        job.location?.toLowerCase().includes(searchLocation.toLowerCase())
+      );
+    }
 
-  setFilteredJobs(filtered);
-  setActiveSection("jobs");
-  setShowSearchOverlay(false);
-};
+    setFilteredJobs(filtered);
+    setActiveSection("jobs");
+    setShowSearchOverlay(false);
+  };
 
   return (
     <>
@@ -413,12 +413,12 @@ const handleSearchJobs = () => {
         <div className="navbar-center">
           {activeSection !== "home" && (
             <div className="search-bar">
-<input
-  type="text"
-  placeholder="Search jobs, companies..."
-  onFocus={() => setShowSearchOverlay(true)}
-  readOnly
-/>
+              <input
+                type="text"
+                placeholder="Search jobs, companies..."
+                onFocus={() => setShowSearchOverlay(true)}
+                readOnly
+              />
             </div>
           )}
         </div>
@@ -446,7 +446,7 @@ const handleSearchJobs = () => {
             )}
           </div>
 
-     
+
           {/* <div
             className="nav-item messaging-item"
             onClick={() => setShowChatPopup(!showChatPopup)}
@@ -454,15 +454,17 @@ const handleSearchJobs = () => {
             <FaEnvelope className="nav-icon-big" />
             <span className="nav-label">Messaging</span>
             {/* <span className="message-badge">3</span> */}
-          {/* </div> */} 
+          {/* </div> */}
 
           <FaBell
+            size={25}
             className="icon"
             title="Notifications"
             onClick={() => setShowNotifications(true)}
           />
           <div className="profile-section">
             <FaUserCircle
+              size={25}
               className="icon"
               onClick={() => togglePanel("profile")}
             />
@@ -781,171 +783,171 @@ const handleSearchJobs = () => {
               /> */}
 
               <label>
-  Location
-  <select name="location" value={filters.location} onChange={handleChange}>
-    <option>All Locations</option>
-    {[...new Set(jobs.map((job) => job.location))].map((loc) => (
-      <option key={loc}>{loc}</option>
-    ))}
-  </select>
-</label>
+                Location
+                <select name="location" value={filters.location} onChange={handleChange}>
+                  <option>All Locations</option>
+                  {[...new Set(jobs.map((job) => job.location))].map((loc) => (
+                    <option key={loc}>{loc}</option>
+                  ))}
+                </select>
+              </label>
 
-<label>
-  Experience
-  <select name="experience" value={filters.experience} onChange={handleChange}>
-    <option>All Experience Levels</option>
-    {[...new Set(jobs.map((job) => job.experience))].map((exp) => (
-      <option key={exp}>{exp}</option>
-    ))}
-  </select>
-</label>
+              <label>
+                Experience
+                <select name="experience" value={filters.experience} onChange={handleChange}>
+                  <option>All Experience Levels</option>
+                  {[...new Set(jobs.map((job) => job.experience))].map((exp) => (
+                    <option key={exp}>{exp}</option>
+                  ))}
+                </select>
+              </label>
 
-<label>
-  Salary
-  <select name="salary" value={filters.salary} onChange={handleChange}>
-    <option>All Salary Ranges</option>
-    {[...new Set(jobs.map((job) => job.salary))].map((sal) => (
-      <option key={sal}>{sal}</option>
-    ))}
-  </select>
-</label>
+              <label>
+                Salary
+                <select name="salary" value={filters.salary} onChange={handleChange}>
+                  <option>All Salary Ranges</option>
+                  {[...new Set(jobs.map((job) => job.salary))].map((sal) => (
+                    <option key={sal}>{sal}</option>
+                  ))}
+                </select>
+              </label>
 
-<label>
-  Designation
-  <select name="designation" value={filters.designation} onChange={handleChange}>
-    <option>All Job Designations</option>
-    {[...new Set(jobs.map((job) => job.jobRole))].map((role) => (
-      <option key={role}>{role}</option>
-    ))}
-  </select>
-</label>
+              <label>
+                Designation
+                <select name="designation" value={filters.designation} onChange={handleChange}>
+                  <option>All Job Designations</option>
+                  {[...new Set(jobs.map((job) => job.jobRole))].map((role) => (
+                    <option key={role}>{role}</option>
+                  ))}
+                </select>
+              </label>
 
-<label>
-  Qualification
-  <select name="qualification" value={filters.qualification} onChange={handleChange}>
-    <option>All Qualifications</option>
-    {[...new Set(jobs.map((job) => job.qualification))].map((q) => (
-      <option key={q}>{q}</option>
-    ))}
-  </select>
-</label>
+              <label>
+                Qualification
+                <select name="qualification" value={filters.qualification} onChange={handleChange}>
+                  <option>All Qualifications</option>
+                  {[...new Set(jobs.map((job) => job.qualification))].map((q) => (
+                    <option key={q}>{q}</option>
+                  ))}
+                </select>
+              </label>
 
-<label>
-  Company
-  <select name="company" value={filters.company} onChange={handleChange}>
-    <option>All Companies</option>
-    {[...new Set(jobs.map((job) => job.companyName))].map((c) => (
-      <option key={c}>{c}</option>
-    ))}
-  </select>
-</label>
-</div>
-{/* Job Cards */}
-<div className="navDash-jobContainer">
-  <h2 className="navDash-jobContainer-heading">Jobs For You</h2>
+              <label>
+                Company
+                <select name="company" value={filters.company} onChange={handleChange}>
+                  <option>All Companies</option>
+                  {[...new Set(jobs.map((job) => job.companyName))].map((c) => (
+                    <option key={c}>{c}</option>
+                  ))}
+                </select>
+              </label>
+            </div>
+            {/* Job Cards */}
+            <div className="navDash-jobContainer">
+              <h2 className="navDash-jobContainer-heading">Jobs For You</h2>
 
-  {loading ? (
-    <p>Loading jobs...</p>
-  ) : jobs.length === 0 ? (
-    <p>No jobs found.</p>
-  ) : (
-    <>
-      <div className="navDash-jobGrid">
-        {filteredJobs
-          .filter(
-            (job) =>
-              selectedCompany === "All Companies" ||
-              job.companyName === selectedCompany
-          )
-          .slice(0, visibleCount)
-          .map((job) => (
-            <div key={job.requirementId} className="navDash-jobCard">
+              {loading ? (
+                <p>Loading jobs...</p>
+              ) : jobs.length === 0 ? (
+                <p>No jobs found.</p>
+              ) : (
+                <>
+                  <div className="navDash-jobGrid">
+                    {filteredJobs
+                      .filter(
+                        (job) =>
+                          selectedCompany === "All Companies" ||
+                          job.companyName === selectedCompany
+                      )
+                      .slice(0, visibleCount)
+                      .map((job) => (
+                        <div key={job.requirementId} className="navDash-jobCard">
 
-              <div className="navDash-jobHeader">
-                {job.companyLogo && (
-                  <img
-                    src={job.companyLogo}
-                    alt="Company Logo"
-                    className="navDash-companyLogo"
-                  />
-                  
-                )}
+                          <div className="navDash-jobHeader">
+                            {job.companyLogo && (
+                              <img
+                                src={job.companyLogo}
+                                alt="Company Logo"
+                                className="navDash-companyLogo"
+                              />
 
-                <div className="navDash-jobInfo">
-                  <p><strong>Company:</strong> {job.companyName}</p>
-                  <p><strong>Location:</strong> {job.location}</p>
-                  <p><strong>Experience:</strong> {job.experience}</p>
-                  <p><strong>Job Role:</strong> {job.jobRole}</p>
+                            )}
+
+                            <div className="navDash-jobInfo">
+                              <p><strong>Company:</strong> {job.companyName}</p>
+                              <p><strong>Location:</strong> {job.location}</p>
+                              <p><strong>Experience:</strong> {job.experience}</p>
+                              <p><strong>Job Role:</strong> {job.jobRole}</p>
+                            </div>
+                          </div>
+
+                          {/* ✅ Bottom Buttons */}
+                          <div className="navDash-jobActions">
+                            {/* View JD - Bottom Left */}
+                            <button
+                              className="navDash-viewBtn"
+                              onClick={() => handleViewJD(job.requirementId)}
+                            >
+                              View JD
+                            </button>
+
+                            {/* Save + Apply Now - Bottom Right */}
+                            <div className="navDash-actionRight">
+                              <button
+                                className="navDash-saveBtn"
+                                onClick={() => toggleSave(job.requirementId)}
+                                title={
+                                  savedJobs.includes(job.requirementId)
+                                    ? "Unsave Job"
+                                    : "Save Job"
+                                }
+                              >
+                                {savedJobs.includes(job.requirementId) ? (
+                                  <FaBookmark />
+                                ) : (
+                                  <FaRegBookmark />
+                                )}
+                              </button>
+
+                              <button
+                                className="navDash-applyBtn"
+                                onClick={() => handleApplyNow(job)}
+                              >
+                                Apply Now
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+
+                  {/* Show More Button below grid */}
+                  {visibleCount < jobs.length && (
+                    <button
+                      className="navDash-showMore"
+                      onClick={() => setVisibleCount((prev) => prev + 6)}
+                    >
+                      Show More
+                    </button>
+                  )}
+                </>
+              )}
+
+              {/* No CV Highlight */}
+              <div className="no-cv-highlight">
+                <div className="no-cv-text">
+                  <h3>No CV? No Problem 🚀</h3>
+                  <p>Create your professional resume instantly in minutes.</p>
                 </div>
-              </div>
 
-              {/* ✅ Bottom Buttons */}
-              <div className="navDash-jobActions">
-                {/* View JD - Bottom Left */}
                 <button
-                  className="navDash-viewBtn"
-                  onClick={() => handleViewJD(job.requirementId)}
+                  className="no-cv-create-btn"
+                  onClick={() => navigate("/resume-templates")}
                 >
-                  View JD
+                  Create Resume
                 </button>
-
-                {/* Save + Apply Now - Bottom Right */}
-                <div className="navDash-actionRight">
-                  <button
-                    className="navDash-saveBtn"
-                    onClick={() => toggleSave(job.requirementId)}
-                    title={
-                      savedJobs.includes(job.requirementId)
-                        ? "Unsave Job"
-                        : "Save Job"
-                    }
-                  >
-                    {savedJobs.includes(job.requirementId) ? (
-                      <FaBookmark />
-                    ) : (
-                      <FaRegBookmark />
-                    )}
-                  </button>
-
-                  <button
-                    className="navDash-applyBtn"
-                    onClick={() => handleApplyNow(job)}
-                  >
-                    Apply Now
-                  </button>
-                </div>
               </div>
             </div>
-          ))}
-      </div>
-
-      {/* Show More Button below grid */}
-      {visibleCount < jobs.length && (
-        <button
-          className="navDash-showMore"
-          onClick={() => setVisibleCount((prev) => prev + 6)}
-        >
-          Show More
-        </button>
-      )}
-    </>
-  )}
-
-  {/* No CV Highlight */}
-  <div className="no-cv-highlight">
-    <div className="no-cv-text">
-      <h3>No CV? No Problem 🚀</h3>
-      <p>Create your professional resume instantly in minutes.</p>
-    </div>
-
-    <button
-      className="no-cv-create-btn"
-      onClick={() => navigate("/resume-templates")}
-    >
-      Create Resume
-    </button>
-  </div>
-</div>
 
           </div>
         )}
@@ -1192,58 +1194,58 @@ const handleSearchJobs = () => {
         </div>
       )}
       {showSearchOverlay && (
-  <div className="rgSearch-top">
-    <div className="rgSearch-wrapper">
-      {/* ===== Logo and Title ===== */}
-      <div className="rgSearch-left">
-        <img src="/jobportal.jpg" alt="RG Portal Logo" className="rgSearch-logo" />
-        <span className="rgSearch-title">RG Portal</span>
-      </div>
+        <div className="rgSearch-top">
+          <div className="rgSearch-wrapper">
+            {/* ===== Logo and Title ===== */}
+            <div className="rgSearch-left">
+              <img src="/jobportal.jpg" alt="RG Portal Logo" className="rgSearch-logo" />
+              <span className="rgSearch-title">RG Portal</span>
+            </div>
 
-      {/* ===== Search Fields ===== */}
-      <div className="rgSearch-fields">
-        <input
-  type="text"
-  placeholder="Enter Skills, Designation etc"
-  className="rgSearch-input"
-  value={searchSkill}
-  onChange={(e) => setSearchSkill(e.target.value)}
-/>
+            {/* ===== Search Fields ===== */}
+            <div className="rgSearch-fields">
+              <input
+                type="text"
+                placeholder="Enter Skills, Designation etc"
+                className="rgSearch-input"
+                value={searchSkill}
+                onChange={(e) => setSearchSkill(e.target.value)}
+              />
 
-<select
-  className="rgSearch-select"
-  value={searchExp}
-  onChange={(e) => setSearchExp(e.target.value)}
->
-  <option value="">Experience</option>
-  {[...Array(11).keys()].map((n) => (
-    <option key={n} value={n}>{n} year{n !== 1 ? "s" : ""}</option>
-  ))}
-</select>
+              <select
+                className="rgSearch-select"
+                value={searchExp}
+                onChange={(e) => setSearchExp(e.target.value)}
+              >
+                <option value="">Experience</option>
+                {[...Array(11).keys()].map((n) => (
+                  <option key={n} value={n}>{n} year{n !== 1 ? "s" : ""}</option>
+                ))}
+              </select>
 
-<input
-  type="text"
-  placeholder="Location"
-  className="rgSearch-input"
-  value={searchLocation}
-  onChange={(e) => setSearchLocation(e.target.value)}
-/>
+              <input
+                type="text"
+                placeholder="Location"
+                className="rgSearch-input"
+                value={searchLocation}
+                onChange={(e) => setSearchLocation(e.target.value)}
+              />
 
-<button className="rgSearch-btn" onClick={handleSearchJobs}>
-  Let’s Find
-</button>
+              <button className="rgSearch-btn" onClick={handleSearchJobs}>
+                Let’s Find
+              </button>
 
-      </div>
+            </div>
 
-      {/* ===== Close Button ===== */}
-      <button className="rgSearch-close" onClick={() => setShowSearchOverlay(false)}>
-        ×
-      </button>
-    </div>
-  </div>
-)}
+            {/* ===== Close Button ===== */}
+            <button className="rgSearch-close" onClick={() => setShowSearchOverlay(false)}>
+              ×
+            </button>
+          </div>
+        </div>
+      )}
 
-<ChatBot />
+      <ChatBot />
 
     </>
   );
