@@ -6,7 +6,8 @@ import EmployeeRoles from "./Components/EmployeeRoles.jsx";
 import RegisterPage from "./Components/Candidate_Profile/RegisterPage.jsx";
 import RegisterEmp from "./Components/Recruiter_Profile/RegisterEmp.jsx";
 import Navbar from "./Components/Candidate_Profile/Navbar.jsx";
-
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 // Recruiter-related components
 import RecruiterNavbar from "./Components/Recruiter_Profile/RecruiterNavbar.jsx";
 import AddJobDescription from "./Components/Recruiter_Profile/addJobDescription.jsx";
@@ -27,6 +28,7 @@ import LandingPage from "./Components/LandingPage.jsx";
 import HeaderWrapper from "./Components/HeaderWrapper.jsx"
 import ProfilePage from "./Components/Candidate_Profile/Profile/ProfilePage.jsx";
 import PremiumPage from "./Components/Candidate_Profile/PremiumPage.jsx";
+import InvitesPage from "./Components/Candidate_Profile/InvitesPage.jsx";
 
 function App() {
   return (
@@ -68,9 +70,12 @@ function App() {
         <Route path="/saved-jobs" element={<SavedJobs />} />
         <Route path="/profile-page" element={<ProfilePage/>}/>
         <Route path="/premium" element={<PremiumPage />} />
+        <Route path="/invites" element={<InvitesPage />} />
 
       </Routes>
+      <ToastContainer />
     </BrowserRouter>
+    
   );
 }
 

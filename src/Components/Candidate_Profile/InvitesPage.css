@@ -1,0 +1,242 @@
+/* ===========================
+   INVITES PAGE - FIXED 2-COLUMN
+=========================== */
+.invites-page {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding: 20px;
+  background: #f4f6f8;
+  min-height: 90vh;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+/* LEFT SECTION (Invite List) */
+.left-section {
+  flex: 1 1 30%;
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  min-width: 300px;
+  max-width: 420px;
+}
+
+.left-section h2 {
+  margin-bottom: 15px;
+  color: #333;
+  font-size: 20px;
+}
+
+.invite-list {
+  list-style: none;
+  padding: 0;
+  overflow-y: auto;
+  max-height: 80vh;
+}
+
+.invite-card {
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 12px;
+  background: #fafafa;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.invite-card:hover {
+  border-color: #007bff;
+  background: #eef5ff;
+}
+
+.invite-card.active {
+  border-color: #0056d2;
+  background: #e8f0fe;
+}
+
+.invite-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.company-logo-small {
+  width: 45px;
+  height: 45px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.invite-meta {
+  font-size: 14px;
+  color: #555;
+}
+
+.invite-salary {
+  font-size: 14px;
+  font-weight: bold;
+  color: #222;
+  margin-top: 5px;
+}
+
+.invite-actions {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+}
+
+.view-btn,
+.not-interested-btn {
+  flex: 1;
+  border: none;
+  border-radius: 8px;
+  padding: 8px;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.view-btn {
+  background: #007bff;
+  color: white;
+}
+
+.view-btn:hover {
+  background: #0056d2;
+}
+
+.not-interested-btn {
+  background: #f5f5f5;
+  color: #333;
+}
+
+.not-interested-btn:hover {
+  background: #e0e0e0;
+}
+
+/* RIGHT SECTION (Job Description) */
+.right-section {
+  flex: 1 1 65%;
+  background: #fff;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  min-width: 320px;
+}
+
+.jd-container h2 {
+  color: #0056d2;
+  margin-bottom: 10px;
+  font-size: 22px;
+}
+
+.jd-container p {
+  margin: 5px 0;
+  line-height: 1.6;
+  font-size: 15px;
+  color: #444;
+}
+
+.company-logo-large {
+  width: 100px;
+  margin-top: 15px;
+  border-radius: 8px;
+}
+
+/* --- Apply Now Button --- */
+.apply-btn {
+  display: inline-block;
+  margin-top: 25px;
+  padding: 12px 28px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 6px rgba(0, 123, 255, 0.3);
+}
+
+.apply-btn:hover {
+  background-color: #0056d2;
+  box-shadow: 0 5px 10px rgba(0, 86, 210, 0.4);
+  transform: translateY(-2px);
+}
+
+.apply-btn:active {
+  background-color: #004bb5;
+  transform: scale(0.98);
+}
+
+/* ===========================
+   RESPONSIVE (Still side-by-side)
+=========================== */
+
+/* Tablets (≤ 992px) */
+@media (max-width: 992px) {
+  .invites-page {
+    gap: 15px;
+    padding: 15px;
+  }
+
+  .left-section {
+    flex: 1 1 35%;
+    padding: 15px;
+  }
+
+  .right-section {
+    flex: 1 1 60%;
+    padding: 20px;
+  }
+
+  .jd-container h2 {
+    font-size: 20px;
+  }
+}
+
+/* Small Mobiles (≤ 600px) */
+@media (max-width: 600px) {
+  .invites-page {
+    flex-direction: row;
+    gap: 10px;
+  }
+
+  .left-section {
+    flex: 1 1 40%;
+    padding: 10px;
+  }
+
+  .right-section {
+    flex: 1 1 55%;
+    padding: 10px;
+  }
+
+  .invite-meta,
+  .invite-salary,
+  .jd-container p {
+    font-size: 13px;
+  }
+
+  .apply-btn {
+    font-size: 14px;
+    padding: 10px 20px;
+  }
+}
+
+/* Very Small Screens (≤ 420px) → only here stack */
+@media (max-width: 420px) {
+  .invites-page {
+    flex-direction: column;
+  }
+
+  .left-section,
+  .right-section {
+    width: 100%;
+  }
+}

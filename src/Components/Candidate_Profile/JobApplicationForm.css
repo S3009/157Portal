@@ -1749,3 +1749,39 @@ label[for="resumeUpload"] {
 .testPrompt-box .start-test-btn:hover {
   background-color: #0056b3;
 }
+.buyPlanOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+.buyPlanModal {
+  background: white;
+  padding: 30px;
+  border-radius: 10px;
+  width: 400px;
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+.buyPlanButtons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+.buyNowBtn {
+  background-color: #1d3a5d;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: none;
+}
+.cancelBtn {
+  background: #ddd;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+}
