@@ -27,50 +27,53 @@ import LandingPage from "./Components/LandingPage.jsx";
 import HeaderWrapper from "./Components/HeaderWrapper.jsx"
 import ProfilePage from "./Components/Candidate_Profile/Profile/ProfilePage.jsx";
 import PremiumPage from "./Components/Candidate_Profile/PremiumPage.jsx";
+import { UserProvider } from "./Components/UserContext.jsx";
 
 function App() {
   return (
-    <BrowserRouter>
-      <HeaderWrapper />  {/* Header only for specific pages */}
-      <Routes>
-        <Route path="/user-type-selection" element={<UserTypeSelection />} />
-        <Route path="/employee-roles" element={<EmployeeRoles />} />
-        <Route path="/login/:userType/:role?" element={<LoginPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/loginemp" element={<LoginEmp />} />
-        <Route path="/navbar" element={<Navbar />} />
+    <UserProvider>
+      <BrowserRouter>
+        <HeaderWrapper />  {/* Header only for specific pages */}
+        <Routes>
+          <Route path="/user-type-selection" element={<UserTypeSelection />} />
+          <Route path="/employee-roles" element={<EmployeeRoles />} />
+          <Route path="/login/:userType/:role?" element={<LoginPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/loginemp" element={<LoginEmp />} />
+          <Route path="/navbar" element={<Navbar />} />
 
-        {/* ===================== Recruiter Routes ===================== */}
-        <Route path="/recruiter-navbar/:userType" element={<RecruiterNavbar />} />
-        <Route path="/add-job-description" element={<AddJobDescription />} />
-        <Route path="/add-job-description/:requirementId" element={<AddJobDescription />} />
-        <Route path="/registerEmp" element={<RegisterEmp />} />
-        <Route path="/paid-post" element={<PaidPostPage />} />
-        <Route path="/add-technical-test" element={<AddTechnicalTest />} />
-        {/* <Route path="/recruiter-homepage" element={<RecruiterHome/>}/> */}
+          {/* ===================== Recruiter Routes ===================== */}
+          <Route path="/recruiter-navbar/:userType" element={<RecruiterNavbar />} />
+          <Route path="/add-job-description" element={<AddJobDescription />} />
+          <Route path="/add-job-description/:requirementId" element={<AddJobDescription />} />
+          <Route path="/registerEmp" element={<RegisterEmp />} />
+          <Route path="/paid-post" element={<PaidPostPage />} />
+          <Route path="/add-technical-test" element={<AddTechnicalTest />} />
+          {/* <Route path="/recruiter-homepage" element={<RecruiterHome/>}/> */}
 
 
 
 
-        {/* General */}
-        <Route path="/" element={<LandingPage />} />
+          {/* General */}
+          <Route path="/" element={<LandingPage />} />
 
-        {/* Candidate routes */}
-        <Route path="/navbar" element={<Navbar />} />
-        <Route path="/apply/:id" element={<JobApplicationForm />} />
-        <Route path="/interview-faqs" element={<InterviewFAQ />} />
-        <Route path="/share-experience" element={<ShareInterviewQuestions />} />
-        <Route path="/salary-hike-calculator" element={<SalaryHikeCalculator />} />
-        <Route path="/applied-jobs" element={<AppliedJobs />} />
-        <Route path="/socket-test" element={<SocketTest />} />
-        <Route path="/registerCandidate" element={<RegisterPage />} />
-        <Route path="/resume-templates" element={<ResumeTemplates />} />
-        <Route path="/saved-jobs" element={<SavedJobs />} />
-        <Route path="/profile-page" element={<ProfilePage/>}/>
-        <Route path="/premium" element={<PremiumPage />} />
+          {/* Candidate routes */}
+          <Route path="/navbar" element={<Navbar />} />
+          <Route path="/apply/:id" element={<JobApplicationForm />} />
+          <Route path="/interview-faqs" element={<InterviewFAQ />} />
+          <Route path="/share-experience" element={<ShareInterviewQuestions />} />
+          <Route path="/salary-hike-calculator" element={<SalaryHikeCalculator />} />
+          <Route path="/applied-jobs" element={<AppliedJobs />} />
+          <Route path="/socket-test" element={<SocketTest />} />
+          <Route path="/registerCandidate" element={<RegisterPage />} />
+          <Route path="/resume-templates" element={<ResumeTemplates />} />
+          <Route path="/saved-jobs" element={<SavedJobs />} />
+          <Route path="/profile-page" element={<ProfilePage />} />
+          <Route path="/premium" element={<PremiumPage />} />
 
-      </Routes>
-    </BrowserRouter>
+        </Routes>
+      </BrowserRouter>
+    </UserProvider>
   );
 }
 

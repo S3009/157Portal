@@ -1,14 +1,17 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useContext } from "react";
 import "./LoginPage.css";
 import LoginImage from "../.././assets/candidate.png"; // replace with your logo path
 import { SyncOutlined } from "@ant-design/icons";
 import { useNavigate, useParams } from "react-router-dom";
-import { API_BASE_URL } from "../../API/api";
+import { API_BASE_PORTAL, API_BASE_URL } from "../../API/api";
 import axios from "axios";
+import { useUser } from "../UserContext"; 
+
 
 const LoginCard = () => {
 
     const { userType, role } = useParams();
+    const { loginUser } = useUser();
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [captcha, setCaptcha] = useState("");
@@ -72,26 +75,24 @@ const LoginCard = () => {
 
         try {
             const loginResponse = await axios.post(
-                `${API_BASE_URL}/user-login-157/${userType}`,
+                `${API_BASE_PORTAL}/jobportal/api/loginUser`,
                 {
-                    userName: 1, // or employeeId if you have that field
-                    employeePassword: password,
-                    tlPassword: password,
-                    managerPassword: password,
-                    superUserPassword: password,
-                    // candidatePassword: password, // optional for candidate
+                    userName: username,
+                    password: password,
                 }
             );
 
             console.log("Login success:", loginResponse.data);
 
-            // Example: Save session details
-            localStorage.setItem("userType", userType);
-            if (role) localStorage.setItem("role", role);
-            localStorage.setItem("username", username);
+            // ✅ Set context + localStorage
+            loginUser({
+                userId: loginResponse.data.candidateId,
+                userType: "candidate",
+                name: loginResponse.data.fullName
+            });
 
-            // Navigate to next page (you can customize this)
-            navigate(`/dashboard/${userType}${role ? `/${role}` : ""}`);
+            // Navigate after storing info
+            navigate(`/navbar`);
 
         } catch (error) {
             console.error("Login failed:", error);
@@ -101,6 +102,7 @@ const LoginCard = () => {
                 alert("Login failed. Please check your network or try again later.");
             }
         }
+
     };
 
 
@@ -150,9 +152,7 @@ const LoginCard = () => {
                     {captchaError && <p className="error">{captchaError}</p>}
                     <button className="forgot-password-btn">Forgot Password?</button>
 
-                    <button
-                        type="submit" className="login-button"
-                        onClick={()=>navigate(`/navbar`)}>
+                    <button type="submit" className="login-button">
                         Login
                     </button>
                 </form>

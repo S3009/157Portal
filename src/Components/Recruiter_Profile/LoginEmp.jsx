@@ -38,6 +38,24 @@ const LoginEmp = () => {
   useEffect(() => { generateCaptcha(); }, []);
   useEffect(() => { drawCaptcha(); }, [captcha]);
 
+  const buildLoginBody = (username, password, role) => {
+    if (role === "portalemp") return { userName: username, password };
+
+    switch (role) {
+      case "Recruiter":
+        return { userName: username, employeePassword: password };
+      case "TeamLeader":
+        return { userName: username, tlPassword: password };
+      case "Manager":
+        return { userName: username, managerPassword: password };
+      case "SuperUser":
+        return { userName: username, superUserPassword: password };
+      default:
+        throw new Error("Invalid role");
+    }
+  };
+
+
   const handleLogin = async (e) => {
     e.preventDefault();
 
@@ -52,22 +70,32 @@ const LoginEmp = () => {
     }
 
     try {
-      let response;
-      if (userType === "newRecruiter") {
-        response = await axios.post("http://localhost:8080/jobportal/api/loginEmployee", {
-          userName: username,
-          password,
-          userType
-        });
-      } else {
-        response = await axios.post(
-          `http://192.168.1.39:9090/api/ats/157industries/user-login-157/${userType}`,
-          { userName: username, password }
-        );
-      }
+      // ✅ Step 2: Build the correct request body per role
+      const body = buildLoginBody(username, password, userType);
 
-      localStorage.setItem("username", username);
-      localStorage.setItem("userType", userType);
+      const apiUrl =
+        userType === "portalemp"
+          ? "http://localhost:8080/jobportal/api/loginEmployee"
+          : `http://192.168.1.39:9090/api/ats/157industries/user-login-157/${userType}`;
+
+      const response = await axios.post(apiUrl, body);
+
+
+      // ✅ Step 3: Save user info
+      loginUser({
+        userId: response.data.employeeId, // or whatever your API returns
+        userType: "employee",
+        role: userType,
+        name: response.data.fullName
+      });
+
+      // Optional: localStorage persistence
+      localStorage.setItem("userId", response.data.employeeId);
+      localStorage.setItem("userType", "employee");
+      localStorage.setItem("role", userType);
+      localStorage.setItem("name", response.data.fullName);
+
+      // Navigate after login
       navigate(`/recruiter-navbar/${userType}`);
     } catch (error) {
       alert(error.response?.data || "Login failed. Please try again.");
@@ -78,7 +106,7 @@ const LoginEmp = () => {
     <div className="login-container">
       <div className="login-card modern-card">
         <div className="login-left">
-         <img src={LoginImage} alt="Logo" className="login-logo" />
+          <img src={LoginImage} alt="Logo" className="login-logo" />
         </div>
         <div className="login-right">
           <div className="login-title">Employee Login</div>
@@ -110,7 +138,7 @@ const LoginEmp = () => {
               <option value="TeamLeader">Team Leader</option>
               <option value="Manager">Manager</option>
               <option value="SuperUser">Super User</option>
-              <option value="newRecruiter">New Recruiter</option>
+              <option value="portalemp">Portal Employee</option>
             </select>
 
             <div className="captcha-container">

@@ -19,9 +19,12 @@ import { useNavigate } from "react-router-dom";
 import HomePage from "./HomePage";
 import { FaRegBookmark, FaBookmark } from "react-icons/fa";
 import ChatBot from "./ChatBot";
+import { useUser } from "../UserContext";
 
 const Navbar = () => {
   // ===== Navbar States =====
+  const { user } = useUser(); // get user here
+  const { logoutUser } = useUser(); // ✅ now it's defined
   const [menuOpen, setMenuOpen] = useState(false);
   const [openPanel, setOpenPanel] = useState(null);
   const jobsRef = useRef(null);
@@ -316,6 +319,12 @@ const Navbar = () => {
     setShowSearchOverlay(false);
   };
 
+  const handleLogout = () => {
+    logoutUser();
+    setOpenPanel(null);
+    navigate("/login");
+  };
+
   return (
     <>
       {/* ===== NAVBAR TOP ===== */}
@@ -447,15 +456,15 @@ const Navbar = () => {
           </div>
 
 
-      <div className="premium-click-container">
-    <span
-      className="premium-label"
-      onClick={() => navigate("/premium")}
-      style={{ cursor: "pointer", marginLeft: "15px", fontWeight: "bold" }}
-    >
-      Premium
-    </span>
-  </div>
+          <div className="premium-click-container">
+            <span
+              className="premium-label"
+              onClick={() => navigate("/premium")}
+              style={{ cursor: "pointer", marginLeft: "15px", fontWeight: "bold" }}
+            >
+              Premium
+            </span>
+          </div>
           {/* <div
             className="nav-item messaging-item"
             onClick={() => setShowChatPopup(!showChatPopup)}
@@ -529,7 +538,7 @@ const Navbar = () => {
           <div className="profile-top">
             <img src="icon.png" alt="Profile" className="profile-pic" />
             <div className="profile-info">
-              <h3>Samruddhi Shekhar Patole</h3>
+              <h3>{user?.name || "Guest User"}</h3>
               <p>B.Sc Computer Science at Dr D Y Patil Law College, Pune</p>
               <button
                 className="btn-update"
@@ -597,8 +606,7 @@ const Navbar = () => {
               href="#"
               onClick={(e) => {
                 e.preventDefault();
-                setShowLogoutPopup(true);
-                setOpenPanel(null);
+                setShowLogoutPopup(true);  // show popup
               }}
             >
               <FaSignOutAlt className="quick-icon" /> Logout
@@ -1150,7 +1158,7 @@ const Navbar = () => {
             <h2>Logout?</h2>
             <p>Are you sure you want to logout from your account?</p>
 
-            <button
+            {/* <button
               className="logout-btn"
               onClick={() => {
                 localStorage.clear();
@@ -1159,7 +1167,8 @@ const Navbar = () => {
               }}
             >
               Yes, Logout
-            </button>
+            </button> */}
+            <button className="logout-btn" onClick={handleLogout}>Yes, Logout</button>
 
             <button
               className="cancel-btn"

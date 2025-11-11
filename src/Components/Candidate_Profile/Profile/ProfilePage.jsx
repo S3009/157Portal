@@ -16,6 +16,7 @@ import PersonalDetailsModal from "./PersonalDetailsModal";
 import { Camera } from "lucide-react"; 
 import axios from "axios";
 import 'remixicon/fonts/remixicon.css';
+import { useUser } from "../../UserContext";
 
 
 const ProfilePage = () => {

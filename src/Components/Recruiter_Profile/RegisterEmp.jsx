@@ -124,7 +124,7 @@ const RegisterEmp = () => {
             required
           >
             <option value="">Select User Type</option>
-            <option value="newRecruiter">New Recruiter</option>
+            <option value="portalemp">New Recruiter</option>
           </select>
 
           <button type="submit" className="btn-register">
