@@ -1,26 +1,50 @@
 // Samruddhi Patole 07/11/25
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import "./PremiumPage.css";
-import { FaCrown, FaCheckCircle, FaBolt, FaBriefcase, FaStar, FaTrophy } from "react-icons/fa";
-import React, { useState, useRef } from "react";
+import {
+  FaCrown,
+  FaCheckCircle,
+  FaBolt,
+  FaBriefcase,
+  FaStar,
+  FaTrophy,
+} from "react-icons/fa";
+import React, { useState, useRef, useEffect } from "react";
 
 const PremiumPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+
   const [selectedPlan, setSelectedPlan] = useState("Pro");
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
-  const [activePaymentMethod, setActivePaymentMethod] = useState("card"); // 'card', 'upi', 'netbanking'
+  const [activePaymentMethod, setActivePaymentMethod] = useState("card");
   const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [showPlanPrompt, setShowPlanPrompt] = useState(false);
 
-  const [userPlans] = useState(["Basic", "Pro"]); 
-  const [currentPlan, setCurrentPlan] = useState(userPlans[userPlans.length - 1]);
+  const [userPlans] = useState(["Basic", "Pro"]);
+  const [currentPlan, setCurrentPlan] = useState(
+    userPlans[userPlans.length - 1]
+  );
 
   const plansRef = useRef(null);
+  const basicPlanRef = useRef(null);
 
   const scrollToPlans = () => {
     if (plansRef.current) {
       plansRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   };
+
+  useEffect(() => {
+    if (location.state?.scrollTo === "basic" && basicPlanRef.current) {
+      setTimeout(() => {
+        basicPlanRef.current.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+      }, 500);
+    }
+  }, [location.state]);
 
   const plans = [
     {
@@ -60,16 +84,15 @@ const PremiumPage = () => {
   };
 
   const handleProceedPayment = () => {
-    setShowUpgradeModal(false);       // close upgrade modal
-    setShowPaymentModal(true);        // open frontend payment modal
+    setShowUpgradeModal(false);
+    setShowPaymentModal(true);
   };
 
-  const currentPlanData = plans.find(p => p.name === currentPlan);
-  const upgradePlanData = plans.find(p => p.name === selectedPlan);
+  const currentPlanData = plans.find((p) => p.name === currentPlan);
+  const upgradePlanData = plans.find((p) => p.name === selectedPlan);
 
   return (
     <div className="premium-container">
-      {/* ===== HEADER ===== */}
       <div className="premium-header">
         <FaCrown className="premium-icon" />
         <h1>Unlock Your Premium Career Journey</h1>
@@ -79,7 +102,6 @@ const PremiumPage = () => {
         </button>
       </div>
 
-      {/* ===== BENEFITS ===== */}
       <div className="premium-benefits">
         <div className="benefit-card">
           <FaBolt className="benefit-icon" />
@@ -108,17 +130,19 @@ const PremiumPage = () => {
         </div>
       </div>
 
-      {/* ===== PREMIUM PLANS ===== */}
       <div className="premium-plans" ref={plansRef}>
         <h2>Choose Your Plan</h2>
         <div className="plans-grid">
           {plans.map((plan) => (
             <div
               key={plan.name}
-              className={`plan-card ${selectedPlan === plan.name ? "highlight" : ""}`}
+              ref={plan.name === "Basic" ? basicPlanRef : null}
+              className={`plan-card ${
+                selectedPlan === plan.name ? "highlight" : ""
+              }`}
               onMouseEnter={() => setSelectedPlan(plan.name)}
             >
-              <h3>{plan.name}</h3>
+              <h3 id={plan.name === "Basic" ? "basic-plan" : ""}>{plan.name}</h3>
               <p className="price">{plan.price}</p>
               <ul>
                 {plan.features.map((f, i) => (
@@ -126,13 +150,16 @@ const PremiumPage = () => {
                 ))}
               </ul>
               <button onClick={handleUpgradeClick}>
-                {plan.name === "Basic" ? "Get Basic" : plan.name === "Pro" ? "Go Pro" : "Go Elite"}
+                {plan.name === "Basic"
+                  ? "Get Basic"
+                  : plan.name === "Pro"
+                  ? "Go Pro"
+                  : "Go Elite"}
               </button>
             </div>
           ))}
         </div>
 
-        {/* ===== Plan Comparison Table ===== */}
         <div className="plan-comparison">
           <h2>Compare Plans</h2>
           <table>
@@ -186,15 +213,11 @@ const PremiumPage = () => {
         </div>
       </div>
 
-      {/* ===== CTA BOTTOM ===== */}
       <div className="premium-cta-bottom">
         <h2>Start Your Premium Journey Today!</h2>
-        <button onClick={handleUpgradeClick}>
-          Upgrade to {selectedPlan}
-        </button>
+        <button onClick={handleUpgradeClick}>Upgrade to {selectedPlan}</button>
       </div>
 
-      {/* ===== UPGRADE MODAL ===== */}
       {showUpgradeModal && (
         <div className="upgrade-modal-overlay">
           <div className="upgrade-modal">
@@ -230,7 +253,6 @@ const PremiumPage = () => {
               </select>
             </div>
 
-            {/* Plan Comparison in Modal */}
             <div className="modal-plan-comparison">
               <h3>Plan Benefits Comparison</h3>
               <table>
@@ -245,8 +267,12 @@ const PremiumPage = () => {
                   {currentPlanData.features.map((f, i) => (
                     <tr key={i}>
                       <td>{f}</td>
-                      <td>{currentPlanData.features.includes(f) ? "✔" : "✖"}</td>
-                      <td>{upgradePlanData.features.includes(f) ? "✔" : "✖"}</td>
+                      <td>
+                        {currentPlanData.features.includes(f) ? "✔" : "✖"}
+                      </td>
+                      <td>
+                        {upgradePlanData.features.includes(f) ? "✔" : "✖"}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -254,7 +280,12 @@ const PremiumPage = () => {
             </div>
 
             <div className="modal-buttons">
-              <button className="cancel-btn" onClick={() => setShowUpgradeModal(false)}>Cancel</button>
+              <button
+                className="cancel-btn"
+                onClick={() => setShowUpgradeModal(false)}
+              >
+                Cancel
+              </button>
               <button className="confirm-btn" onClick={handleProceedPayment}>
                 Proceed to Pay
               </button>
@@ -263,13 +294,11 @@ const PremiumPage = () => {
         </div>
       )}
 
-      {/* ===== PAYMENT MODAL (Moved OUTSIDE Upgrade Modal) ===== */}
       {showPaymentModal && (
         <div className="payment-modal-overlay">
           <div className="payment-modal">
             <h2>Pay for {selectedPlan} Plan</h2>
 
-            {/* ===== Payment Method Tabs ===== */}
             <div className="payment-tabs">
               <button
                 className={activePaymentMethod === "card" ? "active" : ""}
@@ -284,14 +313,15 @@ const PremiumPage = () => {
                 UPI
               </button>
               <button
-                className={activePaymentMethod === "netbanking" ? "active" : ""}
+                className={
+                  activePaymentMethod === "netbanking" ? "active" : ""
+                }
                 onClick={() => setActivePaymentMethod("netbanking")}
               >
                 Netbanking
               </button>
             </div>
 
-            {/* Payment Content */}
             <div className="payment-method-content">
               {activePaymentMethod === "card" && (
                 <div className="method-card">
@@ -322,17 +352,51 @@ const PremiumPage = () => {
               )}
             </div>
 
-            {/* Buttons */}
             <div className="modal-buttons">
-              <button className="cancel-btn" onClick={() => setShowPaymentModal(false)}>Cancel</button>
+              <button
+                className="cancel-btn"
+                onClick={() => setShowPaymentModal(false)}
+              >
+                Cancel
+              </button>
               <button
                 className="confirm-btn"
                 onClick={() => {
                   alert(`Payment successful for ${selectedPlan} (frontend only)`);
+                  localStorage.setItem("hasBasicPlan", "true");
                   setShowPaymentModal(false);
                 }}
               >
                 Pay ₹{upgradePlanData.price.split(" ")[0]}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showPlanPrompt && (
+        <div className="testPrompt-overlay">
+          <div className="testPrompt-modal">
+            <h2>Start Your Test</h2>
+            <p>
+              To start your test, you need to purchase the{" "}
+              <strong>Basic Plan</strong>.
+            </p>
+            <div className="testPrompt-buttons">
+              <button
+                className="close-btn"
+                onClick={() => setShowPlanPrompt(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className="start-test-btn"
+                onClick={() => {
+                  setShowPlanPrompt(false);
+                  navigate("/premium", { state: { scrollTo: "basic" } });
+                }}
+              >
+                Buy Basic Plan
               </button>
             </div>
           </div>

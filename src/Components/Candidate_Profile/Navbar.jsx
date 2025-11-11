@@ -451,6 +451,9 @@ const Navbar = () => {
                 <div className="job-item" onClick={() => navigate("/saved-jobs")}>
                   Saved
                 </div>
+                <div className="job-item" onClick={() => navigate("/invites")}>
+                  Invites
+                </div>
               </div>
             )}
           </div>

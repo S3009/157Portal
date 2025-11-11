@@ -53,6 +53,7 @@ import { Radio as AntdRadio } from 'antd';
 function JobApplicationForm({ loginEmployeeName }) {
   {/*const [messageApi, contextHolder] = message.useMessage()*/ }
   // const API_BASE_URL = "http://localhost:8080";
+const [showPlanPrompt, setShowPlanPrompt] = useState(false);
 
   const { id } = useParams();
   const [jobDetails, setJobDetails] = useState({});
@@ -71,6 +72,8 @@ function JobApplicationForm({ loginEmployeeName }) {
   const [mcqAnswers, setMcqAnswers] = useState({});
   const [mcqScore, setMcqScore] = useState(null);
   const [savedApplicationId, setSavedApplicationId] = useState(null);
+const [hasBasicPlan, setHasBasicPlan] = useState(false);
+const [showBuyPlanPopup, setShowBuyPlanPopup] = useState(false);
 
   const navigate = useNavigate();
 
@@ -960,87 +963,51 @@ function JobApplicationForm({ loginEmployeeName }) {
   };
 
   // ---------- Replace existing handleStartTest with this ----------
-  const handleStartTest = async () => {
-    try {
-      // Prefer the designation from the form (candidate selected) else from job details
-      const roleName =
-        (formData && formData.jobDesignation && formData.jobDesignation.trim()) ||
-        (jobDetails && jobDetails.designation && jobDetails.designation.trim());
+// ✅ Add this function near the top (inside JobApplicationForm component)
+const handleStartTest = async () => {
+  if (!hasBasicPlan) {
+    setShowBuyPlanPopup(true);
+    return;
+  }
 
-      if (!roleName) {
-        alert("Please select a role/designation first.");
-        return;
-      }
+  // ✅ If plan already bought, continue to start test
+  try {
+    const roleName =
+      (formData.jobDesignation && formData.jobDesignation.trim()) ||
+      (jobDetails.designation && jobDetails.designation.trim());
 
-      // Use backend API first
-      const encodedRole = encodeURIComponent(roleName);
-      const resp = await axios.get(`${API_BASE_URL}/api/mcq/role/${encodedRole}`);
+    if (!roleName) {
+      alert("Please select a role/designation first.");
+      return;
+    }
 
-      // Defensive: try several common places the questions array may live
-      const payload = resp?.data || {};
-      const candidates =
-        payload.questions ||
-        payload.mcqs ||
-        payload.items ||
-        payload.data ||
-        (Array.isArray(payload) ? payload : null);
+    const encodedRole = encodeURIComponent(roleName);
+    const resp = await axios.get(`${API_BASE_URL}/api/mcq/role/${encodedRole}`);
+    const payload = resp?.data || {};
 
-      if (Array.isArray(candidates) && candidates.length > 0) {
-        // normalize each item to have question/options/answer if needed
-        const normalized = candidates.map((q) => {
-          // if q already has question and options, keep; else try alternate shapes
-          return {
-            question: q.question ?? q.questionText ?? q.title ?? "",
-            options: q.options ?? q.choices ?? q.answers ?? (q.optionList || []),
-            answer: q.answer ?? q.correctAnswer ?? q.key ?? "",
-            // keep whole original object for any other fields
-            __raw: q,
-          };
-        });
+    const candidates =
+      payload.questions ||
+      payload.mcqs ||
+      payload.items ||
+      payload.data ||
+      (Array.isArray(payload) ? payload : null);
 
-        setMcqQuestions(normalized.slice(0, 20));
-        setMcqAnswers({});
-        setMcqScore(null);
-        setShowMCQModal(true);
-        setShowTestPrompt(false);
-        return;
-      }
-
-      // --- Fallback: previously used local JSON mapping (keeps old behaviour) ---
-      // (Keep your existing roleFileMap and file fetch code as fallback)
-      const roleFileMap = {
-        "Software Engineer": "softwareDeveloperMCQs.json",
-        "Full-Stack Developer": "fullStackDeveloperMCQs.json",
-        "Java Developer": "javaDeveloperMCQs.json",
-        "React Developer": "reactDeveloperMCQs.json",
-        "Software Developer": "softwareDeveloperMCQs.json",
-        // ...keep the rest of your mappings as in file...
-      };
-
-      const matchedKey = Object.keys(roleFileMap).find(
-        (key) => key.toLowerCase() === roleName.toLowerCase()
-      );
-
-      if (!matchedKey) {
-        alert(`No test available for this role: ${roleName}`);
-        return;
-      }
-
-      const fileName = roleFileMap[matchedKey];
-      const res = await fetch(`/data/${fileName}`);
-      if (!res.ok) throw new Error("Local test file not found");
-
-      const data = await res.json();
-      setMcqQuestions((data && Array.isArray(data) ? data : []).slice(0, 20));
+    if (Array.isArray(candidates) && candidates.length > 0) {
+      setMcqQuestions(candidates.slice(0, 20));
       setMcqAnswers({});
       setMcqScore(null);
       setShowMCQModal(true);
       setShowTestPrompt(false);
-    } catch (err) {
-      console.error("Error loading test:", err);
-      alert("Failed to load test questions. Please try again later.");
+      return;
     }
-  };
+
+    alert(`No test available for this role: ${roleName}`);
+  } catch (err) {
+    console.error("Error loading test:", err);
+    alert("Failed to load test questions. Please try again later.");
+  }
+};
+
 
 
 
@@ -1789,9 +1756,8 @@ function JobApplicationForm({ loginEmployeeName }) {
                 Close
               </button>
 
-              <button className="start-test-btn" onClick={handleStartTest}>
-                Start Test
-              </button>
+<button onClick={handleStartTest}>Start Test</button>
+
             </div>
 
           </div>
@@ -1886,6 +1852,35 @@ function JobApplicationForm({ loginEmployeeName }) {
           </div>
         </div>
       )}
+{showBuyPlanPopup && (
+  <div className="buyPlanOverlay">
+    <div className="buyPlanModal">
+      <h2>Start Your Test</h2>
+      <p>To start your technical test, you need to buy the <b>Basic Plan</b>.</p>
+      <div className="buyPlanButtons">
+        <button
+          onClick={() => {
+            setShowBuyPlanPopup(false);
+            navigate("/premium"); // redirects to premium page
+            // OR use scroll behavior if same page:
+            // document.getElementById("basic-plan-section")?.scrollIntoView({ behavior: "smooth" });
+          }}
+          className="buyNowBtn"
+        >
+          Buy Basic Plan
+        </button>
+        <button
+          onClick={() => setShowBuyPlanPopup(false)}
+          className="cancelBtn"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+
 
 
 
