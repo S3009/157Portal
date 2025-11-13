@@ -79,11 +79,7 @@ const ProfilePage = () => {
 
   const fetchCandidateData = async (id) => {
     try {
-<<<<<<< HEAD
-      const res = await axios.get(`http://192.168.1.44:9091/jobportal/api/profile/${id}`);
-=======
       const res = await axios.get(`${API_BASE_PORTAL}/deleteBasicDetails/${id}`);
->>>>>>> f74d11fe382fdadb906da5c24282000b63e1639d
       if (res.data && Object.keys(res.data).length > 0) {
         // returning user: load data
         setPersonalDetails(res.data.personalDetails || {});
