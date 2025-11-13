@@ -132,6 +132,20 @@
   text-align: center;
   margin-bottom: 5px;
 }
+.password-container {
+  position: relative;
+  width: 100%;
+}
+
+.password-toggle-icon {
+  position: absolute;
+  right: 12px;
+  top: 40%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  font-size: 18px;
+  color: #526d82;
+}
 
 /* ---- Responsive ---- */
 @media (max-width: 768px) {

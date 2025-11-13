@@ -1,45 +1,31 @@
 import React, { useState, useRef, useEffect, useContext } from "react";
 import "./LoginPage.css";
-import LoginImage from "../.././assets/candidate.png"; // replace with your logo path
-import { SyncOutlined } from "@ant-design/icons";
+import LoginImage from "../.././assets/candidate.png";
+import { SyncOutlined, EyeOutlined, EyeInvisibleOutlined } from "@ant-design/icons";
 import { useNavigate, useParams } from "react-router-dom";
 import { API_BASE_PORTAL, API_BASE_URL } from "../../API/api";
 import axios from "axios";
 import { useUser } from "../UserContext"; 
 
 
-const LoginCard = () => {
-
+const LoginPage = () => {
     const { userType, role } = useParams();
     const { loginUser } = useUser();
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false); // <-- new state
     const [captcha, setCaptcha] = useState("");
     const [userCaptcha, setUserCaptcha] = useState("");
     const [captchaError, setCaptchaError] = useState("");
     const canvasRef = useRef(null);
     const navigate = useNavigate();
 
-
-    // Determine display type
-    // below code not needed since we seperated login page user wise
-    // let displayType = "";
-    // if (userType === "candidate") {
-    //     displayType = "Candidate";
-    // } else if (userType === "employee") {
-    //     displayType = role
-    //         ? role.charAt(0).toUpperCase() + role.slice(1) // e.g., recruiter → Recruiter
-    //         : "Select Role";
-    // }
-
-    // Generate random CAPTCHA
     const generateCaptcha = () => {
         const randomString = Math.random().toString(36).substring(2, 8).toUpperCase();
         setCaptcha(randomString);
         setCaptchaError("");
     };
 
-    // Draw CAPTCHA on canvas
     const drawCaptcha = () => {
         const canvas = canvasRef.current;
         if (canvas) {
@@ -53,26 +39,17 @@ const LoginCard = () => {
         }
     };
 
-    useEffect(() => {
-        generateCaptcha();
-    }, []);
+    useEffect(() => { generateCaptcha(); }, []);
+    useEffect(() => { drawCaptcha(); }, [captcha]);
 
-    useEffect(() => {
-        drawCaptcha();
-    }, [captcha]);
-
-    const handleRefreshCaptcha = () => {
-        generateCaptcha();
-    };
+    const handleRefreshCaptcha = () => { generateCaptcha(); };
 
     const handleLogin = async (e) => {
         e.preventDefault();
-
         if (userCaptcha !== captcha) {
             setCaptchaError("Incorrect CAPTCHA!");
             return;
         }
-
         try {
             const loginResponse = await axios.post(
                 `${API_BASE_PORTAL}/loginUser`,
@@ -81,7 +58,6 @@ const LoginCard = () => {
                     password: password,
                 }
             );
-
             console.log("Login success:", loginResponse.data);
 
             // ✅ Set context + localStorage
@@ -96,15 +72,10 @@ const LoginCard = () => {
 
         } catch (error) {
             console.error("Login failed:", error);
-            if (error.response && error.response.status === 401) {
-                alert("Invalid credentials! Please try again.");
-            } else {
-                alert("Login failed. Please check your network or try again later.");
-            }
+            alert(error.response?.status === 401 ? "Invalid credentials!" : "Login failed!");
         }
 
     };
-
 
     return (
         <div className="login-card">
@@ -122,14 +93,25 @@ const LoginCard = () => {
                         className="login-input"
                         required
                     />
-                    <input
-                        type="password"
-                        placeholder="Password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="login-input"
-                        required
-                    />
+
+                    {/* Password field with toggle */}
+                    <div className="password-container">
+                        <input
+                            type={showPassword ? "text" : "password"}
+                            placeholder="Password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            className="login-input password-input"
+                            required
+                        />
+                        <span
+                            className="password-toggle-icon"
+                            onClick={() => setShowPassword(!showPassword)}
+                        >
+                            {showPassword ? <EyeInvisibleOutlined /> : <EyeOutlined />}
+                        </span>
+                    </div>
+
                     <div className="captcha-box">
                         <canvas
                             ref={canvasRef}
@@ -150,7 +132,6 @@ const LoginCard = () => {
                         required
                     />
                     {captchaError && <p className="error">{captchaError}</p>}
-                    <button className="forgot-password-btn">Forgot Password?</button>
 
                     <button type="submit" className="login-button">
                         Login
@@ -164,4 +145,4 @@ const LoginCard = () => {
     );
 };
 
-export default LoginCard;
+export default LoginPage;
