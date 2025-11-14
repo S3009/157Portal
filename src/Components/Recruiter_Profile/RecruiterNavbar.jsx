@@ -1,5 +1,5 @@
 // Samruddhi Patole 29/10/25
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import {
@@ -20,9 +20,11 @@ import "./RecruiterNavbar.css";
 import { FaPencilAlt, FaTrashAlt } from "react-icons/fa";
 import { toast } from "react-toastify";
 import { API_BASE_PORTAL } from "../../API/api";
-
+import { useUser } from "../UserContext"; // adjust the path
 const RecruiterNavbar = () => {
   // const API_BASE_URL = "http://localhost:8080";
+
+  const { user, logoutUser } = useUser(); // get user object from context
 
   const [activePage, setActivePage] = useState("home");
   const [showJDModal, setShowJDModal] = useState(false);
@@ -35,6 +37,7 @@ const RecruiterNavbar = () => {
     { sender: "Candidate", text: "Hello, is this position still open?" },
     { sender: "You", text: "Yes, please share your updated resume." },
   ]);
+  const [candidateCount, setCandidateCount] = useState(0);
 
   const [newMessage, setNewMessage] = useState("");
   const [allJobs, setAllJobs] = useState([]);
@@ -63,7 +66,7 @@ const RecruiterNavbar = () => {
   });
 
   const params = new URLSearchParams(location.search);
-  const userType = params.get("userType");
+  // const userType = params.get("userType");
 
   // 💬 Chat Popup States
   // const [showChatPopup, setShowChatPopup] = useState(false);
@@ -154,34 +157,83 @@ const RecruiterNavbar = () => {
   const handleEdit = (requirementId) => {
     navigate(`/add-job-description/${requirementId}`);
   };
-  const handleSentInvites = (requirementId, designation) => {
-    // simulate fetching matching candidates (based on designation)
-    const mockCandidates = [
-      { name: "Riya Sharma", email: "riya.sharma@example.com", designation: designation },
-      { name: "Amit Verma", email: "amit.verma@example.com", designation: designation },
-      { name: "Sneha Patil", email: "sneha.patil@example.com", designation: designation },
-    ];
+  const handleSentInvites = async (requirementId, designation) => {
+    console.log("RecruiterId:", user?.userId)
+    try {
+      const cleanDesignation = encodeURIComponent(designation.trim());
 
-    setInviteCandidates(mockCandidates);
-    setSelectedJobTitle(designation);
-    setShowInvitePopup(true);
-  };
-  const handleSendAllInvites = () => {
-    // Show success toast when all invites are sent
-    toast.success(`✅ Invites sent to ${inviteCandidates.length} candidates for ${selectedJobTitle}!`, {
-      position: "top-center",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "colored",
-    });
+      // ✅ 1️⃣ Fetch total count only
+      const countRes = await axios.get(
+        `${API_BASE_URL}/api/jobportal/getCountByDesignation/${cleanDesignation}`
+      );
 
-    // Close the popup after success
-    setShowInvitePopup(false);
+      const totalCount = countRes.data;
+
+      // ✅ 2️⃣ Optionally, get candidate list (if needed for invite sending)
+      const res = await axios.get(
+        `${API_BASE_URL}/api/jobportal/candidates/${cleanDesignation}`
+      );
+
+      setInviteCandidates(res.data);
+      setCandidateCount(totalCount);
+      setSelectedJobId(requirementId);
+      setSelectedJobTitle(designation);
+      setShowInvitePopup(true);
+
+    } catch (error) {
+      console.error("Error fetching candidates:", error);
+      toast.error("Failed to fetch candidates!");
+    }
   };
+
+
+
+  const handleSendAllInvites = async () => {
+    try {
+      if (!inviteCandidates || inviteCandidates.length === 0) {
+        toast.warning("⚠️ No candidates found for this role!");
+        return;
+      }
+
+      // get logged-in recruiter ID from localStorage (you can modify this)
+      // const recruiterId = localStorage.getItem("recruiterId");
+      const userId = user?.userId;
+
+      const recruiterId = userId;
+
+
+      if (!recruiterId) {
+        toast.error("Recruiter Id Not Found...!");
+        return;
+      }
+
+      for (const candidate of inviteCandidates) {
+        await axios.post(
+          `${API_BASE_URL}/api/jobportal/sendInvite`,
+          null,
+          {
+            params: {
+              candidateId: candidate.candidateId,
+              recruiterId: recruiterId,
+              requirementId: selectedJobId,
+              designation: selectedJobTitle,
+            },
+          }
+        );
+      }
+
+      toast.success(
+        `✅ Invites sent & stored for ${inviteCandidates.length} ${inviteCandidates.length === 1 ? "candidate" : "candidates"}!`
+      );
+      setShowInvitePopup(false);
+    } catch (error) {
+      console.error("Error sending invites:", error);
+      toast.error("❌ Failed to store invites!");
+    }
+  };
+
+
+
 
 
 
@@ -754,42 +806,15 @@ const RecruiterNavbar = () => {
         <div className="invite-popup-overlay">
           <div className="invite-popup-box">
             <div className="invite-header">
-              <h3>Matched Candidates for {selectedJobTitle}</h3>
+              <h3>Candidates for {selectedJobTitle}</h3>
               <button className="popup-close-btn" onClick={() => setShowInvitePopup(false)}>×</button>
             </div>
 
-            <p>Total Matching Candidates: <strong>{inviteCandidates.length}</strong></p>
-
-            {inviteCandidates.length > 0 ? (
-              <table className="invite-table">
-                <thead>
-                  <tr>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Designation</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {inviteCandidates.map((cand, i) => (
-                    <tr key={i}>
-                      <td>{cand.name}</td>
-                      <td>{cand.email}</td>
-                      <td>{cand.designation}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            ) : (
-              <p>No matching candidates found.</p>
-            )}
+            <p>Total Matching Candidates: <strong>{candidateCount}</strong></p>
 
             <div className="invite-popup-actions">
-              <button className="btn-primary" onClick={handleSendAllInvites}>
-                Send All
-              </button>
-              <button className="btn-secondary" onClick={() => setShowInvitePopup(false)}>
-                Cancel
-              </button>
+              <button className="btn-primary" onClick={handleSendAllInvites}>Send Invites</button>
+              <button className="btn-secondary" onClick={() => setShowInvitePopup(false)}>Cancel</button>
             </div>
           </div>
         </div>

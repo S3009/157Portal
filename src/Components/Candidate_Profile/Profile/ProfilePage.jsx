@@ -108,13 +108,13 @@ const ProfilePage = () => {
   formData.append("file", file);
 
   try {
-    const res = await axios.post("http://localhost:8080/api/profile/uploadVideo", formData, {
+    const res = await axios.post("http://192.168.1.44:9091/api/profile/uploadVideo", formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
     alert(res.data);
 
     // Show uploaded video immediately
-    setIntroVideo(`http://localhost:8080/api/profile/videos/${file.name}`);
+    setIntroVideo(`http://192.168.1.44:9091/api/profile/videos/${file.name}`);
   } catch (err) {
     console.error("Video upload failed:", err);
     alert("❌ Failed to upload video: " + err.message);

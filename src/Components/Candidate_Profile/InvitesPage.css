@@ -1,242 +1,175 @@
-/* ===========================
-   INVITES PAGE - FIXED 2-COLUMN
-=========================== */
-.invites-page {
+/* MAIN LAYOUT */
+.inv-page-container {
   display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
+  height: 100vh;
+  background: #f4f7fc;
+  font-family: "Poppins", sans-serif;
+}
+
+/* LEFT PANEL (Naukri Style) */
+.inv-left-panel {
+  width: 28%;
+  background: #ffffff;
+  border-right: 1px solid #e2e2e2;
   padding: 20px;
-  background: #f4f6f8;
-  min-height: 90vh;
-  justify-content: center;
-  transition: all 0.3s ease;
+  overflow-y: auto;
 }
 
-/* LEFT SECTION (Invite List) */
-.left-section {
-  flex: 1 1 30%;
-  background: #fff;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  min-width: 300px;
-  max-width: 420px;
+.inv-title {
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: #1a237e;
 }
 
-.left-section h2 {
-  margin-bottom: 15px;
-  color: #333;
-  font-size: 20px;
-}
-
-.invite-list {
+.inv-list {
   list-style: none;
   padding: 0;
-  overflow-y: auto;
-  max-height: 80vh;
+  margin: 0;
 }
 
-.invite-card {
-  border: 1px solid #e0e0e0;
+/* INVITE CARD */
+.inv-card {
+  background: #fafbff;
+  border: 1px solid #e0e4ff;
   border-radius: 10px;
   padding: 15px;
-  margin-bottom: 12px;
-  background: #fafafa;
+  margin-bottom: 14px;
   cursor: pointer;
-  transition: 0.3s;
+  transition: 0.2s ease-in-out;
 }
 
-.invite-card:hover {
-  border-color: #007bff;
-  background: #eef5ff;
-}
-
-.invite-card.active {
-  border-color: #0056d2;
-  background: #e8f0fe;
-}
-
-.invite-card-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.company-logo-small {
-  width: 45px;
-  height: 45px;
-  border-radius: 8px;
-  object-fit: cover;
-}
-
-.invite-meta {
-  font-size: 14px;
-  color: #555;
-}
-
-.invite-salary {
-  font-size: 14px;
-  font-weight: bold;
-  color: #222;
-  margin-top: 5px;
-}
-
-.invite-actions {
-  margin-top: 10px;
-  display: flex;
-  gap: 10px;
-}
-
-.view-btn,
-.not-interested-btn {
-  flex: 1;
-  border: none;
-  border-radius: 8px;
-  padding: 8px;
-  font-size: 13px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.view-btn {
-  background: #007bff;
-  color: white;
-}
-
-.view-btn:hover {
-  background: #0056d2;
-}
-
-.not-interested-btn {
-  background: #f5f5f5;
-  color: #333;
-}
-
-.not-interested-btn:hover {
-  background: #e0e0e0;
-}
-
-/* RIGHT SECTION (Job Description) */
-.right-section {
-  flex: 1 1 65%;
-  background: #fff;
-  padding: 25px;
-  border-radius: 12px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  min-width: 320px;
-}
-
-.jd-container h2 {
-  color: #0056d2;
-  margin-bottom: 10px;
-  font-size: 22px;
-}
-
-.jd-container p {
-  margin: 5px 0;
-  line-height: 1.6;
-  font-size: 15px;
-  color: #444;
-}
-
-.company-logo-large {
-  width: 100px;
-  margin-top: 15px;
-  border-radius: 8px;
-}
-
-/* --- Apply Now Button --- */
-.apply-btn {
-  display: inline-block;
-  margin-top: 25px;
-  padding: 12px 28px;
-  background-color: #007bff;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 3px 6px rgba(0, 123, 255, 0.3);
-}
-
-.apply-btn:hover {
-  background-color: #0056d2;
-  box-shadow: 0 5px 10px rgba(0, 86, 210, 0.4);
+.inv-card:hover {
+  border-color: #3d5afe;
+  background: #f1f3ff;
   transform: translateY(-2px);
 }
 
-.apply-btn:active {
-  background-color: #004bb5;
-  transform: scale(0.98);
+.inv-card.active {
+  background: #e8ecff;
+  border-color: #3d5afe;
 }
 
-/* ===========================
-   RESPONSIVE (Still side-by-side)
-=========================== */
-
-/* Tablets (≤ 992px) */
-@media (max-width: 992px) {
-  .invites-page {
-    gap: 15px;
-    padding: 15px;
-  }
-
-  .left-section {
-    flex: 1 1 35%;
-    padding: 15px;
-  }
-
-  .right-section {
-    flex: 1 1 60%;
-    padding: 20px;
-  }
-
-  .jd-container h2 {
-    font-size: 20px;
-  }
+/* ROLE TITLE */
+.inv-job-role {
+  font-size: 16px;
+  font-weight: 600;
+  color: #283593;
+  margin-bottom: 6px;
 }
 
-/* Small Mobiles (≤ 600px) */
-@media (max-width: 600px) {
-  .invites-page {
-    flex-direction: row;
-    gap: 10px;
-  }
-
-  .left-section {
-    flex: 1 1 40%;
-    padding: 10px;
-  }
-
-  .right-section {
-    flex: 1 1 55%;
-    padding: 10px;
-  }
-
-  .invite-meta,
-  .invite-salary,
-  .jd-container p {
-    font-size: 13px;
-  }
-
-  .apply-btn {
-    font-size: 14px;
-    padding: 10px 20px;
-  }
+/* COMPANY NAME */
+.inv-company {
+  font-size: 14px;
+  color: #444;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
 }
 
-/* Very Small Screens (≤ 420px) → only here stack */
-@media (max-width: 420px) {
-  .invites-page {
-    flex-direction: column;
-  }
+/* ROW OF ICONS */
+.inv-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: #555;
+  margin-bottom: 5px;
+}
 
-  .left-section,
-  .right-section {
-    width: 100%;
-  }
+.inv-row span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* DATE */
+.inv-date {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #777;
+}
+
+
+/* RIGHT PANEL */
+.inv-right-panel {
+  width: 72%;
+  padding: 30px;
+  overflow-y: scroll;
+}
+
+.inv-jd-box {
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.08);
+}
+
+/* JD HEADER */
+.jd-title {
+  font-size: 30px;
+  margin-bottom: 10px;
+  color: #1a237e;
+}
+
+.jd-meta {
+  display: flex;
+  gap: 20px;
+  color: #444;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+.jd-meta span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* SECTION TITLES */
+.jd-section-title {
+  margin-top: 25px;
+  font-size: 20px;
+  font-weight: bold;
+  color: #283593;
+  border-left: 4px solid #3d5afe;
+  padding-left: 10px;
+}
+
+.jd-text {
+  margin: 10px 0;
+}
+
+/* LIST */
+.jd-list {
+  margin-top: 10px;
+  margin-left: 20px;
+  color: #444;
+}
+
+/* APPLY BUTTON */
+.apply-btn {
+  margin-top: 30px;
+  background: #3d5afe;
+  color: white;
+  padding: 12px 24px;
+  font-size: 18px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.apply-btn:hover {
+  background: #2d45c8;
+}
+
+/* SCROLL */
+.inv-right-panel::-webkit-scrollbar {
+  width: 8px;
+}
+
+.inv-right-panel::-webkit-scrollbar-thumb {
+  background: #c5cae9;
+  border-radius: 10px;
 }

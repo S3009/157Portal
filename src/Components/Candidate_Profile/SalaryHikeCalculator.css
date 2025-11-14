@@ -1,82 +1,246 @@
-.calculator-container {
-  max-width: 500px;
-  margin: 50px auto;
-  padding: 30px;
-  background-color: #fff;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  text-align: center;
-}
+/* ===============================================
+   FULL SALARY INSIGHTS PAGE — PROFESSIONAL PORTAL
+   =============================================== */
 
-.calculator-container h2 {
-  margin-bottom: 20px;
+.salary-page {
+  font-family: "Poppins", sans-serif;
+  background: #f7f9fc;
   color: #222;
+  overflow-x: hidden;
 }
 
-.calculator-form {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  margin-bottom: 20px;
+/* HERO SECTION */
+.hero-section {
+  background: linear-gradient(135deg, #526d82, #526d82);
+  color: white;
+  text-align: center;
+  padding: 60px 20px;
 }
 
-.calculator-form label {
-  font-weight: 600;
-  text-align: left;
+.hero-content {
+  max-width: 700px;
+  margin: 0 auto;
 }
 
-.calculator-form input {
-  padding: 10px;
+.hero-icon {
+  font-size: 45px;
+  margin-bottom: 10px;
+}
+
+.hero-content h1 {
+  font-size: 32px;
+  margin-bottom: 10px;
+}
+
+.hero-content p {
   font-size: 16px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
+  opacity: 0.9;
 }
 
-.calculator-form input:focus {
-  border-color: #007bff;
+/* CALCULATOR SECTION */
+.calculator-section {
+  display: flex;
+  justify-content: center;
+  margin-top: -40px;
+  padding: 20px;
+}
+
+.calculator-box {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  padding: 30px;
+  max-width: 500px;
+  width: 100%;
+  z-index: 2;
+}
+
+.calculator-box h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #526d82;
+}
+
+.input-group {
+  margin-bottom: 15px;
+}
+
+.input-group label {
+  font-weight: 600;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.input-group input,
+.input-group select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background: #fafafa;
+  font-size: 15px;
+  transition: 0.3s;
+}
+
+.input-group input:focus,
+.input-group select:focus {
+  border-color: #526d82;
+  box-shadow: 0 0 6px rgba(0, 123, 255, 0.4);
   outline: none;
 }
 
 .calc-btn {
-  background-color: #007bff;
-  color: #fff;
-  padding: 10px;
-  border: none;
-  border-radius: 6px;
+  width: 100%;
+  background: linear-gradient(135deg, #526d82, #526d82);
+  color: white;
+  padding: 12px;
   font-size: 16px;
+  border: none;
+  border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  font-weight: 600;
+  transition: 0.3s;
 }
 
 .calc-btn:hover {
-  background-color: #0056b3;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 86, 210, 0.3);
 }
 
+/* RESULT BOX */
 .result-box {
+  text-align: center;
   margin-top: 20px;
-  padding: 15px;
-  background: #f9f9f9;
-  border-radius: 6px;
+  padding: 20px;
+  background: #f9fbff;
+  border-radius: 8px;
 }
 
-.result-box h3 {
+.salary-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: #526d82;
+}
+
+.salary-diff {
+  font-size: 15px;
+  color: #444;
+}
+
+/* COMPARISON SECTION */
+.comparison-section {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.comparison-section h2 {
+  color: #526d82;
+  margin-bottom: 20px;
+}
+
+.bar-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  margin-bottom: 6px;
+  color: #555;
+}
+
+.bar-track {
+  position: relative;
+  background: #e0e0e0;
+  height: 14px;
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 0 auto;
+  max-width: 450px;
+}
+
+.bar-user {
+  height: 100%;
+  border-radius: 8px;
+  transition: width 0.5s ease;
+}
+
+.bar-user.above {
+  background: linear-gradient(90deg, #00c853, #64dd17);
+}
+
+.bar-user.below {
+  background: linear-gradient(90deg, #ff7043, #ff8a65);
+}
+
+.bar-marker {
+  position: absolute;
+  top: 0;
+  width: 2px;
+  height: 100%;
+  background: #ffb300;
+  transform: translateX(-50%);
+}
+
+.compare-msg {
+  margin-top: 12px;
   color: #333;
+  font-weight: 500;
 }
 
-.result-box p {
-  font-size: 20px;
-  color: #007bff;
-  font-weight: bold;
+/* TIPS SECTION */
+.tips-section {
+  background: #fff;
+  padding: 50px 20px;
+  text-align: center;
 }
 
-/* Responsive */
+.tips-section h2 {
+  color: #526d82;
+  margin-bottom: 25px;
+}
+
+.tips-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.tip-card {
+  background: #f4f7ff;
+  padding: 25px;
+  border-radius: 10px;
+  transition: 0.3s;
+}
+
+.tip-card:hover {
+  background: #eaf1ff;
+  transform: translateY(-4px);
+}
+
+.tip-icon {
+  font-size: 28px;
+  color: #526d82;
+  margin-bottom: 10px;
+}
+
+/* FOOTER */
+.salary-footer {
+  background: #526d82;
+  color: white;
+  text-align: center;
+  padding: 15px;
+  font-size: 14px;
+}
+
+/* RESPONSIVE */
 @media (max-width: 768px) {
-  .calculator-container {
-    margin: 20px;
+  .hero-content h1 {
+    font-size: 26px;
+  }
+  .calculator-box {
     padding: 20px;
   }
-
-  .calc-btn {
-    width: 100%;
+  .tips-grid {
+    grid-template-columns: 1fr;
   }
 }
