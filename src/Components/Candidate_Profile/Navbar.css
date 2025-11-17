@@ -1409,86 +1409,180 @@ body {
   }
 }
 
+/* ------------------ OVERLAY ------------------ */
 .faq-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.45);
+  background: rgba(0, 0, 0, 0.55);
   backdrop-filter: blur(5px);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 2000;
-  animation: fadeIn 0.3s ease-in-out;
+  padding: 18px;
+  z-index: 3000;
+  animation: fadeIn 0.3s ease;
 }
 
+/* ------------------ POPUP CONTAINER ------------------ */
 .faq-container {
-  width: 90%;
-  max-width: 700px;
-  background: #fff;
-  border-radius: 10px;
-  padding: 25px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 680px;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 22px 20px;
+  box-shadow: 0 12px 38px rgba(0, 0, 0, 0.25);
   animation: slideUp 0.35s ease;
+  max-height: 85vh;
+  overflow-y: auto;
+  position: relative;
 }
 
+/* Scrollbar */
+.faq-container::-webkit-scrollbar {
+  width: 8px;
+}
+.faq-container::-webkit-scrollbar-thumb {
+  background: #bfc8d5;
+  border-radius: 12px;
+}
+.faq-container::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* ------------------ HEADER ------------------ */
 .faq-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #dde1e7;
 }
 
 .faq-header h2 {
-  font-size: 22px;
-  font-weight: 600;
+  font-size: 20px;
+  font-weight: 700;
   color: #1d3557;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
+/* Close Button */
 .faq-close {
   background: #ff4b4b;
   color: white;
   border: none;
-  font-size: 20px;
-  padding: 4px 10px;
+  font-size: 22px;
+  line-height: 20px;
+  padding: 4px 14px;
   border-radius: 6px;
   cursor: pointer;
+  transition: 0.2s;
+}
+.faq-close:hover {
+  background: #da2f2f;
 }
 
+/* ------------------ FAQ CONTENT ------------------ */
 .faq-content {
-  margin-top: 15px;
+  margin-top: 18px;
 }
 
+/* ------------------ ACCORDION ------------------ */
 details {
-  background: #f8faff;
-  padding: 12px;
-  margin-bottom: 12px;
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
+  background: #f9fbff;
+  border: 1px solid #dbe3ef;
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 14px;
   cursor: pointer;
+  transition: background 0.25s ease;
+  position: relative;
 }
 
+details:hover {
+  background: #f2f6ff;
+}
+
+/* Arrow icon */
 summary {
   font-weight: 600;
-  color: #2a4365;
+  color: #1e3a5f;
   font-size: 15px;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
+/* Remove default arrow */
+summary::-webkit-details-marker {
+  display: none;
+}
+
+/* Custom arrow */
+summary::after {
+  content: "⌄";
+  font-size: 18px;
+  color: #1e3a5f;
+  transition: transform 0.25s ease;
+}
+
+/* Rotate arrow when open */
+details[open] summary::after {
+  transform: rotate(180deg);
+}
+
+/* FAQ Paragraph */
 details p {
+  margin-top: 10px;
   font-size: 14px;
-  margin-top: 8px;
+  line-height: 1.55;
   color: #444;
+  padding-right: 6px;
 }
 
+/* ------------------ ANIMATIONS ------------------ */
 @keyframes slideUp {
   from {
+    transform: translateY(25px);
     opacity: 0;
-    transform: translateY(30px);
   }
-
   to {
-    opacity: 1;
     transform: translateY(0);
+    opacity: 1;
   }
 }
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ------------------ MOBILE FULLSCREEN MODE ------------------ */
+@media (max-width: 600px) {
+  .faq-container {
+    max-width: 100%;
+    width: 100%;
+    height: 92vh;
+    max-height: none;
+    border-radius: 12px;
+    padding: 20px 16px;
+  }
+
+  .faq-header h2 {
+    font-size: 18px;
+  }
+
+  summary {
+    font-size: 14px;
+  }
+
+  details p {
+    font-size: 13px;
+  }
+}
+
 
 .logout-overlay {
   position: fixed;
