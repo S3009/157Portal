@@ -1142,28 +1142,63 @@ const Navbar = () => {
 
             <div className="faq-content">
               <details>
+                <summary>How can i create an portal account </summary>
+                <p>Open the website then register first then fill the details after completing your profile will create successfully You can check it by visiting Pofile section</p>
+              </details>
+
+                 <details>
+                  <summary>How Can i create a Resume</summary>
+                  <p>Go to Profile - Create Resume - Download Resume</p>
+                 </details>
+
+                 <details>
+                  <summary>How To do Interview prepartion</summary>
+                  <p>More - Interview - Interview FAQs</p>
+                 </details>
+
+                 <details>
+                  <summary>How To do Interview prepartion</summary>
+                  <p>More - Interview - Interview FAQs</p>
+                 </details>
+
+              <details>
                 <summary>How do I apply for a job?</summary>
-                <p>Browse jobs → Click "Apply" → Fill details → Submit application.</p>
+                <p>Browse jobs → Click "Apply" - Fill details - Submit application.</p>
               </details>
 
               <details>
                 <summary>Can I edit my profile after submission?</summary>
-                <p>Yes, go to Profile → Edit, and update details anytime.</p>
+                <p>Yes, go to Profile - Edit, and update details anytime.</p>
               </details>
 
               <details>
                 <summary>How do I upload a resume?</summary>
-                <p>Visit Resume section → Upload PDF/DOCX → Save.</p>
+                <p>Visit Profile - Resume section - Upload PDF/DOCX - Save.</p>
               </details>
 
               <details>
                 <summary>How do recruiters contact me?</summary>
-                <p>You will receive notification & email from company HR.</p>
+                <p>You will receive invites , notification & email from company HR.</p>
               </details>
 
               <details>
                 <summary>Is this platform free for job seekers?</summary>
                 <p>Yes, applying and creating resume is 100% free.</p>
+              </details>
+
+              <details>
+                <summary>How Can I change my Acocunt Password</summary>
+                <p>Got to Settings - Password - Change My Password</p>
+              </details>
+
+              <details>
+                <summary>How can i get the extra information related to portal or career</summary>
+                <p>By Chatbot </p>
+              </details>
+              
+              <details>
+                <summary> How Can I deactivate My Acount</summary>
+                <p>Goto Settings - Account - Deactivate Account</p>
               </details>
             </div>
           </div>
