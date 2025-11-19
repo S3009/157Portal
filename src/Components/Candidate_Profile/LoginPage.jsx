@@ -64,7 +64,8 @@ const LoginPage = () => {
             loginUser({
                 userId: loginResponse.data.candidateId,
                 userType: "candidate",
-                name: loginResponse.data.fullName
+                name: loginResponse.data.fullName,
+                userName: username 
             });
 
             // Navigate after storing info

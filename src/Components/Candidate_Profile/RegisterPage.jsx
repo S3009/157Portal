@@ -4,15 +4,16 @@ import "./RegisterPage.css";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { API_BASE_PORTAL } from "../../API/api";
 
 const RegisterPage = () => {
   const [formData, setFormData] = useState({
-        fullName: "",
-        userName: "",
-        password: "",
-        email: "",
-        mobileNo: "",
-        gender: "",
+    fullName: "",
+    userName: "",
+    password: "",
+    email: "",
+    mobileNo: "",
+    gender: "",
   });
 
   const [showPassword, setShowPassword] = useState(false); // 👁️ toggle state
@@ -47,12 +48,17 @@ const RegisterPage = () => {
         gender: "",
       });
     } catch (error) {
+      console.log("AXIOS ERROR:", error);
+
       if (error.response) {
+        console.log("Backend Response:", error.response);
         toast.error(error.response.data || "Registration failed!");
       } else {
+        console.log("NO RESPONSE FROM SERVER", error);
         toast.error("Server error. Please try again.");
       }
     }
+
   };
 
   return (
@@ -64,9 +70,9 @@ const RegisterPage = () => {
             Join <span className="highlight">RG Job Portal</span>
           </h2>
           <ul>
-            Build your profile and get noticed by recruiters<br/>
-            Receive personalized job recommendations<br/>
-            Apply to top companies instantly<br/>
+            Build your profile and get noticed by recruiters<br />
+            Receive personalized job recommendations<br />
+            Apply to top companies instantly<br />
           </ul>
           <p>Your dream job is just a click away 🚀</p>
         </div>
@@ -160,7 +166,7 @@ const RegisterPage = () => {
 
       {/* Toast Container */}
       <ToastContainer
-     
+
         position="top-center"
         autoClose={2500}
         hideProgressBar={false}
@@ -168,7 +174,7 @@ const RegisterPage = () => {
         closeOnClick
         pauseOnHover={false}
         draggable
-      
+
       />
     </div>
   );

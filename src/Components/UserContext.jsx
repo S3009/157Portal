@@ -14,11 +14,15 @@ export const UserProvider = ({ children }) => {
   }, []);
 
   // ✅ Save login data (userId + userType)
-  const loginUser = ({ userId, userType, name }) => {
-    const data = { userId, userType, name };
+  const loginUser = ({ userId, userType, name, userName, role}) => {
+    const data = { userId, userType, name, userName, role };
     setUser(data);
     localStorage.setItem("user", JSON.stringify(data));
+    console.log("LOGIN USER CALLED WITH =", { userId, userType, name, userName, role });
+
   };
+  
+
 
 
   // ✅ Logout

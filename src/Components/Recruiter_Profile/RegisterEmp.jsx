@@ -8,12 +8,10 @@ import { API_BASE_PORTAL } from "../../API/api";
 
 const RegisterEmp = () => {
   const [formData, setFormData] = useState({
-    employeeName: "",
-    userName: "",
-    employeePassword: "",
-    employeeEmail: "",
-    officialContactNumber: "",
+    username: "",
+    password: "",
     userType: "",
+    fullName: ""
   });
 
   const [showPassword, setShowPassword] = useState(false);
@@ -37,12 +35,10 @@ const RegisterEmp = () => {
       toast.success(response.data || "Employee registered successfully!");
 
       setFormData({
-        employeeName: "",
-        userName: "",
-        employeePassword: "",
-        employeeEmail: "",
-        officialContactNumber: "",
+        username: "",
+        password: "",
         userType: "",
+        fullName: ""
       });
     } catch (error) {
       if (error.response) {
@@ -55,99 +51,99 @@ const RegisterEmp = () => {
 
   return (
     <div className="main-container">
-    <div className="register-card">
-      {/* LEFT SIDE - Image */}
-      <div className="left-panel">
-      </div>
+      <div className="register-card">
+        {/* LEFT SIDE - Image */}
+        <div className="left-panel">
+        </div>
 
-      {/* RIGHT SIDE - Form */}
-      <div className="right-panel">
-        <h2 className="register-title">Create Your RG Profile</h2>
+        {/* RIGHT SIDE - Form */}
+        <div className="right-panel">
+          <h2 className="register-title">Create Your RG Profile</h2>
 
-        <form className="register-form" onSubmit={handleSubmit}>
-          <input
-            type="text"
-            name="employeeName"
-            placeholder="Employee Name"
-            value={formData.employeeName}
-            onChange={handleChange}
-            required
-          />
-
-          <input
-            type="text"
-            name="userName"
-            placeholder="Username"
-            value={formData.userName}
-            onChange={handleChange}
-            required
-          />
-
-          <div className="password-field">
+          <form className="register-form" onSubmit={handleSubmit}>
             <input
-              type={showPassword ? "text" : "password"}
-              name="employeePassword"
-              value={formData.employeePassword}
+              type="text"
+              name="fullName"
+              placeholder="Employee Name"
+              value={formData.fullName}
               onChange={handleChange}
-              placeholder="Password (min 6 characters)"
               required
             />
-            <span
-              className="eye-icon"
-              onClick={() => setShowPassword(!showPassword)}
+
+            <input
+              type="text"
+              name="username"
+              placeholder="Username"
+              value={formData.username}
+              onChange={handleChange}
+              required
+            />
+
+            <div className="password-field">
+              <input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="Password (min 6 characters)"
+                required
+              />
+              <span
+                className="eye-icon"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </span>
+            </div>
+
+            <input
+              type="email"
+              name="employeeEmail"
+              placeholder="Email ID"
+              value={formData.employeeEmail}
+              onChange={handleChange}
+              required
+            />
+
+            <input
+              type="tel"
+              name="officialContactNumber"
+              placeholder="Mobile Number"
+              value={formData.officialContactNumber}
+              onChange={handleChange}
+              required
+            />
+
+            <select
+              name="userType"
+              value={formData.userType}
+              onChange={handleChange}
+              required
             >
-              {showPassword ? <FaEyeSlash /> : <FaEye />}
-            </span>
-          </div>
+              <option value="">Select User Type</option>
+              <option value="portalemp">New Recruiter</option>
+            </select>
 
-          <input
-            type="email"
-            name="employeeEmail"
-            placeholder="Email ID"
-            value={formData.employeeEmail}
-            onChange={handleChange}
-            required
-          />
+            <button type="submit" className="btn-register">
+              Register
+            </button>
+          </form>
 
-          <input
-            type="tel"
-            name="officialContactNumber"
-            placeholder="Mobile Number"
-            value={formData.officialContactNumber}
-            onChange={handleChange}
-            required
-          />
+          <p className="login-link">
+            Already have an account? <a href="/loginEmp">Login here</a>
+          </p>
 
-          <select
-            name="userType"
-            value={formData.userType}
-            onChange={handleChange}
-            required
-          >
-            <option value="">Select User Type</option>
-            <option value="portalemp">New Recruiter</option>
-          </select>
-
-          <button type="submit" className="btn-register">
-            Register
+          <button type="button" className="btn-google">
+            <img
+              src="https://developers.google.com/identity/images/g-logo.png"
+              alt="Google"
+            />
+            Continue with Google
           </button>
-        </form>
+        </div>
 
-        <p className="login-link">
-          Already have an account? <a href="/loginEmp">Login here</a>
-        </p>
-
-        <button type="button" className="btn-google">
-          <img
-            src="https://developers.google.com/identity/images/g-logo.png"
-            alt="Google"
-          />
-          Continue with Google
-        </button>
+        <ToastContainer position="top-center" autoClose={2500} />
       </div>
-
-      <ToastContainer position="top-center" autoClose={2500} />
-    </div>
     </div>
   );
 };

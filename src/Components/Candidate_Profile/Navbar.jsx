@@ -13,6 +13,8 @@ import {
   FaSignOutAlt,
   FaUsers,
   FaEnvelope,
+  FaHome,
+  FaBriefcase,
 } from "react-icons/fa";
 import "./Navbar.css";
 import { useNavigate } from "react-router-dom";
@@ -21,10 +23,13 @@ import { FaRegBookmark, FaBookmark } from "react-icons/fa";
 import ChatBot from "./ChatBot";
 import { useUser } from "../UserContext";
 import { API_BASE_PORTAL } from "../../API/api";
-
+import ProfilePage from "./Profile/ProfilePage";
 const Navbar = () => {
+
   // ===== Navbar States =====
   const { user } = useUser(); // get user here
+  console.log("USER FROM CONTEXT = ", user);
+
   const { logoutUser } = useUser(); // ✅ now it's defined
   const [menuOpen, setMenuOpen] = useState(false);
   const [openPanel, setOpenPanel] = useState(null);
@@ -35,6 +40,8 @@ const Navbar = () => {
   const [showFAQ, setShowFAQ] = useState(false);
   const [showLogoutPopup, setShowLogoutPopup] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
+  { activeSection === "profile" && <ProfilePage /> }
+
   const [showDropdown, setShowDropdown] = useState();
   const [showInterviewSubmenu, setShowInterviewSubmenu] = useState();
   const [filteredJobs, setFilteredJobs] = useState([]);
@@ -320,11 +327,47 @@ const Navbar = () => {
     setShowSearchOverlay(false);
   };
 
-  const handleLogout = () => {
-    logoutUser();
-    setOpenPanel(null);
-    navigate("/login");
+  const handleLogout = async () => {
+    if (!user || !user.userName) {
+      console.error("User data not loaded yet");
+      return;
+    }
+
+    try {
+      await axios.post(
+        `${API_BASE_PORTAL}/logoutUser?userName=${user.userName}&userType=candidate`
+      );
+
+      logoutUser();
+      setOpenPanel(null);
+      console.log("Logout successful!")
+      navigate("/login");
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
   };
+
+  useEffect(() => {
+    const handleBack = (event) => {
+      if (activeSection !== "home") {
+        event.preventDefault();
+        setActiveSection("home");
+        return;
+      }
+    };
+
+    window.addEventListener("popstate", handleBack);
+
+    return () => {
+      window.removeEventListener("popstate", handleBack);
+    };
+  }, [activeSection]);
+
+  useEffect(() => {
+    window.history.pushState(null, "", window.location.href);
+  }, []);
+
+
 
   return (
     <>
@@ -493,6 +536,30 @@ const Navbar = () => {
           </div>
         </div>
       </nav>
+
+      {/* ===== MOBILE TOP NAVBAR ===== */}
+      <div className="mobile-top-nav">
+        <div className="m-logo" onClick={() => setActiveSection("home")}>
+          <img src="/jobportal.jpg" alt="Logo" />
+          <span>RG Portal</span>
+        </div>
+
+        <div className="m-icons">
+          <FaBell
+            className="m-notif-icon"
+            size={23}
+            onClick={() => setShowNotifications(true)}
+          />
+
+          <FaUserCircle
+            className="m-profile-icon"
+            size={25}
+            onClick={() => togglePanel("profile")}
+          />
+        </div>
+      </div>
+
+
       {/* ===== CHAT POPUP ===== */}
       {/* {showChatPopup && (
         <div className="candChat-popup-overlay">
@@ -1127,20 +1194,20 @@ const Navbar = () => {
                 <p>Open the website then register first then fill the details after completing your profile will create successfully You can check it by visiting Pofile section</p>
               </details>
 
-                 <details>
-                  <summary>How Can i create a Resume</summary>
-                  <p>Go to Profile - Create Resume - Download Resume</p>
-                 </details>
+              <details>
+                <summary>How Can i create a Resume</summary>
+                <p>Go to Profile - Create Resume - Download Resume</p>
+              </details>
 
-                 <details>
-                  <summary>How To do Interview prepartion</summary>
-                  <p>More - Interview - Interview FAQs</p>
-                 </details>
+              <details>
+                <summary>How To do Interview prepartion</summary>
+                <p>More - Interview - Interview FAQs</p>
+              </details>
 
-                 <details>
-                  <summary>How To do Interview prepartion</summary>
-                  <p>More - Interview - Interview FAQs</p>
-                 </details>
+              <details>
+                <summary>How To do Interview prepartion</summary>
+                <p>More - Interview - Interview FAQs</p>
+              </details>
 
               <details>
                 <summary>How do I apply for a job?</summary>
@@ -1176,7 +1243,7 @@ const Navbar = () => {
                 <summary>How can i get the extra information related to portal or career</summary>
                 <p>By Chatbot </p>
               </details>
-              
+
               <details>
                 <summary> How Can I deactivate My Acount</summary>
                 <p>Goto Settings - Account - Deactivate Account</p>
@@ -1303,6 +1370,43 @@ const Navbar = () => {
       )}
 
       <ChatBot />
+
+      {/* ===== MOBILE BOTTOM NAVBAR ===== */}
+      <div className="mobile-bottom-nav">
+        <div
+          className={`m-item ${activeSection === "home" ? "active" : ""}`}
+          onClick={() => setActiveSection("home")}
+        >
+          <FaHome />
+          <span>Home</span>
+        </div>
+
+        <div
+          className={`m-item ${activeSection === "jobs" ? "active" : ""}`}
+          onClick={() => setActiveSection("jobs")}
+        >
+          <FaBriefcase />
+          <span>Jobs</span>
+        </div>
+
+        <div
+          className={`m-item ${activeSection === "saved" ? "active" : ""}`}
+          onClick={() => navigate("/saved-jobs")}
+        >
+          <FaBookmark />
+          <span>Saved</span>
+        </div>
+
+        <div
+          className={`m-item ${openPanel === "profile" ? "active" : ""}`}
+          onClick={() => togglePanel("profile")}
+        >
+          <FaUserCircle />
+          <span>Profile</span>
+        </div>
+
+
+      </div>
 
     </>
   );

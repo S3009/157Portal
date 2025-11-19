@@ -30,6 +30,8 @@ const RecruiterNavbar = () => {
   const [appliedJobs, setAppliedJobs] = useState([]);
 const location = useLocation();
 
+  const [showLogoutPopup, setShowLogoutPopup] = useState(false);
+
   const [activePage, setActivePage] = useState("home");
   const [showJDModal, setShowJDModal] = useState(false);
   const [showTestPopup, setShowTestPopup] = useState(false);
@@ -164,7 +166,7 @@ const getBackendApplication = async (jobAppId) => {
   //       alert("Failed to fetch company list.");
   //     }
   //   };
-  const API_BASE_URL = "http://localhost:8080";
+  // const API_BASE_URL = "http://localhost:8080";
 
   const handleDelete = async (requirementId) => {
     if (!window.confirm("Are you sure you want to delete this job description?")) return;
@@ -275,13 +277,13 @@ const updateStatus = async (jobAppId, newStatus) => {
       const cleanDesignation = encodeURIComponent(designation.trim());
 
       const countRes = await axios.get(
-        `${API_BASE_URL}/api/jobportal/getCountByDesignation/${cleanDesignation}`
+        `${API_BASE_PORTAL}/api/jobportal/getCountByDesignation/${cleanDesignation}`
       );
 
       const totalCount = countRes.data;
 
       const res = await axios.get(
-        `${API_BASE_URL}/api/jobportal/candidates/${cleanDesignation}`
+        `${API_BASE_PORTAL}/getCandidatesByDesignation/${cleanDesignation}`
       );
 
       setInviteCandidates(res.data);
@@ -317,7 +319,7 @@ const updateStatus = async (jobAppId, newStatus) => {
 
       for (const candidate of inviteCandidates) {
         await axios.post(
-          `${API_BASE_URL}/api/jobportal/sendInvite`,
+          `${API_BASE_PORTAL}/api/jobportal/sendInvite`,
           null,
           {
             params: {
@@ -419,6 +421,57 @@ const handleViewJD = async (requirementId, applicationId) => {
   }
 };
 
+  const handleLogout = async () => {
+    if (!user) {
+      console.error("No user found in context");
+      return;
+    }
+
+    const { userName, role } = user;
+
+    try {
+      if (role === "portalemp") {
+        // 🔵 Portal Employee uses the COMMON logout API
+        await axios.post(
+          `${API_BASE_PORTAL}/logoutUser?userName=${userName}&userType=portalemp`
+        );
+      } else {
+        // 🔴 Recruiter / TL / Manager / SuperUser use ATS logout API
+        let body = {};
+
+        switch (user.role) {
+          case "SuperUser":
+            body = { superUserId: user.userId };
+            break;
+          case "Manager":
+            body = { managerId: user.userId };
+            break;
+          case "TeamLeader":
+            body = { teamLeaderId: user.userId };
+            break;
+          case "Recruiters":
+            body = { employeeId: user.userId };
+            break;
+          default:
+            throw new Error("Invalid role for logout");
+        }
+
+        const apiUrl = `${API_BASE_URL}/user-logout-157/${user.role}`;
+
+        await axios.post(apiUrl, body);
+      }
+
+      logoutUser();
+      setShowLogoutPopup(false);
+      setOpenPanel(null);
+      navigate("/loginemp");
+
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
+
+
   return (
     <>
       {/* ===== NAVBAR ===== */}
@@ -503,9 +556,41 @@ const handleViewJD = async (requirementId, applicationId) => {
             <a href="#">
               <FaQuestionCircle className="recNav-quick-icon" /> FAQs
             </a>
-            <a href="#">
-              <FaSignOutAlt className="recNav-quick-icon" /> Logout
+            <a
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                setShowLogoutPopup(true);  // show popup
+                setOpenPanel(null);
+              }}
+            >
+              <FaSignOutAlt className="quick-icon" /> Logout
             </a>
+
+          </div>
+        </div>
+      )}
+
+      {showLogoutPopup && (
+        <div className="logout-popup-overlay">
+          <div className="logout-popup">
+            <h3>Are you sure you want to logout?</h3>
+
+            <div className="logout-popup-buttons">
+              <button
+                className="confirm-btn"
+                onClick={handleLogout}
+              >
+                Yes, Logout
+              </button>
+
+              <button
+                className="cancel-btn"
+                onClick={() => setShowLogoutPopup(false)}
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
       )}

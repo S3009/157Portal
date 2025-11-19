@@ -162,7 +162,9 @@ const ProfilePage = () => {
     try {
       const candidateId = localStorage.getItem("candidateId");
       const response = await axios.post(
-        `${API_BASE_PORTAL}/createBasicDetails/${candidateId}`,
+        // `${API_BASE_PORTAL}/createBasicDetails/${candidateId}`,
+                `${API_BASE_PORTAL}/createBasicDetails/1`,
+
         details
       );
       alert("✅ Basic Details Created!");

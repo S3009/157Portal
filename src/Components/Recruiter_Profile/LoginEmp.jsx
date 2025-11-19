@@ -88,7 +88,6 @@ const LoginEmp = () => {
     }
 
     try {
-      // Step 1: Build the request body
       const body = buildLoginBody(username, password, userType);
 
       const API_BASE_URL = "http://192.168.1.44:9090/api/ats/157industries"
@@ -101,19 +100,23 @@ const LoginEmp = () => {
       console.log("📤 API URL:", apiUrl);
       console.log("📦 Request Body:", body);
 
-      // Step 3: Make API call
       const response = await axios.post(apiUrl, body);
-      console.log("✅ API Response:", response);
+      console.log("✅ API Response:", response.data);
 
-      // Step 4: Extract only what's needed
-      const userId =
-        userType === "portalemp"
-          ? response.data.uid
-          : response.data.employeeId;
+      // 🔴 Manual check for ATS API login failure
+      if (userType !== "portalemp" && (response.data.employeeId === 0 || response.data.statusCode !== "200 OK")) {
+        alert(response.data.status || "Invalid credentials!"); // show message from API
+        return; // stop further execution
+      }
+
+      // Step 4: Extract the userId
+      const userId = userType === "portalemp" ? response.data.uid : response.data.employeeId;
 
       // Step 5: Save login info in context
       loginUser({
         userId,
+        userName: username,
+        name: response.data.fullName || response.data.employeeName,
         userType: "employee",
         role: userType,
       });
@@ -122,17 +125,18 @@ const LoginEmp = () => {
       localStorage.setItem("userId", userId);
       localStorage.setItem("userType", "employee");
       localStorage.setItem("role", userType);
+      localStorage.setItem("name", response.data.fullName || response.data.employeeName);
 
-      console.log("EMP ID:",userId)
+      console.log("EMP ID:", userId);
+
       // Step 7: Navigate to the correct dashboard
       navigate(`/recruiter-navbar/${userType}`);
     } catch (error) {
       console.error("❌ Login failed:", error.response?.data || error);
       alert(error.response?.data || "Login failed. Please try again.");
     }
-
-
   };
+
 
   return (
     <div className="login-container">

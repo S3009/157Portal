@@ -43,7 +43,7 @@ export default function SalaryHikeCalculator() {
   return (
     <div className="salary-page">
       {/* 🟦 Hero Section */}
-      <section className="hero-section">
+      <section className="hero-sectionn">
         <div className="hero-content">
           <FaChartLine className="hero-icon" />
           <h1>Salary Hike & Growth Insights</h1>
