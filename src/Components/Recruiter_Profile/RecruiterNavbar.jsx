@@ -16,6 +16,8 @@ import {
   FaUserTie,
   FaSearch,
 } from "react-icons/fa";
+import { useLocation } from "react-router-dom";
+
 import "./RecruiterNavbar.css";
 import { FaPencilAlt, FaTrashAlt } from "react-icons/fa";
 import { toast } from "react-toastify";
@@ -24,7 +26,9 @@ import { useUser } from "../UserContext"; // adjust the path
 const RecruiterNavbar = () => {
   // const API_BASE_URL = "http://localhost:8080";
 
-  const { user, logoutUser } = useUser(); // get user object from context
+  const { user, logoutUser } = useUser(); 
+  const [appliedJobs, setAppliedJobs] = useState([]);
+const location = useLocation();
 
   const [activePage, setActivePage] = useState("home");
   const [showJDModal, setShowJDModal] = useState(false);
@@ -54,6 +58,7 @@ const RecruiterNavbar = () => {
   const [showInvitePopup, setShowInvitePopup] = useState(false);
   const [inviteCandidates, setInviteCandidates] = useState([]);
   const [selectedJobTitle, setSelectedJobTitle] = useState("");
+console.log("Logged in userType =", user);
 
   const [filters, setFilters] = useState({
     keyword: "",
@@ -64,6 +69,9 @@ const RecruiterNavbar = () => {
     qualification: "All Qualifications",
     company: "All Companies",
   });
+const getApplicationId = (a) => {
+  return a.applicationId || a.jobApplicationId || a.id;
+};
 
   const params = new URLSearchParams(location.search);
   // const userType = params.get("userType");
@@ -86,6 +94,49 @@ const RecruiterNavbar = () => {
   const [designationSuggestions, setDesignationSuggestions] = useState([]);
   const [locationSuggestions, setLocationSuggestions] = useState([]);
 
+const handleViewResume = async (jobAppId) => {
+  try {
+    const appData = await getBackendApplication(jobAppId);
+    if (!appData) return;
+
+    const currentStatus = appData.status;
+
+    if (statusOrder["viewed"] <= statusOrder[currentStatus]) {
+      return; 
+    }
+
+    await axios.post(`${API_BASE_PORTAL}/markViewed/${jobAppId}`);
+
+    const updatedApp = await getBackendApplication(jobAppId);
+
+    setApplicants(prev =>
+      prev.map(a =>
+        a.jobApplicationId === jobAppId
+          ? { ...a, status: updatedApp.status }
+          : a
+      )
+    );
+
+    toast.success("Application viewed");
+
+  } catch (err) {
+    console.error("Error updating view:", err);
+  }
+};
+
+
+
+const getBackendApplication = async (jobAppId) => {
+  try {
+    const res = await axios.get(
+      `${API_BASE_PORTAL}/getApplicationByJobAppId/${jobAppId}`
+    );
+    return res.data; 
+  } catch (err) {
+    console.error("Error fetching application:", err);
+    return null;
+  }
+};
 
   // Close profile panel on outside click
   //   useEffect(() => {
@@ -141,17 +192,78 @@ const RecruiterNavbar = () => {
 
   const currentYear = new Date().getFullYear();
 
-  const handleViewApplicants = async (requirementId) => {
-    try {
-      const response = await axios.get(`${API_BASE_PORTAL}/requirement/${requirementId}`);
+const handleViewApplicants = async (requirementId) => {
+  try {
+    const response = await axios.get(
+      `${API_BASE_PORTAL}/getByRequirement/${requirementId}`
+    );
 
-      setApplicants(response.data);
-      setSelectedJobId(requirementId);
-      setShowApplicantsPopup(true);
-    } catch (error) {
-      console.error("❌ Error:", error);
+    const applicants = response.data || [];
+
+    const applicantsWithStatus = await Promise.all(
+      applicants.map(async (a) => {
+        const appData = await getBackendApplication(a.id);
+        return {
+          ...a,
+jobApplicationId: a.jobApplicationId || a.id,
+          applicationId: appData?.id,
+          status: appData?.status || "pending"
+        };
+      })
+    );
+
+    setApplicants(applicantsWithStatus);
+    setSelectedJobId(requirementId);
+    setShowApplicantsPopup(true);
+
+  } catch (error) {
+    console.error("Error loading applicants:", error);
+  }
+};
+
+const statusOrder = {
+  pending: 1,
+  viewed: 2,
+  shortlisted: 3,
+  hired: 4
+};
+
+
+const updateStatus = async (jobAppId, newStatus) => {
+  try {
+    const appData = await getBackendApplication(jobAppId);
+    if (!appData) return;
+
+    const currentStatus = appData.status;
+
+    if (statusOrder[newStatus] <= statusOrder[currentStatus]) {
+      toast.info(`Cannot change status backward. Current: ${currentStatus}`);
+      return;
     }
-  };
+
+    await axios.post(`${API_BASE_PORTAL}/updateStatus`, {
+      jobApplicationId: jobAppId,
+      status: newStatus,
+    });
+
+    const updatedApp = await getBackendApplication(jobAppId);
+
+    setApplicants(prev =>
+      prev.map(a =>
+        a.jobApplicationId === jobAppId
+          ? { ...a, status: updatedApp.status }
+          : a
+      )
+    );
+
+    toast.success(`Status updated to ${updatedApp.status}`);
+
+  } catch (err) {
+    console.error("Status update failed:", err);
+    toast.error("Failed to update status");
+  }
+};
+
 
 
   const handleEdit = (requirementId) => {
@@ -162,14 +274,12 @@ const RecruiterNavbar = () => {
     try {
       const cleanDesignation = encodeURIComponent(designation.trim());
 
-      // ✅ 1️⃣ Fetch total count only
       const countRes = await axios.get(
         `${API_BASE_URL}/api/jobportal/getCountByDesignation/${cleanDesignation}`
       );
 
       const totalCount = countRes.data;
 
-      // ✅ 2️⃣ Optionally, get candidate list (if needed for invite sending)
       const res = await axios.get(
         `${API_BASE_URL}/api/jobportal/candidates/${cleanDesignation}`
       );
@@ -195,8 +305,6 @@ const RecruiterNavbar = () => {
         return;
       }
 
-      // get logged-in recruiter ID from localStorage (you can modify this)
-      // const recruiterId = localStorage.getItem("recruiterId");
       const userId = user?.userId;
 
       const recruiterId = userId;
@@ -232,13 +340,6 @@ const RecruiterNavbar = () => {
     }
   };
 
-
-
-
-
-
-  // ✅ Fetch jobs and listen to Apply count updates
-  // ✅ Fetch jobs only once from backend
   useEffect(() => {
     const fetchJobs = async () => {
       try {
@@ -247,13 +348,12 @@ const RecruiterNavbar = () => {
 
         let jobList = response.data.map(job => ({
           ...job,
-          applications: 0 // initialize
+          applications: 0 
         }));
 
-        // ✅ GET LIVE APPLICATION COUNT FOR EACH JOB
         for (const job of jobList) {
-          const res = await axios.get(`${API_BASE_PORTAL}/requirement/${job.requirementId}`);
-          job.applications = res.data.length; // real-time count
+          const res = await axios.get(`${API_BASE_PORTAL}/getByRequirement/${job.requirementId}`);
+          job.applications = res.data.length; 
         }
 
         setAllJobs(jobList);
@@ -271,21 +371,21 @@ const RecruiterNavbar = () => {
   }, []);
 
 
-  // Fetch recruiter’s posted jobs
-  useEffect(() => {
-    const fetchJobs = async () => {
-      try {
-        setLoading(true);
-        const res = await axios.get(`${API_BASE_PORTAL}/getAllRequirements`);
-        setJobs(res.data || []);
-      } catch (err) {
-        console.error("Error fetching jobs:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchJobs();
-  }, []);
+  // // Fetch recruiter’s posted jobs
+  // useEffect(() => {
+  //   const fetchJobs = async () => {
+  //     try {
+  //       setLoading(true);
+  //       const res = await axios.get(`${API_BASE_PORTAL}/getAllRequirements`);
+  //       setJobs(res.data || []);
+  //     } catch (err) {
+  //       console.error("Error fetching jobs:", err);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+  //   fetchJobs();
+  // }, []);
 
   const handleTestType = (type) => {
     setShowTestPopup(false);
@@ -305,16 +405,19 @@ const RecruiterNavbar = () => {
     setShowTestPopup(true);
   };
 
-  const handleViewJD = async (id) => {
-    try {
-      const response = await axios.get(`${API_BASE_PORTAL}/getRequirementById/${id}`);
-      setSelectedJD(response.data);
-      setShowJDModal(true);
-    } catch (err) {
-      console.error("Error fetching JD:", err);
-      alert("Failed to load JD details.");
-    }
-  };
+const handleViewJD = async (requirementId, applicationId) => {
+  try {
+    const res = await axios.get(`${API_BASE_PORTAL}/getRequirementById/${requirementId}`);
+    setSelectedJD(res.data);
+    setShowJDModal(true);
+
+    await axios.put(`${API_BASE_PORTAL}/markViewed/${applicationId}`);
+
+   
+  } catch (error) {
+    console.error("Error fetching JD or updating status:", error);
+  }
+};
 
   return (
     <>
@@ -672,10 +775,9 @@ const RecruiterNavbar = () => {
                         textAlign: "right",
                         display: "flex",
                         justifyContent: "flex-end",
-                        gap: "10px", // spacing between buttons
+                        gap: "10px", 
                       }}
                     >
-                      {/* {userType === "PortalEmp" && ( */}
                       <div style={{ display: "flex", alignItems: "center" }}>
                         <button
                           className="recJobCard-edit-btn"
@@ -746,6 +848,7 @@ const RecruiterNavbar = () => {
                       <th>Education</th>
                       <th>Applied</th>
                       <th>Test Score</th>
+                      <th>Status</th>
                       <th>Action</th>
                     </tr>
                   </thead>
@@ -753,19 +856,15 @@ const RecruiterNavbar = () => {
                     {applicants
                       .slice()
                       .sort((a, b) => {
-                        // If both have scores → sort descending
                         if (a.testScore != null && b.testScore != null) {
                           return b.testScore - a.testScore;
                         }
-                        // If only a has score → a first
                         if (a.testScore != null && b.testScore == null) {
                           return -1;
                         }
-                        // If only b has score → b first
                         if (a.testScore == null && b.testScore != null) {
                           return 1;
                         }
-                        // Both no score → keep original order
                         return 0;
                       })
                       .map((c, i) => (
@@ -777,11 +876,61 @@ const RecruiterNavbar = () => {
                           <td>
                             {c.testScore != null ? c.testScore : "Test not given"}
                           </td>
-                          <td>
-                            <button className="btn-small view-btn">View Resume</button>
-                            <button className="btn-small primary-btn">Shortlist</button>
-                            <button className="btn-small danger-btn">Reject</button>
-                          </td>
+
+  <td>
+    {c.status === "viewed"
+      ? "Viewed"
+      : c.status === "shortlisted"
+      ? "Shortlisted"
+      : c.status === "hired"
+      ? "Hired"
+      : "Pending"}
+  </td>
+<td>
+
+  {/* View Profile — ONLY for portal_emp */}
+  {user?.userType?.toLowerCase() === "portal_emp" && (
+    <button
+      className="applied-btn"
+      onClick={() => handleViewResume(c.jobApplicationId)}
+    >
+      View Profile
+    </button>
+  )}
+
+  {/* Add to Line Up — ONLY for recruiter */}
+  {user?.userType?.toLowerCase() === "recruiter" && (
+    <button
+      className="applied-btn lineup-btn"
+      style={{ marginLeft: "10px", background: "#4caf50", color: "#fff" }}
+      onClick={() => console.log("Add to Lineup clicked for", c.jobApplicationId)}
+    >
+      Add to Line Up
+    </button>
+  )}
+
+</td>
+
+
+
+
+
+
+{/* <button 
+  className="btn-small primary-btn"
+  onClick={() => updateStatus(c.jobApplicationId, "shortlisted")}
+>
+  Shortlist
+</button> */}
+
+{/* <button 
+  className="btn-small danger-btn"
+  onClick={() => updateStatus(c.jobApplicationId, "hired")}
+>
+  Hire
+</button> */}
+
+                        
                         </tr>
                       ))}
 

@@ -20,7 +20,7 @@ const InvitesPage = () => {
     const fetchInvites = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:8080/api/jobportal/candidate/${candidateId}`
+          `http://localhost:8080/api/jobportal/getInvitesForCandidate/${candidateId}`
         );
 
         setInvites(res.data);
