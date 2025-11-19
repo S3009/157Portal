@@ -453,7 +453,15 @@ const handleViewJD = async (requirementId, applicationId) => {
               onClick={() => togglePanel("profile")}
             />
             <span className="recNav-label">Profile</span>
+
+            {/* Show panel only if openPanel === "profile" */}
+            {openPanel === "profile" && (
+              <div className="profile-panel">
+                <p>Profile content goes here</p>
+              </div>
+            )}
           </div>
+
         </div>
       </nav>
 
@@ -960,7 +968,6 @@ const handleViewJD = async (requirementId, applicationId) => {
           </div>
         </div>
       )}
-
 
       <footer className="recFooter-footer">
         <div className="recFooter-content">
