@@ -2210,3 +2210,147 @@ details p {
     right: 5%;
   }
 }
+
+/* ===== MOBILE TOP NAVBAR ===== */
+.mobile-top-nav {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    display: none !important;     /* hide desktop navbar */
+  }
+
+  .mobile-top-nav {
+    display: flex;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 55px;
+    background: #526d82;
+    color: #fff;
+    z-index: 1000;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 15px;
+  }
+
+  .m-logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  .m-logo img {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+  }
+
+  .m-profile-icon {
+    font-size: 25px;
+    color: #fff;
+    cursor: pointer;
+  }
+}
+
+/* ===== MOBILE BOTTOM NAVBAR ===== */
+.mobile-bottom-nav {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .mobile-bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: #ffffff;
+    border-top: 1px solid #ddd;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  .m-item {
+    text-align: center;
+    color: #666;
+    display: flex;
+    flex-direction: column;
+    font-size: 13px;
+  }
+
+  .m-item svg {
+    font-size: 22px;
+  }
+
+  .m-item.active {
+    color: #0078ff;
+    font-weight: 600;
+  }
+
+  /* Add padding so content is not hidden */
+  .main-content-below-navbar {
+    padding-top: 70px;
+    padding-bottom: 70px;
+  }
+}
+
+@media (max-width: 768px) {
+  .mobile-profile-panel {
+    position: fixed !important;
+    top: 60px;       /* below top navbar */
+    left: 0;
+    right: 0;
+    bottom: 60px;    /* above bottom navbar */
+    width: 100% !important;
+    height: auto;
+    background: #fff;
+    overflow-y: auto;
+    z-index: 9999 !important;
+    border-left: none !important;
+  }
+}
+
+/* .profile-panel.open {
+  position: fixed;
+  top: 60px;        
+  left: 0;
+  right: 0;
+  bottom: 60px;      
+  background: #fff;
+  z-index: 99999;
+  overflow-y: auto;
+} */
+
+/* container for icons */
+.m-icons {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+/* show on mobile ONLY */
+.m-notif-icon,
+.m-profile-icon {
+  display: none;
+}
+
+/* mobile responsiveness */
+@media (max-width: 768px) {
+  .m-notif-icon,
+  .m-profile-icon {
+    display: block;
+    color: #333;
+  }
+
+  .m-notif-icon:active,
+  .m-profile-icon:active {
+    color: #0056ff;
+  }
+}
