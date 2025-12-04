@@ -367,7 +367,7 @@ const AddJobDescription = ({ loginEmployeeName }) => {
     try {
       const url = requirementId
         ? `${API_BASE_PORTAL}/update/${requirementId}`
-        : `${API_BASE_PORTAL}/create`;
+        : `${API_BASE_PORTAL}/createRequirement`;
 
       const method = requirementId ? "PUT" : "POST";
 

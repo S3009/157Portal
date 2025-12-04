@@ -95,12 +95,12 @@ const Navbar = () => {
       let updated;
       if (savedJobs.includes(jobId)) {
         await axios.delete(
-          `${API_BASE_PORTAL}/unsave?candidateId=${candidateId}&requirementId=${jobId}`
+          `http://localhost:8080/api/jobportal/unsave?candidateId=${candidateId}&requirementId=${jobId}`
         );
         updated = savedJobs.filter((id) => id !== jobId);
       } else {
         await axios.post(
-          `${API_BASE_PORTAL}/save?candidateId=${candidateId}&requirementId=${jobId}`
+          `http://localhost:8080/api/jobportal/save?candidateId=${candidateId}&requirementId=${jobId}`
         );
         updated = [...savedJobs, jobId];
       }
@@ -140,22 +140,55 @@ const Navbar = () => {
     setOpenPanel((prev) => (prev === panel ? null : panel));
 
   // ===== Fetch jobs =====
-  useEffect(() => {
-    const fetchJobs = async () => {
-      try {
-        const res = await axios.get(`${API_BASE_PORTAL}/getAllRequirements`);
-        const data = res.data || [];
-        setJobs(data);
-        setFilteredJobs(data);
-        localStorage.setItem("jobsList", JSON.stringify(data)); // ✅ store globally
-      } catch (error) {
-        console.error("Error fetching jobs:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchJobs();
-  }, []);
+useEffect(() => {
+  const fetchJobs = async () => {
+    try {
+      setLoading(true);
+
+      // 🟦 1. Fetch Portal Jobs (existing)
+      const portalRes = await axios.get(`http://localhost:8080/api/jobportal/getAllRequirements`);
+      const portalJobs = portalRes.data || [];
+
+      // 🟩 2. Fetch Recruiter Jobs (new)
+      const recruiterRes = await axios.get(
+        "https://rg.157careers.in/api/ats/157industries/fetch-all-job-descriptions/139/Recruiters"
+      );
+      const recruiterJobs = recruiterRes.data || [];
+
+      // Normalize recruiter job object keys to match candidate portal fields
+      const formattedRecruiterJobs = recruiterJobs.map((job) => ({
+        requirementId: job.requirementId,
+        companyName: job.companyName,
+        location: job.location,
+        experience: job.experience,
+        jobRole: job.designation,
+        salary: job.salary,
+        qualification: job.qualification || "Not Mentioned",
+        companyLogo: job.companyLogo || "",
+        skills: job.skills || "",
+      }));
+
+      // 🟧 3. Merge both sources
+      const mergedJobs = [...portalJobs, ...formattedRecruiterJobs];
+
+      setJobs(mergedJobs);
+      setFilteredJobs(mergedJobs);
+
+      // Save to local storage
+      localStorage.setItem("jobsList", JSON.stringify(mergedJobs));
+
+    } catch (error) {
+      console.error("❌ Error loading jobs:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchJobs();
+}, []);
+
+
+
   useEffect(() => {
     const fetchCompanies = async () => {
       try {
@@ -167,6 +200,7 @@ const Navbar = () => {
     };
     fetchCompanies();
   }, []);
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -190,7 +224,7 @@ const Navbar = () => {
 
       try {
         const res = await axios.get(
-          `${API_BASE_PORTAL}/getSavedJobsByCandidate/${candidateId}`
+          `http://localhost:8080/api/jobportal/getSavedJobsByCandidate/${candidateId}`
         );
 
         const savedIds = res.data.map(job => job.requirementId);
