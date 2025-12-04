@@ -168,7 +168,7 @@ const [showBuyPlanPopup, setShowBuyPlanPopup] = useState(false);
     const fetchQuestions = async () => {
       try {
         const response = await axios.get(
-          `${API_BASE_PORTAL}/requirement/${formData.requirementId}`
+          `http://localhost:8080/api/jobportal/requirement/${formData.requirementId}`
         );
         setQuestions(response.data || []);
       } catch (error) {
@@ -825,7 +825,7 @@ const [showBuyPlanPopup, setShowBuyPlanPopup] = useState(false);
   useEffect(() => {
     if (formData.requirementId || id) {
       axios
-        .get(`${API_BASE_PORTAL}/questions/${formData.requirementId || id}`)
+        .get(`http://localhost:8080/api/jobportal/questions/${formData.requirementId || id}`)
         .then((res) => {
           setQuestions(res.data || []);
         })
@@ -893,12 +893,12 @@ const [showBuyPlanPopup, setShowBuyPlanPopup] = useState(false);
       }));
 
       if (formattedAnswers.length > 0) {
-        await axios.post(`${API_BASE_PORTAL}/submit-answers`, formattedAnswers);
+        await axios.post(`http://localhost:8080/api/jobportal/submit-answers`, formattedAnswers);
       }
 
       // ✅ Submit application to backend
       const response = await axios.post(
-        `${API_BASE_PORTAL}/submit`,
+        `http://localhost:8080/api/jobportal/submit`,
         applicationData
       );
 
@@ -911,7 +911,7 @@ const [showBuyPlanPopup, setShowBuyPlanPopup] = useState(false);
 
       toast.success("✅ Application submitted successfully!", { autoClose: 1500 });
       // ✅ Refresh job list from backend so RecruiterNavbar updates count
-      axios.get(`${API_BASE_PORTAL}/getAllRequirements`)
+      axios.get(`http://localhost:8080/api/jobportal/getAllRequirements`)
         .then(res => {
           localStorage.setItem("jobsList", JSON.stringify(res.data));
           window.dispatchEvent(new Event("jobsUpdated")); // notify navbar to refresh
@@ -983,7 +983,7 @@ const handleStartTest = async () => {
     }
 
     const encodedRole = encodeURIComponent(roleName);
-    const resp = await axios.get(`${API_BASE_PORTAL}/role/${encodedRole}`);
+    const resp = await axios.get(`http://localhost:8080/api/jobportal/role/${encodedRole}`);
     const payload = resp?.data || {};
 
     const candidates =

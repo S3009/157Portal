@@ -90,7 +90,7 @@ const LoginEmp = () => {
     try {
       const body = buildLoginBody(username, password, userType);
 
-      const API_BASE_URL = "http://192.168.1.44:9090/api/ats/157industries"
+      const API_BASE_URL = "http://192.168.1.40:9090/api/ats/157industries"
       // Step 2: Select the right API
       const apiUrl =
         userType === "portalemp"

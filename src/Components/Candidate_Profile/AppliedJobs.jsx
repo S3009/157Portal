@@ -19,7 +19,7 @@ const AppliedJobs = () => {
   const handleViewJD = async (requirementId) => {
     try {
       const res = await axios.get(
-        `${API_BASE_PORTAL}/getRequirementById/${requirementId}`
+        `http://localhost:8080/api/jobportal/getRequirementById/${requirementId}`
       );
       setSelectedJD(res.data);
       setShowJDModal(true);
@@ -31,7 +31,7 @@ const AppliedJobs = () => {
 
 const fetchApplicationStatus = async (applicationId) => {
   try {
-    const res = await axios.get(`${API_BASE_PORTAL}/getApplicationStatus/${applicationId}`);
+    const res = await axios.get(`http://localhost:8080/api/jobportal/getApplicationStatus/${applicationId}`);
     return res.data?.status;
   } catch (err) {
     return null;
@@ -53,7 +53,7 @@ const handleViewStatus = async (application) => {
 useEffect(() => {
   const fetchAppliedJobs = async () => {
     try {
-      const res = await axios.get(`${API_BASE_PORTAL}/getAllApplications`);
+      const res = await axios.get(`http://localhost:8080/api/jobportal/getAllApplications`);
       const apps = res.data || [];
 
       const appsWithStatus = await Promise.all(
@@ -63,7 +63,7 @@ useEffect(() => {
 
           try {
             const statusRes = await axios.get(
-              `${API_BASE_PORTAL}/getApplicationStatus/${applicationId}`
+              `http://localhost:8080/api/jobportal/getApplicationStatus/${applicationId}`
             );
             status = statusRes.data.status;
           } catch (err) {

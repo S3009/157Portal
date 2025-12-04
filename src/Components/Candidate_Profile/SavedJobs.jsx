@@ -14,7 +14,7 @@ const SavedJobs = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const res = await axios.get(`${API_BASE_PORTAL}/candidate/1/details`);
+      const res = await axios.get(`http://localhost:8080/api/jobportal/candidate/1/details`);
       setSavedJobs(res.data);
     };
     fetchData();
@@ -22,7 +22,7 @@ const SavedJobs = () => {
 
   const openJDModal = async (requirementId) => {
     try {
-      const res = await axios.get(`${API_BASE_PORTAL}/getRequirementById/${requirementId}`);
+      const res = await axios.get(`http://localhost:8080/api/jobportal/getRequirementById/${requirementId}`);
       setSelectedJD(res.data);
       setShowJDModal(true);
     } catch (err) {

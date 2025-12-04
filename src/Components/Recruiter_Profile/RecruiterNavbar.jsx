@@ -21,14 +21,24 @@ import { useLocation } from "react-router-dom";
 import "./RecruiterNavbar.css";
 import { FaPencilAlt, FaTrashAlt } from "react-icons/fa";
 import { toast } from "react-toastify";
-import { API_BASE_PORTAL } from "../../API/api";
+import { API_BASE_PORTAL, API_BASE_URL } from "../../API/api";
 import { useUser } from "../UserContext"; // adjust the path
+
 const RecruiterNavbar = () => {
   // const API_BASE_URL = "http://localhost:8080";
+    const { loginUser } = useUser();
+// console.log("LOGGED IN USER DETAILS:",loginUser)
 
-  const { user, logoutUser } = useUser(); 
-  const [appliedJobs, setAppliedJobs] = useState([]);
 const location = useLocation();
+  const { user, logoutUser } = useUser(); 
+
+// override role if URL contains "newRecruiter"
+const effectiveRole = location.pathname.includes("newRecruiter")
+  ? "recruiter"
+  : user?.role?.toLowerCase();
+
+  const [appliedJobs, setAppliedJobs] = useState([]);
+
 
   const [showLogoutPopup, setShowLogoutPopup] = useState(false);
 
@@ -104,7 +114,9 @@ const handleViewResume = async (jobAppId) => {
     const currentStatus = appData.status;
 
     if (statusOrder["viewed"] <= statusOrder[currentStatus]) {
-      return; 
+      // already viewed → directly navigate
+      navigate("/navbar");
+      return;
     }
 
     await axios.post(`${API_BASE_PORTAL}/markViewed/${jobAppId}`);
@@ -121,6 +133,9 @@ const handleViewResume = async (jobAppId) => {
 
     toast.success("Application viewed");
 
+    // ⭐ Navigate to Recruiter Navbar Home
+    navigate("/navbar");
+
   } catch (err) {
     console.error("Error updating view:", err);
   }
@@ -128,10 +143,52 @@ const handleViewResume = async (jobAppId) => {
 
 
 
+useEffect(() => {
+  const fetchRecruiterJobs = async () => {
+    try {
+      if (effectiveRole === "recruiter") {
+        const response = await axios.get(
+          "https://rg.157careers.in/api/ats/157industries/fetch-all-job-descriptions/139/Recruiters"
+        );
+
+        console.log("Recruiter JD List:", response.data);
+
+        // 🔥 Add applicant count for every recruiter JD
+        const jobList = await Promise.all(
+          response.data.map(async (job) => {
+            try {
+              const res = await axios.get(
+                `http://localhost:8080/api/jobportal/getByRequirement/${job.requirementId}`
+              );
+
+              return {
+                ...job,
+                applications: res.data.length,  // ⭐ SAME AS portalemp
+              };
+            } catch (err) {
+              console.error("Error fetching applicant count:", err);
+              return { ...job, applications: 0 };
+            }
+          })
+        );
+
+        setJobs(jobList);
+        setFilteredJobs(jobList);
+        setAllJobs(jobList);
+      }
+    } catch (error) {
+      console.error("Error fetching recruiter job descriptions:", error);
+    }
+  };
+
+  fetchRecruiterJobs();
+}, [effectiveRole]);
+
+
 const getBackendApplication = async (jobAppId) => {
   try {
     const res = await axios.get(
-      `${API_BASE_PORTAL}/getApplicationByJobAppId/${jobAppId}`
+      `http://localhost:8080/api/jobportal/getApplicationByJobAppId/${jobAppId}`
     );
     return res.data; 
   } catch (err) {
@@ -197,7 +254,7 @@ const getBackendApplication = async (jobAppId) => {
 const handleViewApplicants = async (requirementId) => {
   try {
     const response = await axios.get(
-      `${API_BASE_PORTAL}/getByRequirement/${requirementId}`
+      `http://localhost:8080/api/jobportal/getByRequirement/${requirementId}`
     );
 
     const applicants = response.data || [];
@@ -342,35 +399,89 @@ const updateStatus = async (jobAppId, newStatus) => {
     }
   };
 
-  useEffect(() => {
-    const fetchJobs = async () => {
-      try {
+useEffect(() => {
+  const fetchPortalEmpJobs = async () => {
+    try {
+      if (effectiveRole === "portalemp") {
         setLoading(true);
-        const response = await axios.get(`${API_BASE_PORTAL}/getAllRequirements`);
 
-        let jobList = response.data.map(job => ({
-          ...job,
-          applications: 0 
-        }));
 
-        for (const job of jobList) {
-          const res = await axios.get(`${API_BASE_PORTAL}/getByRequirement/${job.requirementId}`);
-          job.applications = res.data.length; 
-        }
+        const response = await axios.get(
+          "http://localhost:8080/api/jobportal/getAllRequirements"
+        );
 
-        setAllJobs(jobList);
+        // 🔥 Fetch real applicant count for each JD
+        let jobList = await Promise.all(
+          response.data.map(async (job) => {
+            try {
+              const res = await axios.get(
+                `http://localhost:8080/api/jobportal/getByRequirement/${job.requirementId}`
+              );
+
+              return {
+                ...job,
+                applications: res.data.length, // <-- REAL COUNT
+              };
+            } catch (err) {
+              console.error("Error fetching count:", err);
+              return {
+                ...job,
+                applications: 0,
+              };
+            }
+          })
+        );
+
+
         setJobs(jobList);
         setFilteredJobs(jobList);
-
-      } catch (error) {
-        console.error("❌ Error fetching jobs:", error);
-      } finally {
-        setLoading(false);
+        setAllJobs(jobList);
       }
-    };
 
-    fetchJobs();
-  }, []);
+    } catch (error) {
+      console.error("Error fetching jobs:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchPortalEmpJobs();
+}, [effectiveRole]);
+
+
+// useEffect(() => {
+//   if (effectiveRole !== "portalemp") return;  // ⛔ skip for newRecruiter
+
+//   const fetchJobs = async () => {
+//     try {
+//       setLoading(true);
+//       const response = await axios.get("http://localhost:8080/api/jobportal/getAllRequirements");
+
+//       let jobList = response.data.map(job => ({
+//         ...job,
+//         applications: 0
+//       }));
+
+//       for (const job of jobList) {
+//         const res = await axios.get(
+//           `http://localhost:8080/api/jobportal/getByRequirement/${job.requirementId}`
+//         );
+//         job.applications = res.data.length;
+//       }
+
+//       setAllJobs(jobList);
+//       setJobs(jobList);
+//       setFilteredJobs(jobList);
+
+//     } catch (error) {
+//       console.error("❌ Error fetching jobs:", error);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   fetchJobs();
+// }, [effectiveRole]);
 
 
   // // Fetch recruiter’s posted jobs
@@ -979,20 +1090,27 @@ const handleViewJD = async (requirementId, applicationId) => {
       ? "Hired"
       : "Pending"}
   </td>
-<td>
+{/* <td> */}
 
   {/* View Profile — ONLY for portal_emp */}
-  {user?.userType?.toLowerCase() === "portal_emp" && (
+  {/* {user?.userType?.toLowerCase() === "portal_emp" && (
     <button
       className="applied-btn"
       onClick={() => handleViewResume(c.jobApplicationId)}
     >
       View Profile
     </button>
-  )}
+  )} */}
+
+  {/* <button
+      className="applied-btn"
+      onClick={() => handleViewResume(c.jobApplicationId)}
+    >
+      View Profile
+    </button> */}
 
   {/* Add to Line Up — ONLY for recruiter */}
-  {user?.userType?.toLowerCase() === "recruiter" && (
+  {/* {user?.userType?.toLowerCase() === "newRecruiter" && (
     <button
       className="applied-btn lineup-btn"
       style={{ marginLeft: "10px", background: "#4caf50", color: "#fff" }}
@@ -1002,7 +1120,30 @@ const handleViewJD = async (requirementId, applicationId) => {
     </button>
   )}
 
+</td> */}
+<td>
+  {/* PORTAL EMPLOYEE → View Profile */}
+  {effectiveRole === "portalemp" && (
+    <button
+      className="applied-btn"
+      onClick={() => handleViewResume(c.jobApplicationId)}
+    >
+      View Profile
+    </button>
+  )}
+
+  {/* RECRUITER → Add to Line Up */}
+  {effectiveRole === "recruiter" && (
+    <button
+      className="applied-btn lineup-btn"
+      style={{ marginLeft: "10px", background: "#4caf50", color: "#fff" }}
+      onClick={() => console.log("Add to Calling", c.jobApplicationId)}
+    >
+      Add to Calling
+    </button>
+  )}
 </td>
+
 
 
 
