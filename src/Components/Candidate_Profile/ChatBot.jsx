@@ -86,7 +86,7 @@ const ChatBot = () => {
     <>
       {!open && (
         <div className="chatbot-button" onClick={() => setOpen(true)}>
-          🤖
+          💬
         </div>
       )}
 

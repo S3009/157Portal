@@ -15,6 +15,7 @@ import {
   FaEnvelope,
   FaHome,
   FaBriefcase,
+  FaSearch,
 } from "react-icons/fa";
 import "./Navbar.css";
 import { useNavigate } from "react-router-dom";
@@ -31,6 +32,7 @@ const Navbar = () => {
   console.log("USER FROM CONTEXT = ", user);
 
   const { logoutUser } = useUser(); // ✅ now it's defined
+  const [activeMobileTab, setActiveMobileTab] = useState("home");
   const [menuOpen, setMenuOpen] = useState(false);
   const [openPanel, setOpenPanel] = useState(null);
   const jobsRef = useRef(null);
@@ -41,6 +43,12 @@ const Navbar = () => {
   const [showLogoutPopup, setShowLogoutPopup] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
   { activeSection === "profile" && <ProfilePage /> }
+
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
+  const [showMobileSort, setShowMobileSort] = useState(false);
+  const [sortBy, setSortBy] = useState("relevance");
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
+
 
   const [showDropdown, setShowDropdown] = useState();
   const [showInterviewSubmenu, setShowInterviewSubmenu] = useState();
@@ -156,6 +164,26 @@ const Navbar = () => {
     };
     fetchJobs();
   }, []);
+
+  // ================= SORT LOGIC =================
+  let sortedJobs = [...filteredJobs];
+
+  if (sortBy === "newest") {
+    sortedJobs.sort((a, b) => b.requirementId - a.requirementId);
+  }
+  if (sortBy === "salary-desc") {
+    sortedJobs.sort((a, b) => Number(b.salary) - Number(a.salary));
+  }
+  if (sortBy === "salary-asc") {
+    sortedJobs.sort((a, b) => Number(a.salary) - Number(b.salary));
+  }
+  if (sortBy === "experience-asc") {
+    sortedJobs.sort((a, b) => Number(a.experience) - Number(b.experience));
+  }
+  if (sortBy === "experience-desc") {
+    sortedJobs.sort((a, b) => Number(b.experience) - Number(a.experience));
+  }
+
   useEffect(() => {
     const fetchCompanies = async () => {
       try {
@@ -546,17 +574,18 @@ const Navbar = () => {
 
         <div className="m-icons">
           <FaBell
-            className="m-notif-icon"
             size={23}
+            className="m-bell"
             onClick={() => setShowNotifications(true)}
           />
 
-          <FaUserCircle
-            className="m-profile-icon"
-            size={25}
-            onClick={() => togglePanel("profile")}
+          <FaBars
+            size={24}
+            className="m-hamburger"
+            onClick={() => setShowMobileMenu(true)}
           />
         </div>
+
       </div>
 
 
@@ -859,186 +888,453 @@ const Navbar = () => {
         {activeSection === "home" && <HomePage />}
 
         {activeSection === "jobs" && (
-          <div className="navDash-container">
-            {/* Sidebar */}
-            <div className="navDash-sidebar">
-              {/* <input
-                type="text"
-                name="keyword"
-                value={filters.keyword}
-                onChange={handleChange}
-                placeholder="Search by keyword..."
-              /> */}
+          <>
+            {/* ================= DESKTOP JOBS VIEW ================= */}
+            <div className="navDash-container desktop-only">
+              {/* --- PASTE YOUR ENTIRE EXISTING DESKTOP JOBS CODE HERE --- */}
+              {/* Sidebar */}
+              <div className="navDash-sidebar">
+                <label>
+                  Location
+                  <select name="location" value={filters.location} onChange={handleChange}>
+                    <option>All Locations</option>
+                    {[...new Set(jobs.map((job) => job.location))].map((loc) => (
+                      <option key={loc}>{loc}</option>
+                    ))}
+                  </select>
+                </label>
 
-              <label>
-                Location
-                <select name="location" value={filters.location} onChange={handleChange}>
-                  <option>All Locations</option>
-                  {[...new Set(jobs.map((job) => job.location))].map((loc) => (
-                    <option key={loc}>{loc}</option>
-                  ))}
-                </select>
-              </label>
+                <label>
+                  Experience
+                  <select name="experience" value={filters.experience} onChange={handleChange}>
+                    <option>All Experience Levels</option>
+                    {[...new Set(jobs.map((job) => job.experience))].map((exp) => (
+                      <option key={exp}>{exp}</option>
+                    ))}
+                  </select>
+                </label>
 
-              <label>
-                Experience
-                <select name="experience" value={filters.experience} onChange={handleChange}>
-                  <option>All Experience Levels</option>
-                  {[...new Set(jobs.map((job) => job.experience))].map((exp) => (
-                    <option key={exp}>{exp}</option>
-                  ))}
-                </select>
-              </label>
+                <label>
+                  Salary
+                  <select name="salary" value={filters.salary} onChange={handleChange}>
+                    <option>All Salary Ranges</option>
+                    {[...new Set(jobs.map((job) => job.salary))].map((sal) => (
+                      <option key={sal}>{sal}</option>
+                    ))}
+                  </select>
+                </label>
 
-              <label>
-                Salary
-                <select name="salary" value={filters.salary} onChange={handleChange}>
-                  <option>All Salary Ranges</option>
-                  {[...new Set(jobs.map((job) => job.salary))].map((sal) => (
-                    <option key={sal}>{sal}</option>
-                  ))}
-                </select>
-              </label>
+                <label>
+                  Designation
+                  <select name="designation" value={filters.designation} onChange={handleChange}>
+                    <option>All Job Designations</option>
+                    {[...new Set(jobs.map((job) => job.jobRole))].map((role) => (
+                      <option key={role}>{role}</option>
+                    ))}
+                  </select>
+                </label>
 
-              <label>
-                Designation
-                <select name="designation" value={filters.designation} onChange={handleChange}>
-                  <option>All Job Designations</option>
-                  {[...new Set(jobs.map((job) => job.jobRole))].map((role) => (
-                    <option key={role}>{role}</option>
-                  ))}
-                </select>
-              </label>
+                <label>
+                  Qualification
+                  <select name="qualification" value={filters.qualification} onChange={handleChange}>
+                    <option>All Qualifications</option>
+                    {[...new Set(jobs.map((job) => job.qualification))].map((q) => (
+                      <option key={q}>{q}</option>
+                    ))}
+                  </select>
+                </label>
 
-              <label>
-                Qualification
-                <select name="qualification" value={filters.qualification} onChange={handleChange}>
-                  <option>All Qualifications</option>
-                  {[...new Set(jobs.map((job) => job.qualification))].map((q) => (
-                    <option key={q}>{q}</option>
-                  ))}
-                </select>
-              </label>
+                <label>
+                  Company
+                  <select name="company" value={filters.company} onChange={handleChange}>
+                    <option>All Companies</option>
+                    {[...new Set(jobs.map((job) => job.companyName))].map((c) => (
+                      <option key={c}>{c}</option>
+                    ))}
+                  </select>
+                </label>
+              </div>
 
-              <label>
-                Company
-                <select name="company" value={filters.company} onChange={handleChange}>
-                  <option>All Companies</option>
-                  {[...new Set(jobs.map((job) => job.companyName))].map((c) => (
-                    <option key={c}>{c}</option>
-                  ))}
-                </select>
-              </label>
-            </div>
-            {/* Job Cards */}
-            <div className="navDash-jobContainer">
-              <h2 className="navDash-jobContainer-heading">Jobs For You</h2>
+              {/* Job Cards */}
+              <div className="navDash-jobContainer">
+                <h2 className="navDash-jobContainer-heading">Jobs For You</h2>
 
-              {loading ? (
-                <p>Loading jobs...</p>
-              ) : jobs.length === 0 ? (
-                <p>No jobs found.</p>
-              ) : (
-                <>
-                  <div className="navDash-jobGrid">
-                    {filteredJobs
-                      .filter(
-                        (job) =>
-                          selectedCompany === "All Companies" ||
-                          job.companyName === selectedCompany
-                      )
-                      .slice(0, visibleCount)
-                      .map((job) => (
-                        <div key={job.requirementId} className="navDash-jobCard">
+                {loading ? (
+                  <p>Loading jobs...</p>
+                ) : jobs.length === 0 ? (
+                  <p>No jobs found.</p>
+                ) : (
+                  <>
+                    <div className="navDash-jobGrid">
+                      {sortedJobs
+                        .filter(
+                          (job) =>
+                            selectedCompany === "All Companies" ||
+                            job.companyName === selectedCompany
+                        )
+                        .slice(0, visibleCount)
+                        .map((job) => (
+                          <div key={job.requirementId} className="navDash-jobCard">
 
-                          <div className="navDash-jobHeader">
-                            {job.companyLogo && (
-                              <img
-                                src={job.companyLogo}
-                                alt="Company Logo"
-                                className="navDash-companyLogo"
-                              />
+                            <div className="navDash-jobHeader">
+                              {job.companyLogo && (
+                                <img
+                                  src={job.companyLogo}
+                                  alt="Company Logo"
+                                  className="navDash-companyLogo"
+                                />
+                              )}
 
-                            )}
-
-                            <div className="navDash-jobInfo">
-                              <p><strong>Company:</strong> {job.companyName}</p>
-                              <p><strong>Location:</strong> {job.location}</p>
-                              <p><strong>Experience:</strong> {job.experience}</p>
-                              <p><strong>Job Role:</strong> {job.jobRole}</p>
+                              <div className="navDash-jobInfo">
+                                <p><strong>Company:</strong> {job.companyName}</p>
+                                <p><strong>Location:</strong> {job.location}</p>
+                                <p><strong>Experience:</strong> {job.experience}</p>
+                                <p><strong>Job Role:</strong> {job.jobRole}</p>
+                              </div>
                             </div>
-                          </div>
 
-                          {/* ✅ Bottom Buttons */}
-                          <div className="navDash-jobActions">
-                            {/* View JD - Bottom Left */}
-                            <button
-                              className="navDash-viewBtn"
-                              onClick={() => handleViewJD(job.requirementId)}
-                            >
-                              View JD
-                            </button>
-
-                            {/* Save + Apply Now - Bottom Right */}
-                            <div className="navDash-actionRight">
+                            <div className="navDash-jobActions">
                               <button
-                                className="navDash-saveBtn"
-                                onClick={() => toggleSave(job.requirementId)}
-                                title={
-                                  savedJobs.includes(job.requirementId)
-                                    ? "Unsave Job"
-                                    : "Save Job"
-                                }
+                                className="navDash-viewBtn"
+                                onClick={() => handleViewJD(job.requirementId)}
                               >
-                                {savedJobs.includes(job.requirementId) ? (
-                                  <FaBookmark />
-                                ) : (
-                                  <FaRegBookmark />
-                                )}
+                                View JD
                               </button>
 
-                              <button
-                                className="navDash-applyBtn"
-                                onClick={() => handleApplyNow(job)}
-                              >
-                                Apply Now
-                              </button>
+                              <div className="navDash-actionRight">
+                                <button
+                                  className="navDash-saveBtn"
+                                  onClick={() => toggleSave(job.requirementId)}
+                                  title={
+                                    savedJobs.includes(job.requirementId)
+                                      ? "Unsave Job"
+                                      : "Save Job"
+                                  }
+                                >
+                                  {savedJobs.includes(job.requirementId) ? (
+                                    <FaBookmark />
+                                  ) : (
+                                    <FaRegBookmark />
+                                  )}
+                                </button>
+
+                                <button
+                                  className="navDash-applyBtn"
+                                  onClick={() => handleApplyNow(job)}
+                                >
+                                  Apply Now
+                                </button>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      ))}
+                        ))}
+                    </div>
+
+                    {visibleCount < jobs.length && (
+                      <button
+                        className="navDash-showMore"
+                        onClick={() => setVisibleCount((prev) => prev + 6)}
+                      >
+                        Show More
+                      </button>
+                    )}
+                  </>
+                )}
+
+                <div className="no-cv-highlight">
+                  <div className="no-cv-text">
+                    <h3>No CV? No Problem 🚀</h3>
+                    <p>Create your professional resume instantly in minutes.</p>
                   </div>
 
-                  {/* Show More Button below grid */}
-                  {visibleCount < jobs.length && (
-                    <button
-                      className="navDash-showMore"
-                      onClick={() => setVisibleCount((prev) => prev + 6)}
-                    >
-                      Show More
-                    </button>
-                  )}
-                </>
-              )}
-
-              {/* No CV Highlight */}
-              <div className="no-cv-highlight">
-                <div className="no-cv-text">
-                  <h3>No CV? No Problem 🚀</h3>
-                  <p>Create your professional resume instantly in minutes.</p>
+                  <button
+                    className="no-cv-create-btn"
+                    onClick={() => navigate("/resume-templates")}
+                  >
+                    Create Resume
+                  </button>
                 </div>
-
-                <button
-                  className="no-cv-create-btn"
-                  onClick={() => navigate("/resume-templates")}
-                >
-                  Create Resume
-                </button>
               </div>
             </div>
 
-          </div>
+            {/* ================= MOBILE JOBS VIEW ================= */}
+            <div className="mobile-jobs-view mobile-only">
+              {/* ================= MOBILE JOBS SEARCH BAR ================= */}
+              <div
+                className="mobile-search-bar"
+                onClick={() => setShowSearchOverlay(true)}
+              >
+                <FaSearch className="search-icon" />
+                <span>Search jobs, companies...</span>
+              </div>
+
+              {/* ================= MOBILE FILTERS + SORT ROW ================= */}
+              <div className="mobile-filter-sort-row">
+                <div
+                  className="mobile-filter-btn"
+                  onClick={() => setShowMobileFilters(true)}
+                >
+                  Filters ▾
+                </div>
+
+                <div
+                  className="mobile-sort-btn"
+                  onClick={() => setShowMobileSort(true)}
+                >
+                  Sort ▾
+                </div>
+              </div>
+
+              {/* ================= MOBILE JOB LIST ================= */}
+              <div className="mobile-job-list">
+                {sortedJobs.map((job) => (
+                  <div key={job.requirementId} className="mobile-job-card">
+
+                    {/* Job Header */}
+                    <div className="mobile-job-header">
+                      {job.companyLogo && (
+                        <img
+                          src={job.companyLogo}
+                          className="mobile-company-logo"
+                          alt="Company Logo"
+                        />
+                      )}
+
+                      <div className="mobile-job-info">
+                        <h4>{job.companyName}</h4>
+                        <p>{job.jobRole}</p>
+                        <small>
+                          📍 {job.location} &nbsp;&nbsp; ⏳ {job.experience}
+                        </small>
+                      </div>
+                    </div>
+
+                    {/* Job Buttons */}
+                    <div className="mobile-job-actions">
+                      <button onClick={() => handleViewJD(job.requirementId)}>
+                        View JD
+                      </button>
+
+                      <button onClick={() => toggleSave(job.requirementId)}>
+                        {savedJobs.includes(job.requirementId) ? "Saved" : "Save"}
+                      </button>
+
+                      <button
+                        className="apply-mobile"
+                        onClick={() => handleApplyNow(job)}
+                      >
+                        Apply
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* ================= MOBILE FILTERS BOTTOM SHEET ================= */}
+              {showMobileFilters && (
+                <div className="mobile-filter-overlay" onClick={() => setShowMobileFilters(false)}>
+                  <div
+                    className="mobile-filter-sheet"
+                    onClick={(e) => e.stopPropagation()} /* prevent closing when clicking inside */
+                  >
+                    <div className="sheet-header">
+                      <h3>Filters</h3>
+                      <button className="sheet-close" onClick={() => setShowMobileFilters(false)}>
+                        ×
+                      </button>
+                    </div>
+
+                    {/* ========== FILTER ACCORDIONS ========== */}
+                    <div className="filter-accordion">
+
+                      {/* Location */}
+                      <details>
+                        <summary>Location</summary>
+                        <select
+                          name="location"
+                          value={filters.location}
+                          onChange={handleChange}
+                        >
+                          <option>All Locations</option>
+                          {[...new Set(jobs.map((job) => job.location))].map((loc) => (
+                            <option key={loc}>{loc}</option>
+                          ))}
+                        </select>
+                      </details>
+
+                      {/* Experience */}
+                      <details>
+                        <summary>Experience</summary>
+                        <select
+                          name="experience"
+                          value={filters.experience}
+                          onChange={handleChange}
+                        >
+                          <option>All Experience Levels</option>
+                          {[...new Set(jobs.map((job) => job.experience))].map((exp) => (
+                            <option key={exp}>{exp}</option>
+                          ))}
+                        </select>
+                      </details>
+
+                      {/* Salary */}
+                      <details>
+                        <summary>Salary</summary>
+                        <select
+                          name="salary"
+                          value={filters.salary}
+                          onChange={handleChange}
+                        >
+                          <option>All Salary Ranges</option>
+                          {[...new Set(jobs.map((job) => job.salary))].map((sal) => (
+                            <option key={sal}>{sal}</option>
+                          ))}
+                        </select>
+                      </details>
+
+                      {/* Designation */}
+                      <details>
+                        <summary>Designation</summary>
+                        <select
+                          name="designation"
+                          value={filters.designation}
+                          onChange={handleChange}
+                        >
+                          <option>All Job Designations</option>
+                          {[...new Set(jobs.map((job) => job.jobRole))].map((role) => (
+                            <option key={role}>{role}</option>
+                          ))}
+                        </select>
+                      </details>
+
+                      {/* Qualification */}
+                      <details>
+                        <summary>Qualification</summary>
+                        <select
+                          name="qualification"
+                          value={filters.qualification}
+                          onChange={handleChange}
+                        >
+                          <option>All Qualifications</option>
+                          {[...new Set(jobs.map((job) => job.qualification))].map((q) => (
+                            <option key={q}>{q}</option>
+                          ))}
+                        </select>
+                      </details>
+
+                      {/* Company */}
+                      <details>
+                        <summary>Company</summary>
+                        <select
+                          name="company"
+                          value={filters.company}
+                          onChange={handleChange}
+                        >
+                          <option>All Companies</option>
+                          {[...new Set(jobs.map((job) => job.companyName))].map((c) => (
+                            <option key={c}>{c}</option>
+                          ))}
+                        </select>
+                      </details>
+                    </div>
+
+                    {/* APPLY FILTERS BUTTON */}
+                    <button className="apply-filters-btn" onClick={() => setShowMobileFilters(false)}>
+                      Apply Filters
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* ================= MOBILE SORT BOTTOM SHEET ================= */}
+              {showMobileSort && (
+                <div
+                  className="mobile-sort-overlay"
+                  onClick={() => setShowMobileSort(false)}
+                >
+                  <div
+                    className="mobile-sort-sheet"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <div className="sort-header">
+                      <h3>Sort Jobs</h3>
+                      <button
+                        className="sort-close"
+                        onClick={() => setShowMobileSort(false)}
+                      >
+                        ×
+                      </button>
+                    </div>
+
+                    {/* SORT OPTIONS */}
+                    <div className="sort-options">
+                      <div
+                        className="sort-option"
+                        onClick={() => {
+                          setSortBy("relevance");
+                          setShowMobileSort(false);
+                        }}
+                      >
+                        Relevance
+                      </div>
+
+                      <div
+                        className="sort-option"
+                        onClick={() => {
+                          setSortBy("newest");
+                          setShowMobileSort(false);
+                        }}
+                      >
+                        Newest First
+                      </div>
+
+                      <div
+                        className="sort-option"
+                        onClick={() => {
+                          setSortBy("salary-desc");
+                          setShowMobileSort(false);
+                        }}
+                      >
+                        Salary: High → Low
+                      </div>
+
+                      <div
+                        className="sort-option"
+                        onClick={() => {
+                          setSortBy("salary-asc");
+                          setShowMobileSort(false);
+                        }}
+                      >
+                        Salary: Low → High
+                      </div>
+
+                      <div
+                        className="sort-option"
+                        onClick={() => {
+                          setSortBy("experience-asc");
+                          setShowMobileSort(false);
+                        }}
+                      >
+                        Experience: Low → High
+                      </div>
+
+                      <div
+                        className="sort-option"
+                        onClick={() => {
+                          setSortBy("experience-desc");
+                          setShowMobileSort(false);
+                        }}
+                      >
+                        Experience: High → Low
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </>
         )}
+
       </div>
 
 
@@ -1369,44 +1665,154 @@ const Navbar = () => {
         </div>
       )}
 
-      <ChatBot />
+      <div className="chatbot-wrapper">
+        <ChatBot />
+      </div>
+
+      {/* ===== MOBILE SIDE MENU ===== */}
+      {showMobileMenu && (
+        <div
+          className="mobile-menu-overlay"
+          onClick={() => setShowMobileMenu(false)}
+        >
+          <div
+            className="mobile-menu-drawer"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="mobile-menu-title">Menu</h3>
+
+            <div
+              className="mobile-menu-item"
+              onClick={() => {
+                navigate("/recommended");
+                setShowMobileMenu(false);
+              }}
+            >
+              Recommended Jobs
+            </div>
+
+            <div
+              className="mobile-menu-item"
+              onClick={() => {
+                navigate("/saved-jobs");
+                setShowMobileMenu(false);
+              }}
+            >
+              Saved Jobs
+            </div>
+
+            <div
+              className="mobile-menu-item"
+              onClick={() => {
+                navigate("/interview-faqs");
+                setShowMobileMenu(false);
+              }}
+            >
+              Interview FAQs
+            </div>
+
+            <div
+              className="mobile-menu-item"
+              onClick={() => {
+                navigate("/share-experience");
+                setShowMobileMenu(false);
+              }}
+            >
+              Share Interview Experience
+            </div>
+
+            <div
+              className="mobile-menu-item"
+              onClick={() => {
+                navigate("/salary-hike-calculator");
+                setShowMobileMenu(false);
+              }}
+            >
+              Salary Hike Calculator
+            </div>
+
+            <div
+              className="mobile-menu-item"
+              onClick={() => {
+                navigate("/premium");
+                setShowMobileMenu(false);
+              }}
+            >
+              Premium
+            </div>
+          </div>
+        </div>
+      )}
+
+
 
       {/* ===== MOBILE BOTTOM NAVBAR ===== */}
       <div className="mobile-bottom-nav">
+        {/* HOME */}
         <div
-          className={`m-item ${activeSection === "home" ? "active" : ""}`}
-          onClick={() => setActiveSection("home")}
+          className={`m-item ${activeMobileTab === "home" ? "active" : ""}`}
+          onClick={() => {
+            setOpenPanel(null);
+            setActiveSection("home");
+            setActiveMobileTab("home");
+          }}
         >
           <FaHome />
           <span>Home</span>
         </div>
 
+        {/* JOBS */}
         <div
-          className={`m-item ${activeSection === "jobs" ? "active" : ""}`}
-          onClick={() => setActiveSection("jobs")}
+          className={`m-item ${activeMobileTab === "jobs" ? "active" : ""}`}
+          onClick={() => {
+            setOpenPanel(null);
+            setActiveSection("jobs");
+            setActiveMobileTab("jobs");
+          }}
         >
           <FaBriefcase />
           <span>Jobs</span>
         </div>
 
+        {/* APPLIED */}
         <div
-          className={`m-item ${activeSection === "saved" ? "active" : ""}`}
-          onClick={() => navigate("/saved-jobs")}
+          className={`m-item ${activeMobileTab === "applied" ? "active" : ""}`}
+          onClick={() => {
+            setOpenPanel(null);
+            setActiveMobileTab("applied");
+            navigate("/applied-jobs");
+          }}
         >
-          <FaBookmark />
-          <span>Saved</span>
+          <FaRegBookmark />
+          <span>Applied</span>
         </div>
 
+        {/* INVITES */}
         <div
-          className={`m-item ${openPanel === "profile" ? "active" : ""}`}
-          onClick={() => togglePanel("profile")}
+          className={`m-item ${activeMobileTab === "invites" ? "active" : ""}`}
+          onClick={() => {
+            setOpenPanel(null);
+            setActiveMobileTab("invites");
+            navigate("/invites");  // we’ll wire this later, but route exists in your My Jobs dropdown
+          }}
+        >
+          <FaEnvelope />
+          <span>Invites</span>
+        </div>
+
+        {/* PROFILE */}
+        <div
+          className={`m-item ${activeMobileTab === "profile" ? "active" : ""}`}
+          onClick={() => {
+            setActiveMobileTab("profile");
+            togglePanel("profile");
+          }}
         >
           <FaUserCircle />
           <span>Profile</span>
         </div>
-
-
       </div>
+
 
     </>
   );

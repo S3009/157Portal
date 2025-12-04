@@ -42,6 +42,7 @@
   color: #f3f3f3;
   transition: 0.3s;
 }
+
 /* Premium link styled like nav links */
 .premium-click-container {
   display: flex;
@@ -49,7 +50,8 @@
 }
 
 .premium-label {
-  color: #fff; /* golden/orange color for premium */
+  color: #fff;
+  /* golden/orange color for premium */
   font-weight: 600;
   cursor: pointer;
   transition: color 0.2s;
@@ -441,12 +443,6 @@
 }
 
 /* ===== Global Reset ===== */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  font-family: "Inter", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-}
 
 body {
   background-color: #f8fafc;
@@ -544,13 +540,13 @@ body {
 /* ===== Job Cards Section ===== */
 
 
-.navDash-jobCard {
+/* .navDash-jobCard {
   background: #fff;
   border-radius: 10px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   padding: 20px;
   transition: transform 0.2s ease;
-}
+} */
 
 .navDash-actionRight {
   display: flex;
@@ -591,10 +587,10 @@ body {
   background-color: #005bbb;
 }
 
-.navDash-jobCard:hover {
+/* .navDash-jobCard:hover {
   transform: translateY(-4px);
   box-shadow: 0 4px 12px rgba(0, 120, 255, 0.1);
-}
+} */
 
 .navDash-jobCard:hover {
   transform: translateY(-4px);
@@ -1441,10 +1437,12 @@ body {
 .faq-container::-webkit-scrollbar {
   width: 8px;
 }
+
 .faq-container::-webkit-scrollbar-thumb {
   background: #bfc8d5;
   border-radius: 12px;
 }
+
 .faq-container::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
 }
@@ -1479,6 +1477,7 @@ body {
   cursor: pointer;
   transition: 0.2s;
 }
+
 .faq-close:hover {
   background: #da2f2f;
 }
@@ -1548,6 +1547,7 @@ details p {
     transform: translateY(25px);
     opacity: 0;
   }
+
   to {
     transform: translateY(0);
     opacity: 1;
@@ -1555,8 +1555,13 @@ details p {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 /* ------------------ MOBILE FULLSCREEN MODE ------------------ */
@@ -1761,31 +1766,69 @@ details p {
 /* ===== Notification Side Panel ===== */
 .notif-overlay {
   position: fixed;
-  top: 70px;
-  /* height of your navbar */
+  top: 60px;
+  /* push below mobile top bar */
+  left: 0;
   right: 0;
   bottom: 0;
-  left: 0;
-  background: rgba(0, 0, 0, 0.3);
-  display: flex;
-  justify-content: flex-end;
+  background: rgba(0, 0, 0, 0.4);
   z-index: 2000;
-  transition: background 0.3s ease-in-out;
+  /* higher than navbars */
 }
 
 .notif-panel {
-  width: 350px;
-  background: #fff;
-  height: calc(100vh - 70px);
-  /* adjusts for navbar height */
-  box-shadow: -3px 0 10px rgba(0, 0, 0, 0.2);
-  display: flex;
-  flex-direction: column;
-  animation: slideInRight 0.3s ease forwards;
-  position: relative;
-  border-top-left-radius: 12px;
+  position: absolute;
+  top: 70px;
+  right: 20px;
+  width: 80%;
+  max-width: 350px;
+  background: white;
+  border-radius: 10px;
+  padding: 15px;
+  z-index: 2100;
+  /* even higher */
 }
 
+
+/* === MOBILE FIX FOR NOTIFICATION PANEL === */
+@media (max-width: 768px) {
+
+  .notification-container {
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: flex-start !important;
+    padding-top: 80px !important;
+    /* so it appears below top navbar */
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 2000;
+  }
+
+  .notification-panel {
+    /* width: 90% !important; */
+    max-height: 70vh !important;
+    background: #fff !important;
+    border-radius: 12px !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
+    padding: 20px !important;
+    overflow-y: auto !important;
+    z-index: 2100;
+    /* above overlay */
+    position: fixed;
+    top: 120px !important;
+    /* pushes panel fully inside screen */
+    right: 10px !important;
+    left: 10px !important;
+    width: auto !important;
+    max-width: 95% !important;
+  }
+
+}
 
 @keyframes slideInRight {
   from {
@@ -2109,7 +2152,9 @@ details p {
 .interview-submenu li:hover {
   color: #333 !important;
   background: #f3f6fa;
-}/* === ✅ FINAL RESPONSIVE NAVBAR FIX (11/11/25 by ChatGPT) === */
+}
+
+/* === ✅ FINAL RESPONSIVE NAVBAR FIX (11/11/25 by ChatGPT) === */
 @media (max-width: 992px) {
   .navbar {
     padding: 0 18px;
@@ -2121,12 +2166,14 @@ details p {
 }
 
 @media (max-width: 768px) {
+
   /* Hamburger Icon */
   .menu-icon {
     display: block;
     color: #fff;
     font-size: 28px;
-    z-index: 2002; /* above everything */
+    z-index: 2002;
+    /* above everything */
   }
 
   /* Fullscreen mobile menu */
@@ -2136,14 +2183,16 @@ details p {
     left: -100%;
     width: 100%;
     height: calc(100vh - 70px);
-    background: #526d82; /* ✅ dark blue visible background */
+    background: #526d82;
+    /* ✅ dark blue visible background */
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
     padding-top: 40px;
     gap: 25px;
     transition: left 0.35s ease-in-out;
-    z-index: 2001; /* ✅ higher than panels */
+    z-index: 2001;
+    /* ✅ higher than panels */
     overflow-y: auto;
   }
 
@@ -2152,7 +2201,8 @@ details p {
   }
 
   .nav-links li {
-    color: #fff; /* ✅ ensure white text visible */
+    color: #fff;
+    /* ✅ ensure white text visible */
     font-size: 18px;
     font-weight: 600;
     text-align: center;
@@ -2167,7 +2217,8 @@ details p {
   }
 
   .premium-label {
-    color: #fff !important; /* ✅ visible in mobile view */
+    color: #fff !important;
+    /* ✅ visible in mobile view */
   }
 
   .navbar-left {
@@ -2175,7 +2226,8 @@ details p {
   }
 
   .navbar-right {
-    display: none; /* hide icons to simplify */
+    display: none;
+    /* hide icons to simplify */
   }
 
   .logo-text {
@@ -2183,9 +2235,6 @@ details p {
     color: #fff;
   }
 
-  /* Make sure search bar or panels don’t overlap menu */
-  .profile-panel,
-  .notif-panel,
   .rgSearch-top {
     display: none !important;
   }
@@ -2218,7 +2267,8 @@ details p {
 
 @media (max-width: 768px) {
   .navbar {
-    display: none !important;     /* hide desktop navbar */
+    display: none !important;
+    /* hide desktop navbar on mobile */
   }
 
   .mobile-top-nav {
@@ -2230,7 +2280,7 @@ details p {
     height: 55px;
     background: #526d82;
     color: #fff;
-    z-index: 1000;
+    z-index: 3000;
     align-items: center;
     justify-content: space-between;
     padding: 0 15px;
@@ -2250,12 +2300,18 @@ details p {
     border-radius: 50%;
   }
 
-  .m-profile-icon {
-    font-size: 25px;
+  .m-icons {
+    display: flex;
+    align-items: center;
+  }
+
+  .m-notif-icon {
+    font-size: 22px;
     color: #fff;
     cursor: pointer;
   }
 }
+
 
 /* ===== MOBILE BOTTOM NAVBAR ===== */
 .mobile-bottom-nav {
@@ -2304,10 +2360,12 @@ details p {
 @media (max-width: 768px) {
   .mobile-profile-panel {
     position: fixed !important;
-    top: 60px;       /* below top navbar */
+    top: 60px;
+    /* below top navbar */
     left: 0;
     right: 0;
-    bottom: 60px;    /* above bottom navbar */
+    bottom: 60px;
+    /* above bottom navbar */
     width: 100% !important;
     height: auto;
     background: #fff;
@@ -2343,6 +2401,7 @@ details p {
 
 /* mobile responsiveness */
 @media (max-width: 768px) {
+
   .m-notif-icon,
   .m-profile-icon {
     display: block;
@@ -2353,4 +2412,329 @@ details p {
   .m-profile-icon:active {
     color: #0056ff;
   }
+}
+
+/* ===== CHATBOT FLOATING POSITIONING ===== */
+
+.chatbot-wrapper {
+  position: fixed;
+  z-index: 99999;
+  right: 20px;
+  bottom: 20px;
+}
+
+/* MOBILE POSITION */
+@media (max-width: 768px) {
+  .chatbot-wrapper {
+    bottom: 80px;
+    /* above mobile bottom navbar */
+    right: 15px;
+  }
+}
+
+.desktop-only { display: block; }
+.mobile-only { display: none; }
+
+@media(max-width:768px) {
+  .desktop-only { display: none !important; }
+  .mobile-only { display: block !important; }
+}
+
+/* ===== MOBILE JOBS UI ===== */
+.mobile-search-bar {
+  margin-top: 60px; /* below mobile navbar */
+  background: #fff;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #555;
+  border: 1px solid #ddd;
+}
+
+.mobile-search-bar span {
+  font-size: 15px;
+}
+
+.mobile-filter-sort-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 15px;
+  margin-bottom: 10px;
+}
+
+.mobile-filter-btn,
+.mobile-sort-btn {
+  background: #eee;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.mobile-job-list {
+  padding: 10px 12px;
+}
+
+.mobile-job-card {
+  background: #fff;
+  padding: 12px;
+  border-radius: 10px;
+  margin-bottom: 12px;
+  border: 1px solid #ddd;
+}
+
+.mobile-job-header {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.mobile-company-logo {
+  width: 45px;
+  height: 45px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+.mobile-job-info h4 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.mobile-job-info p {
+  margin: 2px 0;
+  font-size: 14px;
+}
+
+.mobile-job-info small {
+  color: #666;
+  font-size: 12px;
+}
+
+.mobile-job-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 12px;
+}
+
+.mobile-job-actions button {
+  flex: 1;
+  margin: 0 4px;
+  padding: 8px 0;
+  border-radius: 6px;
+  border: none;
+  font-size: 14px;
+  background: #eee;
+}
+
+.apply-mobile {
+  background: #0078ff !important;
+  color: #fff;
+}
+
+/* ============= MOBILE FILTER BOTTOM SHEET ============= */
+
+.mobile-filter-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 5000;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+}
+
+.mobile-filter-sheet {
+  width: 100%;
+  max-height: 80%;
+  background: #fff;
+  border-radius: 15px 15px 0 0;
+  padding: 15px;
+  overflow-y: auto;
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.sheet-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #ddd;
+}
+
+.sheet-header h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.sheet-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.filter-accordion details {
+  background: #f8f8f8;
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.filter-accordion summary {
+  font-size: 16px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.filter-accordion select {
+  width: 100%;
+  margin-top: 8px;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.apply-filters-btn {
+  width: 100%;
+  margin-top: 15px;
+  padding: 12px 0;
+  background: #0078ff;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+}
+
+/* ============= MOBILE SORT BOTTOM SHEET ============= */
+
+.mobile-sort-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 5000;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+}
+
+.mobile-sort-sheet {
+  width: 100%;
+  max-height: 60%;
+  background: #fff;
+  border-radius: 15px 15px 0 0;
+  padding: 15px;
+  animation: slideUp 0.3s ease;
+}
+
+.sort-header {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 10px;
+}
+
+.sort-header h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.sort-close {
+  font-size: 24px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.sort-options {
+  margin-top: 15px;
+}
+
+.sort-option {
+  padding: 12px;
+  border-bottom: 1px solid #eee;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.sort-option:hover {
+  background: #f7f7f7;
+}
+
+/* ===== MOBILE MENU OVERLAY ===== */
+
+.mobile-menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 5000;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* ===== SIDE DRAWER ===== */
+
+.mobile-menu-drawer {
+  width: 70%;
+  max-width: 300px;
+  background: #fff;
+  height: 100%;
+  padding: 20px;
+  animation: slideIn 0.3s ease forwards;
+}
+
+@keyframes slideIn {
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0); }
+}
+
+.mobile-menu-title {
+  font-size: 22px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.mobile-menu-item {
+  padding: 14px 0;
+  border-bottom: 1px solid #eee;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.mobile-menu-item:hover {
+  background: #f5f5f5;
+}
+
+/* ===== Mobile Icons (Bell + Hamburger) ===== */
+
+.mobile-icons-right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.m-hamburger {
+  cursor: pointer;
+}
+
+.m-bell {
+  cursor: pointer;
 }
