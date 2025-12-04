@@ -411,6 +411,82 @@
   color: #333;
   font-weight: 500;
 }
+/* ========================= */
+/* Applied Jobs Status Ticks */
+/* ========================= */
+
+/* Green tick for viewed status */
+.status-tick {
+  display: inline-flex;
+  align-items: center;
+  color: #28a745; /* Green color */
+  font-weight: bold;
+  margin-left: 5px;
+}
+
+.status-tick::before {
+  content: "✔";
+  margin-right: 3px;
+  font-size: 14px;
+  color: #28a745;
+}
+
+/* Tracker circle for completed stages */
+.tracker-step.done .circle {
+  background-color: #28a745;
+  border: 2px solid #28a745;
+}
+
+.tracker-step.pending .circle {
+  background-color: #fff;
+  border: 2px solid #ccc;
+}
+
+/* Tracker line for completed stages */
+.tracker-line.done {
+  background-color: #28a745;
+}
+
+.tracker-line.pending {
+  background-color: #ccc;
+}
+
+/* Modal tracker step text */
+.tracker-step p {
+  margin-top: 5px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Optional: hover effect on applied cards */
+.applied-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  transition: box-shadow 0.3s ease;
+}
+/* Green circle tick for viewed status */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  background-color: #28a745; /* Green background */
+  color: #fff;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: bold;
+  margin-left: 5px;
+}
+
+/* Optional: Badge with text next to it */
+.status-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #28a745;
+}
 
 /* Responsive Adjustments */
 @media (max-width: 768px) {

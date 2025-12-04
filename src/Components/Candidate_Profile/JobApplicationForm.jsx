@@ -222,7 +222,7 @@ const [showBuyPlanPopup, setShowBuyPlanPopup] = useState(false);
     }
 
     // ✅ Save score to backend
-    axios.post("http://localhost:8080/api/applications/update-score", {
+    axios.post(`${API_BASE_PORTAL}/update-score`, {
       applicationId: appId,
       score: score,
     })
@@ -263,8 +263,8 @@ const [showBuyPlanPopup, setShowBuyPlanPopup] = useState(false);
       const fetchJobData = async () => {
         try {
           const [jobRes, questionRes] = await Promise.all([
-            axios.get(`http://localhost:8080/api/requirements/${id}`),
-            axios.get(`http://localhost:8080/api/questions/requirement/${id}`),
+            axios.get(`${API_BASE_PORTAL}/getRequirementById/${id}`),
+            axios.get(`${API_BASE_PORTAL}/getQuestionsByRequirement/${id}`),
           ]);
 
           setJobDetails(jobRes.data);

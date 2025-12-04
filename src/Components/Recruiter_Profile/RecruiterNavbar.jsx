@@ -16,15 +16,29 @@ import {
   FaUserTie,
   FaSearch,
 } from "react-icons/fa";
+import { useLocation } from "react-router-dom";
+
 import "./RecruiterNavbar.css";
 import { FaPencilAlt, FaTrashAlt } from "react-icons/fa";
 import { toast } from "react-toastify";
-import { API_BASE_PORTAL } from "../../API/api";
+import { API_BASE_PORTAL, API_BASE_URL } from "../../API/api";
 import { useUser } from "../UserContext"; // adjust the path
+
 const RecruiterNavbar = () => {
   // const API_BASE_URL = "http://localhost:8080";
+    const { loginUser } = useUser();
+// console.log("LOGGED IN USER DETAILS:",loginUser)
 
-  const { user, logoutUser } = useUser(); // get user object from context
+const location = useLocation();
+  const { user, logoutUser } = useUser(); 
+
+// override role if URL contains "newRecruiter"
+const effectiveRole = location.pathname.includes("newRecruiter")
+  ? "recruiter"
+  : user?.role?.toLowerCase();
+
+  const [appliedJobs, setAppliedJobs] = useState([]);
+
 
   const [showLogoutPopup, setShowLogoutPopup] = useState(false);
 
@@ -56,6 +70,7 @@ const RecruiterNavbar = () => {
   const [showInvitePopup, setShowInvitePopup] = useState(false);
   const [inviteCandidates, setInviteCandidates] = useState([]);
   const [selectedJobTitle, setSelectedJobTitle] = useState("");
+console.log("Logged in userType =", user);
 
   const [filters, setFilters] = useState({
     keyword: "",
@@ -66,6 +81,9 @@ const RecruiterNavbar = () => {
     qualification: "All Qualifications",
     company: "All Companies",
   });
+const getApplicationId = (a) => {
+  return a.applicationId || a.jobApplicationId || a.id;
+};
 
   const params = new URLSearchParams(location.search);
   // const userType = params.get("userType");
@@ -88,6 +106,96 @@ const RecruiterNavbar = () => {
   const [designationSuggestions, setDesignationSuggestions] = useState([]);
   const [locationSuggestions, setLocationSuggestions] = useState([]);
 
+const handleViewResume = async (jobAppId) => {
+  try {
+    const appData = await getBackendApplication(jobAppId);
+    if (!appData) return;
+
+    const currentStatus = appData.status;
+
+    if (statusOrder["viewed"] <= statusOrder[currentStatus]) {
+      // already viewed → directly navigate
+      navigate("/navbar");
+      return;
+    }
+
+    await axios.post(`${API_BASE_PORTAL}/markViewed/${jobAppId}`);
+
+    const updatedApp = await getBackendApplication(jobAppId);
+
+    setApplicants(prev =>
+      prev.map(a =>
+        a.jobApplicationId === jobAppId
+          ? { ...a, status: updatedApp.status }
+          : a
+      )
+    );
+
+    toast.success("Application viewed");
+
+    // ⭐ Navigate to Recruiter Navbar Home
+    navigate("/navbar");
+
+  } catch (err) {
+    console.error("Error updating view:", err);
+  }
+};
+
+
+
+useEffect(() => {
+  const fetchRecruiterJobs = async () => {
+    try {
+      if (effectiveRole === "recruiter") {
+        const response = await axios.get(
+          "https://rg.157careers.in/api/ats/157industries/fetch-all-job-descriptions/139/Recruiters"
+        );
+
+        console.log("Recruiter JD List:", response.data);
+
+        // 🔥 Add applicant count for every recruiter JD
+        const jobList = await Promise.all(
+          response.data.map(async (job) => {
+            try {
+              const res = await axios.get(
+                `${API_BASE_PORTAL}/getByRequirement/${job.requirementId}`
+              );
+
+              return {
+                ...job,
+                applications: res.data.length,  // ⭐ SAME AS portalemp
+              };
+            } catch (err) {
+              console.error("Error fetching applicant count:", err);
+              return { ...job, applications: 0 };
+            }
+          })
+        );
+
+        setJobs(jobList);
+        setFilteredJobs(jobList);
+        setAllJobs(jobList);
+      }
+    } catch (error) {
+      console.error("Error fetching recruiter job descriptions:", error);
+    }
+  };
+
+  fetchRecruiterJobs();
+}, [effectiveRole]);
+
+
+const getBackendApplication = async (jobAppId) => {
+  try {
+    const res = await axios.get(
+      `${API_BASE_PORTAL}/getApplicationByJobAppId/${jobAppId}`
+    );
+    return res.data; 
+  } catch (err) {
+    console.error("Error fetching application:", err);
+    return null;
+  }
+};
 
   // Close profile panel on outside click
   //   useEffect(() => {
@@ -143,17 +251,78 @@ const RecruiterNavbar = () => {
 
   const currentYear = new Date().getFullYear();
 
-  const handleViewApplicants = async (requirementId) => {
-    try {
-      const response = await axios.get(`${API_BASE_PORTAL}/requirement/${requirementId}`);
+const handleViewApplicants = async (requirementId) => {
+  try {
+    const response = await axios.get(
+      `${API_BASE_PORTAL}/getByRequirement/${requirementId}`
+    );
 
-      setApplicants(response.data);
-      setSelectedJobId(requirementId);
-      setShowApplicantsPopup(true);
-    } catch (error) {
-      console.error("❌ Error:", error);
+    const applicants = response.data || [];
+
+    const applicantsWithStatus = await Promise.all(
+      applicants.map(async (a) => {
+        const appData = await getBackendApplication(a.id);
+        return {
+          ...a,
+jobApplicationId: a.jobApplicationId || a.id,
+          applicationId: appData?.id,
+          status: appData?.status || "pending"
+        };
+      })
+    );
+
+    setApplicants(applicantsWithStatus);
+    setSelectedJobId(requirementId);
+    setShowApplicantsPopup(true);
+
+  } catch (error) {
+    console.error("Error loading applicants:", error);
+  }
+};
+
+const statusOrder = {
+  pending: 1,
+  viewed: 2,
+  shortlisted: 3,
+  hired: 4
+};
+
+
+const updateStatus = async (jobAppId, newStatus) => {
+  try {
+    const appData = await getBackendApplication(jobAppId);
+    if (!appData) return;
+
+    const currentStatus = appData.status;
+
+    if (statusOrder[newStatus] <= statusOrder[currentStatus]) {
+      toast.info(`Cannot change status backward. Current: ${currentStatus}`);
+      return;
     }
-  };
+
+    await axios.post(`${API_BASE_PORTAL}/updateStatus`, {
+      jobApplicationId: jobAppId,
+      status: newStatus,
+    });
+
+    const updatedApp = await getBackendApplication(jobAppId);
+
+    setApplicants(prev =>
+      prev.map(a =>
+        a.jobApplicationId === jobAppId
+          ? { ...a, status: updatedApp.status }
+          : a
+      )
+    );
+
+    toast.success(`Status updated to ${updatedApp.status}`);
+
+  } catch (err) {
+    console.error("Status update failed:", err);
+    toast.error("Failed to update status");
+  }
+};
+
 
 
   const handleEdit = (requirementId) => {
@@ -164,14 +333,12 @@ const RecruiterNavbar = () => {
     try {
       const cleanDesignation = encodeURIComponent(designation.trim());
 
-      // ✅ 1️⃣ Fetch total count only
       const countRes = await axios.get(
         `${API_BASE_PORTAL}/api/jobportal/getCountByDesignation/${cleanDesignation}`
       );
 
       const totalCount = countRes.data;
 
-      // ✅ 2️⃣ Optionally, get candidate list (if needed for invite sending)
       const res = await axios.get(
         `${API_BASE_PORTAL}/getCandidatesByDesignation/${cleanDesignation}`
       );
@@ -197,8 +364,6 @@ const RecruiterNavbar = () => {
         return;
       }
 
-      // get logged-in recruiter ID from localStorage (you can modify this)
-      // const recruiterId = localStorage.getItem("recruiterId");
       const userId = user?.userId;
 
       const recruiterId = userId;
@@ -234,60 +399,106 @@ const RecruiterNavbar = () => {
     }
   };
 
-
-
-
-
-
-  // ✅ Fetch jobs and listen to Apply count updates
-  // ✅ Fetch jobs only once from backend
-  useEffect(() => {
-    const fetchJobs = async () => {
-      try {
+useEffect(() => {
+  const fetchPortalEmpJobs = async () => {
+    try {
+      if (effectiveRole === "portalemp") {
         setLoading(true);
-        const response = await axios.get(`${API_BASE_PORTAL}/getAllRequirements`);
 
-        let jobList = response.data.map(job => ({
-          ...job,
-          applications: 0 // initialize
-        }));
 
-        // ✅ GET LIVE APPLICATION COUNT FOR EACH JOB
-        for (const job of jobList) {
-          const res = await axios.get(`${API_BASE_PORTAL}/requirement/${job.requirementId}`);
-          job.applications = res.data.length; // real-time count
-        }
+        const response = await axios.get(
+          `${API_BASE_PORTAL}/getAllRequirements`
+        );
 
-        setAllJobs(jobList);
+        // 🔥 Fetch real applicant count for each JD
+        let jobList = await Promise.all(
+          response.data.map(async (job) => {
+            try {
+              const res = await axios.get(
+                `${API_BASE_PORTAL}/getByRequirement/${job.requirementId}`
+              );
+
+              return {
+                ...job,
+                applications: res.data.length, // <-- REAL COUNT
+              };
+            } catch (err) {
+              console.error("Error fetching count:", err);
+              return {
+                ...job,
+                applications: 0,
+              };
+            }
+          })
+        );
+
+
         setJobs(jobList);
         setFilteredJobs(jobList);
-
-      } catch (error) {
-        console.error("❌ Error fetching jobs:", error);
-      } finally {
-        setLoading(false);
+        setAllJobs(jobList);
       }
-    };
 
-    fetchJobs();
-  }, []);
+    } catch (error) {
+      console.error("Error fetching jobs:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchPortalEmpJobs();
+}, [effectiveRole]);
 
 
-  // Fetch recruiter’s posted jobs
-  useEffect(() => {
-    const fetchJobs = async () => {
-      try {
-        setLoading(true);
-        const res = await axios.get(`${API_BASE_PORTAL}/getAllRequirements`);
-        setJobs(res.data || []);
-      } catch (err) {
-        console.error("Error fetching jobs:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchJobs();
-  }, []);
+// useEffect(() => {
+//   if (effectiveRole !== "portalemp") return;  // ⛔ skip for newRecruiter
+
+//   const fetchJobs = async () => {
+//     try {
+//       setLoading(true);
+//       const response = await axios.get("http://localhost:8080/api/jobportal/getAllRequirements");
+
+//       let jobList = response.data.map(job => ({
+//         ...job,
+//         applications: 0
+//       }));
+
+//       for (const job of jobList) {
+//         const res = await axios.get(
+//           `http://localhost:8080/api/jobportal/getByRequirement/${job.requirementId}`
+//         );
+//         job.applications = res.data.length;
+//       }
+
+//       setAllJobs(jobList);
+//       setJobs(jobList);
+//       setFilteredJobs(jobList);
+
+//     } catch (error) {
+//       console.error("❌ Error fetching jobs:", error);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   fetchJobs();
+// }, [effectiveRole]);
+
+
+  // // Fetch recruiter’s posted jobs
+  // useEffect(() => {
+  //   const fetchJobs = async () => {
+  //     try {
+  //       setLoading(true);
+  //       const res = await axios.get(`${API_BASE_PORTAL}/getAllRequirements`);
+  //       setJobs(res.data || []);
+  //     } catch (err) {
+  //       console.error("Error fetching jobs:", err);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+  //   fetchJobs();
+  // }, []);
 
   const handleTestType = (type) => {
     setShowTestPopup(false);
@@ -307,16 +518,19 @@ const RecruiterNavbar = () => {
     setShowTestPopup(true);
   };
 
-  const handleViewJD = async (id) => {
-    try {
-      const response = await axios.get(`${API_BASE_PORTAL}/getRequirementById/${id}`);
-      setSelectedJD(response.data);
-      setShowJDModal(true);
-    } catch (err) {
-      console.error("Error fetching JD:", err);
-      alert("Failed to load JD details.");
-    }
-  };
+const handleViewJD = async (requirementId, applicationId) => {
+  try {
+    const res = await axios.get(`${API_BASE_PORTAL}/getRequirementById/${requirementId}`);
+    setSelectedJD(res.data);
+    setShowJDModal(true);
+
+    await axios.put(`${API_BASE_PORTAL}/markViewed/${applicationId}`);
+
+   
+  } catch (error) {
+    console.error("Error fetching JD or updating status:", error);
+  }
+};
 
   const handleLogout = async () => {
     if (!user) {
@@ -765,10 +979,9 @@ const RecruiterNavbar = () => {
                         textAlign: "right",
                         display: "flex",
                         justifyContent: "flex-end",
-                        gap: "10px", // spacing between buttons
+                        gap: "10px", 
                       }}
                     >
-                      {/* {userType === "PortalEmp" && ( */}
                       <div style={{ display: "flex", alignItems: "center" }}>
                         <button
                           className="recJobCard-edit-btn"
@@ -839,6 +1052,7 @@ const RecruiterNavbar = () => {
                       <th>Education</th>
                       <th>Applied</th>
                       <th>Test Score</th>
+                      <th>Status</th>
                       <th>Action</th>
                     </tr>
                   </thead>
@@ -846,19 +1060,15 @@ const RecruiterNavbar = () => {
                     {applicants
                       .slice()
                       .sort((a, b) => {
-                        // If both have scores → sort descending
                         if (a.testScore != null && b.testScore != null) {
                           return b.testScore - a.testScore;
                         }
-                        // If only a has score → a first
                         if (a.testScore != null && b.testScore == null) {
                           return -1;
                         }
-                        // If only b has score → b first
                         if (a.testScore == null && b.testScore != null) {
                           return 1;
                         }
-                        // Both no score → keep original order
                         return 0;
                       })
                       .map((c, i) => (
@@ -870,11 +1080,91 @@ const RecruiterNavbar = () => {
                           <td>
                             {c.testScore != null ? c.testScore : "Test not given"}
                           </td>
-                          <td>
-                            <button className="btn-small view-btn">View Resume</button>
-                            <button className="btn-small primary-btn">Shortlist</button>
-                            <button className="btn-small danger-btn">Reject</button>
-                          </td>
+
+  <td>
+    {c.status === "viewed"
+      ? "Viewed"
+      : c.status === "shortlisted"
+      ? "Shortlisted"
+      : c.status === "hired"
+      ? "Hired"
+      : "Pending"}
+  </td>
+{/* <td> */}
+
+  {/* View Profile — ONLY for portal_emp */}
+  {/* {user?.userType?.toLowerCase() === "portal_emp" && (
+    <button
+      className="applied-btn"
+      onClick={() => handleViewResume(c.jobApplicationId)}
+    >
+      View Profile
+    </button>
+  )} */}
+
+  {/* <button
+      className="applied-btn"
+      onClick={() => handleViewResume(c.jobApplicationId)}
+    >
+      View Profile
+    </button> */}
+
+  {/* Add to Line Up — ONLY for recruiter */}
+  {/* {user?.userType?.toLowerCase() === "newRecruiter" && (
+    <button
+      className="applied-btn lineup-btn"
+      style={{ marginLeft: "10px", background: "#4caf50", color: "#fff" }}
+      onClick={() => console.log("Add to Lineup clicked for", c.jobApplicationId)}
+    >
+      Add to Line Up
+    </button>
+  )}
+
+</td> */}
+<td>
+  {/* PORTAL EMPLOYEE → View Profile */}
+  {effectiveRole === "portalemp" && (
+    <button
+      className="applied-btn"
+      onClick={() => handleViewResume(c.jobApplicationId)}
+    >
+      View Profile
+    </button>
+  )}
+
+  {/* RECRUITER → Add to Line Up */}
+  {effectiveRole === "recruiter" && (
+    <button
+      className="applied-btn lineup-btn"
+      style={{ marginLeft: "10px", background: "#4caf50", color: "#fff" }}
+      onClick={() => console.log("Add to Calling", c.jobApplicationId)}
+    >
+      Add to Calling
+    </button>
+  )}
+</td>
+
+
+
+
+
+
+
+{/* <button 
+  className="btn-small primary-btn"
+  onClick={() => updateStatus(c.jobApplicationId, "shortlisted")}
+>
+  Shortlist
+</button> */}
+
+{/* <button 
+  className="btn-small danger-btn"
+  onClick={() => updateStatus(c.jobApplicationId, "hired")}
+>
+  Hire
+</button> */}
+
+                        
                         </tr>
                       ))}
 
