@@ -1,0 +1,207 @@
+/* ================================
+   Candidate Card (Naukri Style + Animation)
+================================ */
+
+/* ===== Card Wrapper ===== */
+.candidate-card-modern {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 20px 22px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  margin-bottom: 16px;
+  animation: fadeSlideUp 0.45s ease forwards;
+  transition: box-shadow 0.25s ease, transform 0.25s ease;
+}
+
+.candidate-card-modern:hover {
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.1);
+  transform: translateY(-4px);
+}
+
+/* ===== LEFT SECTION ===== */
+.candidate-left {
+  width: 72%;
+}
+
+/* Candidate Name */
+.candidate-name {
+  font-size: 18px;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 6px;
+}
+
+.candidate-card-modern:hover .candidate-name {
+  color: #2563eb;
+}
+
+/* Meta Row */
+.candidate-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  font-size: 13px;
+  color: #6b7280;
+  margin-bottom: 10px;
+}
+
+.candidate-current,
+.candidate-left p {
+  font-size: 14px;
+  color: #374151;
+  margin: 4px 0;
+}
+
+.candidate-skills {
+  margin-top: 6px;
+  line-height: 1.5;
+}
+
+/* ===== ACTION BUTTON GROUP ===== */
+.candidate-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+/* 🔥 COMMON BUTTON BASE (KEY FIX) */
+.view-profile-btn,
+.download-resume-btn {
+  height: 34px;
+  min-width: 160px;
+  padding: 0 18px;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+/* View Profile */
+.view-profile-btn {
+  border: 1px solid #2563eb;
+  background: #ffffff;
+  color: #2563eb;
+}
+
+.view-profile-btn:hover {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+/* Download Resume */
+.download-resume-btn {
+  border: 1px solid #16a34a;
+  background: #ffffff;
+  color: #16a34a;
+}
+
+.download-resume-btn:hover {
+  background: #16a34a;
+  color: #ffffff;
+}
+
+/* ===== RIGHT SECTION ===== */
+.candidate-right {
+  width: 26%;
+  padding-left: 20px;
+  text-align: center;
+  border-left: 1px solid #f0f0f0;
+}
+
+.candidate-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  margin-bottom: 10px;
+  object-fit: cover;
+}
+
+.phone-btn,
+.call-btn {
+  width: 100%;
+  height: 34px;
+  font-size: 13px;
+  border-radius: 999px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.phone-btn {
+  border: 1px solid #d1d5db;
+  background: #f9fafb;
+}
+
+.call-btn {
+  border: none;
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.verified {
+  font-size: 12px;
+  color: #16a34a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+/* ===== Animations ===== */
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.candidate-phone {
+  margin-top: 8px;
+  font-weight: 600;
+  color: #2e7d32;
+  font-size: 14px;
+}
+
+
+/* ===== Responsive ===== */
+@media (max-width: 900px) {
+  .candidate-card-modern {
+    flex-direction: column;
+  }
+
+  .candidate-left,
+  .candidate-right {
+    width: 100%;
+  }
+
+  .candidate-right {
+    border-left: none;
+    border-top: 1px solid #f0f0f0;
+    padding-top: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .candidate-actions {
+    flex-direction: column;
+  }
+
+  .view-profile-btn,
+  .download-resume-btn {
+    width: 100%;
+  }
+}

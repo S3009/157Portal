@@ -2,6 +2,9 @@
 import React, { useState, useEffect, useRef, useContext } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import CandidateCard from "./CandidateCard";
+
+
 import {
   FaBell,
   FaUserCircle,
@@ -38,6 +41,8 @@ const effectiveRole = location.pathname.includes("newRecruiter")
   : user?.role?.toLowerCase();
 
   const [appliedJobs, setAppliedJobs] = useState([]);
+const [searchedCandidates, setSearchedCandidates] = useState([]);
+const [showCandidates, setShowCandidates] = useState(false);
 
 
   const [showLogoutPopup, setShowLogoutPopup] = useState(false);
@@ -98,7 +103,8 @@ const getApplicationId = (a) => {
 
   const [searchQuery, setSearchQuery] = useState("");
   const [suggestions, setSuggestions] = useState([]);
-
+const [selectedCandidateIds, setSelectedCandidateIds] = useState([]);
+const [selectAll, setSelectAll] = useState(false);
   const jobsRef = useRef(null);
   const searchContainerRef = useRef(null);
   const navigate = useNavigate();
@@ -148,7 +154,7 @@ useEffect(() => {
     try {
       if (effectiveRole === "recruiter") {
         const response = await axios.get(
-          "https://rg.157careers.in/api/ats/157industries/fetch-all-job-descriptions/139/Recruiters"
+          "https://rg.157careers.in/api/ats/157industries/fetch-all-job-descriptions/1/Recruiters"
         );
 
         console.log("Recruiter JD List:", response.data);
@@ -183,6 +189,51 @@ useEffect(() => {
 
   fetchRecruiterJobs();
 }, [effectiveRole]);
+//samruddhi
+// useEffect(() => {
+//   if (!searchQuery.trim()) {
+//     setFilteredJobs(jobs);
+//     return;
+//   }
+
+//   const filtered = jobs.filter((job) =>
+//     job.designation
+//       ?.toLowerCase()
+//       .includes(searchQuery.toLowerCase())
+//   );
+
+//   setFilteredJobs(filtered);
+// }, [searchQuery, jobs]);
+useEffect(() => {
+  const fetchCandidatesByDesignation = async () => {
+
+    // 🔹 If search is empty → show JD list
+    if (!searchQuery.trim()) {
+      setShowCandidates(false);
+      setSearchedCandidates([]);
+      return;
+    }
+
+    try {
+const res = await axios.get(
+  "http://localhost:8080/api/profile/search/candidates",
+  {
+    params: { designation: searchQuery }
+  }
+);
+
+
+      setSearchedCandidates(res.data);
+      setShowCandidates(true);
+
+    } catch (error) {
+      console.error("Candidate search failed", error);
+      toast.error("Failed to fetch candidates");
+    }
+  };
+
+  fetchCandidatesByDesignation();
+}, [searchQuery]);
 
 
 const getBackendApplication = async (jobAppId) => {
@@ -328,76 +379,80 @@ const updateStatus = async (jobAppId, newStatus) => {
   const handleEdit = (requirementId) => {
     navigate(`/add-job-description/${requirementId}`);
   };
-  const handleSentInvites = async (requirementId, designation) => {
-    console.log("RecruiterId:", user?.userId)
-    try {
-      const cleanDesignation = encodeURIComponent(designation.trim());
+const handleSentInvites = async (requirementId, designation) => {
+  try {
+    const res = await axios.get(
+      `http://localhost:8080/api/jobportal/getByRequirement/${requirementId}`
+    );
 
-      const countRes = await axios.get(
-        `${API_BASE_PORTAL}/api/jobportal/getCountByDesignation/${cleanDesignation}`
-      );
-
-      const totalCount = countRes.data;
-
-      const res = await axios.get(
-        `${API_BASE_PORTAL}/getCandidatesByDesignation/${cleanDesignation}`
-      );
-
-      setInviteCandidates(res.data);
-      setCandidateCount(totalCount);
-      setSelectedJobId(requirementId);
-      setSelectedJobTitle(designation);
-      setShowInvitePopup(true);
-
-    } catch (error) {
-      console.error("Error fetching candidates:", error);
-      toast.error("Failed to fetch candidates!");
+    if (!res.data || res.data.length === 0) {
+      toast.warning("No candidates have applied for this job yet");
+      return;
     }
-  };
+
+    setInviteCandidates(res.data);
+    setCandidateCount(res.data.length);
+    setSelectedJobId(requirementId);
+    setSelectedJobTitle(designation);
+    setSelectedCandidateIds([]); // reset selection
+    setSelectAll(false);
+    setShowInvitePopup(true);
+
+  } catch (error) {
+    console.error(error);
+    toast.error("Failed to fetch applied candidates");
+  }
+};
+
+const toggleCandidate = (candidateId) => {
+  setSelectedCandidateIds((prev) =>
+    prev.includes(candidateId)
+      ? prev.filter((id) => id !== candidateId)
+      : [...prev, candidateId]
+  );
+};
+
+const toggleSelectAll = () => {
+  if (selectAll) {
+    setSelectedCandidateIds([]);
+  } else {
+    setSelectedCandidateIds(inviteCandidates.map(c => c.candidateId));
+  }
+  setSelectAll(!selectAll);
+};
 
 
 
-  const handleSendAllInvites = async () => {
-    try {
-      if (!inviteCandidates || inviteCandidates.length === 0) {
-        toast.warning("⚠️ No candidates found for this role!");
-        return;
-      }
-
-      const userId = user?.userId;
-
-      const recruiterId = userId;
-
-
-      if (!recruiterId) {
-        toast.error("Recruiter Id Not Found...!");
-        return;
-      }
-
-      for (const candidate of inviteCandidates) {
-        await axios.post(
-          `${API_BASE_PORTAL}/api/jobportal/sendInvite`,
-          null,
-          {
-            params: {
-              candidateId: candidate.candidateId,
-              recruiterId: recruiterId,
-              requirementId: selectedJobId,
-              designation: selectedJobTitle,
-            },
-          }
-        );
-      }
-
-      toast.success(
-        `✅ Invites sent & stored for ${inviteCandidates.length} ${inviteCandidates.length === 1 ? "candidate" : "candidates"}!`
-      );
-      setShowInvitePopup(false);
-    } catch (error) {
-      console.error("Error sending invites:", error);
-      toast.error("❌ Failed to store invites!");
+const handleSendAllInvites = async () => {
+  try {
+    const recruiterId = user?.userId;
+    if (!recruiterId) {
+      toast.error("Recruiter ID missing");
+      return;
     }
-  };
+
+    for (const candidateId of selectedCandidateIds) {
+      await axios.post(
+        `${API_BASE_PORTAL}/api/jobportal/sendInvite`,
+        null,
+        {
+          params: {
+            candidateId,
+            recruiterId,
+            requirementId: selectedJobId,
+          },
+        }
+      );
+    }
+
+    toast.success(`Invites sent to ${selectedCandidateIds.length} candidates`);
+    setShowInvitePopup(false);
+
+  } catch (error) {
+    console.error(error);
+    toast.error("Failed to send invites");
+  }
+};
 
 useEffect(() => {
   const fetchPortalEmpJobs = async () => {
@@ -582,6 +637,28 @@ const handleViewJD = async (requirementId, applicationId) => {
     }
   };
 
+const [stats, setStats] = useState({
+  totalCandidates: 0,
+  shortlisted: 0,
+  interviewScheduled: 0
+});
+useEffect(() => {
+  const fetchRecruiterStats = async () => {
+    try {
+      if (effectiveRole === "recruiter" && user?.userId) {
+        const res = await axios.get(
+          `${API_BASE_PORTAL}/api/jobportal/recruiter-stats/${user.userId}`
+        );
+
+        setStats(res.data);
+      }
+    } catch (error) {
+      console.error("Error fetching recruiter stats:", error);
+    }
+  };
+
+  fetchRecruiterStats();
+}, [effectiveRole, user]);
 
   return (
     <>
@@ -880,60 +957,87 @@ const handleViewJD = async (requirementId, applicationId) => {
             <div className="stat-card">
               <FaUsers size={28} color="#1976d2" />
               <h3>Total Candidates</h3>
-              <p>148</p>
+<p>{stats.totalCandidates}</p>
             </div>
             <div className="stat-card">
               <FaClipboardList size={28} color="#43a047" />
               <h3>Shortlisted</h3>
-              <p>36</p>
-            </div>
+<p>{stats.shortlisted}</p>            </div>
             <div className="stat-card">
               <FaUserTie size={28} color="#f57c00" />
               <h3>Interviews Scheduled</h3>
-              <p>12</p>
-            </div>
+<p>{stats.interviewScheduled}</p>            </div>
           </div>
 
           {/* === Search Bar === */}
-          <div className="search-bar">
-            <FaSearch className="search-icon" />
-            <input
-              type="text"
-              placeholder="Search candidates by name, skills, or location..."
-            />
-            <button>Search</button>
-          </div>
+      <div className="search-bar">
+  <FaSearch className="search-icon" />
+  <input
+    type="text"
+    placeholder="Search by designation..."
+    value={searchQuery}
+    onChange={(e) => setSearchQuery(e.target.value)}
+  />
+</div>
+
 
           {/* === My Posted Jobs === */}
-          <h2 className="section-title">My Posted Jobs</h2>
-          {loading ? (
-            <p>Loading jobs...</p>
-          ) : jobs.length === 0 ? (
-            <p>No jobs posted yet.</p>
-          ) : (
-            <div className="job-card-container">
-              {jobs.map((job) => (
-                <div key={job.requirementId} className="job-card">
-                  <h3>{job.designation}</h3>
-                  <p><strong>Company:</strong> {job.companyName}</p>
-                  <p><strong>Location:</strong> {job.location}</p>
-                  <p><strong>Experience:</strong> {job.experience}</p>
-                  <p><strong>Salary:</strong> {job.salary}</p>
-                  <div className="job-card-actions">
-                    <button onClick={() => handleViewJD(job.requirementId)}>
-                      View JD
-                    </button>
-                    <button
-                      className="recJobCard-invite-btn"
-                      onClick={() => handleSentInvites(job.requirementId, job.designation)}
-                    >
-                      Sent Invites
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+        {/* === My Posted Jobs / Search Results === */}
+<h2 className="section-title">
+  {showCandidates ? "Candidates" : "My Posted Jobs"}
+</h2>
+
+{loading ? (
+  <p>Loading...</p>
+) : showCandidates ? (
+
+  /* ================== CANDIDATE LIST ================== */
+<div className="candidate-card-container">
+  {searchedCandidates.map((c) => (
+    <CandidateCard
+      key={c.id}
+      c={c}
+      onViewProfile={handleViewResume}
+    />
+  ))}
+</div>
+
+
+) : (
+
+  /* ================== JD LIST ================== */
+  jobs.length === 0 ? (
+    <p>No jobs posted yet.</p>
+  ) : (
+    <div className="job-card-container">
+      {jobs.map((job) => (
+        <div key={job.requirementId} className="job-card">
+          <h3>{job.designation}</h3>
+          <p><strong>Company:</strong> {job.companyName}</p>
+          <p><strong>Location:</strong> {job.location}</p>
+          <p><strong>Experience:</strong> {job.experience}</p>
+          <p><strong>Salary:</strong> {job.salary}</p>
+
+          <div className="job-card-actions">
+            <button onClick={() => handleViewJD(job.requirementId)}>
+              View JD
+            </button>
+            <button
+              className="recJobCard-invite-btn"
+              onClick={() =>
+                handleSentInvites(job.requirementId, job.designation)
+              }
+            >
+              Send Invites
+            </button>
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+
+)}
+
         </div>
       )}
 
@@ -1176,24 +1280,67 @@ const handleViewJD = async (requirementId, applicationId) => {
         </div>
       )}
 
-      {/* ===== SENT INVITES POPUP ===== */}
-      {showInvitePopup && (
-        <div className="invite-popup-overlay">
-          <div className="invite-popup-box">
-            <div className="invite-header">
-              <h3>Candidates for {selectedJobTitle}</h3>
-              <button className="popup-close-btn" onClick={() => setShowInvitePopup(false)}>×</button>
-            </div>
+    {showInvitePopup && (
+  <div className="invite-popup-overlay">
+    <div className="invite-popup-box large">
 
-            <p>Total Matching Candidates: <strong>{candidateCount}</strong></p>
+      <div className="invite-header">
+        <h3>Applicants for {selectedJobTitle}</h3>
+        <button onClick={() => setShowInvitePopup(false)}>×</button>
+      </div>
 
-            <div className="invite-popup-actions">
-              <button className="btn-primary" onClick={handleSendAllInvites}>Send Invites</button>
-              <button className="btn-secondary" onClick={() => setShowInvitePopup(false)}>Cancel</button>
+      <p><strong>Total Applied:</strong> {candidateCount}</p>
+
+      {/* SELECT ALL */}
+      <div className="select-all-row">
+        <input
+          type="checkbox"
+          checked={selectAll}
+          onChange={toggleSelectAll}
+        />
+        <label>Select All</label>
+      </div>
+
+      {/* CANDIDATE LIST */}
+      <div className="invite-list">
+        {inviteCandidates.map((c) => (
+          <div key={c.candidateId} className="invite-candidate-row">
+            <input
+              type="checkbox"
+              checked={selectedCandidateIds.includes(c.candidateId)}
+              onChange={() => toggleCandidate(c.candidateId)}
+            />
+
+            <div>
+              <p><strong>{c.fullName}</strong></p>
+              <p>{c.contactNumber}</p>
+              <p>{c.educationalQualification}</p>
             </div>
           </div>
-        </div>
-      )}
+        ))}
+      </div>
+
+      <div className="invite-popup-actions">
+        <button
+          className="btn-primary"
+          disabled={selectedCandidateIds.length === 0}
+          onClick={handleSendAllInvites}
+        >
+          Send Invites ({selectedCandidateIds.length})
+        </button>
+
+        <button
+          className="btn-secondary"
+          onClick={() => setShowInvitePopup(false)}
+        >
+          Cancel
+        </button>
+      </div>
+
+    </div>
+  </div>
+)}
+
 
       <footer className="recFooter-footer">
         <div className="recFooter-content">
